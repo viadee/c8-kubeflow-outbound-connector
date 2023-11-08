@@ -1,4 +1,4 @@
-package io.camunda.example;
+package de.viadee.bpm.camunda.connectors.kubeflow;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

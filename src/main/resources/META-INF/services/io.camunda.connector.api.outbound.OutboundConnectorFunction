@@ -1,1 +1,1 @@
-io.camunda.example.MyConnectorFunction
+de.viadee.bpm.camunda.connectors.kubeflow.KubeflowConnectorFunction

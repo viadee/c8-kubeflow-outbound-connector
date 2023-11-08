@@ -3,10 +3,10 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <name>connector-template</name>
-  <description>Camunda Connector Template</description>
-  <groupId>io.camunda.connector</groupId>
-  <artifactId>connector-template</artifactId>
+  <name>kubeflow-connector</name>
+  <description>Camunda Kubeflow Connector</description>
+  <groupId>de.viadee.bpm</groupId>
+  <artifactId>camunda-kubeflow-connector</artifactId>
   <packaging>jar</packaging>
   <version>0.1.0-SNAPSHOT</version>
 
@@ -36,6 +36,7 @@
   </properties>
 
   <dependencies>
+
     <dependency>
       <groupId>io.camunda.connector</groupId>
       <artifactId>connector-core</artifactId>
@@ -232,7 +233,7 @@
         <artifactId>element-template-generator-maven-plugin</artifactId>
         <configuration>
           <connectorClasses>
-            <connectorClass>io.camunda.example.MyConnectorFunction</connectorClass>
+            <connectorClass>de.viadee.bpm.camunda.connectors.kubeflow.KubeflowConnectorFunction</connectorClass>
           </connectorClasses>
         </configuration>
       </plugin>

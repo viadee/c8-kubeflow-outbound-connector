@@ -1,28 +1,30 @@
-package io.camunda.example;
+package de.viadee.bpm.camunda.connectors.kubeflow;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.camunda.connector.api.error.ConnectorException;
-import io.camunda.connector.test.outbound.OutboundConnectorContextBuilder;
-import io.camunda.example.dto.Authentication;
-import io.camunda.example.dto.MyConnectorRequest;
-import io.camunda.example.dto.MyConnectorResult;
 import org.junit.jupiter.api.Test;
 
-public class MyFunctionTest {
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import de.viadee.bpm.camunda.connectors.kubeflow.dto.Authentication;
+import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowConnectorRequest;
+import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowConnectorResult;
+import io.camunda.connector.api.error.ConnectorException;
+import io.camunda.connector.test.outbound.OutboundConnectorContextBuilder;
+
+public class KubeflowFunctionTest {
 
   ObjectMapper objectMapper = new ObjectMapper();
 
   @Test
   void shouldReturnReceivedMessageWhenExecute() throws Exception {
     // given
-    var input = new MyConnectorRequest(
+    var input = new KubeflowConnectorRequest(
             "Hello World!",
             new Authentication("testUser", "testToken")
     );
-    var function = new MyConnectorFunction();
+    var function = new KubeflowConnectorFunction();
     var context = OutboundConnectorContextBuilder.create()
       .variables(objectMapper.writeValueAsString(input))
       .build();
@@ -30,7 +32,7 @@ public class MyFunctionTest {
     var result = function.execute(context);
     // then
     assertThat(result)
-      .isInstanceOf(MyConnectorResult.class)
+      .isInstanceOf(KubeflowConnectorResult.class)
       .extracting("myProperty")
       .isEqualTo("Message received: Hello World!");
   }
@@ -38,11 +40,11 @@ public class MyFunctionTest {
   @Test
   void shouldThrowWithErrorCodeWhenMessageStartsWithFail() throws Exception {
     // given
-    var input = new MyConnectorRequest(
+    var input = new KubeflowConnectorRequest(
             "Fail: unauthorized",
             new Authentication("testUser", "testToken")
     );
-    var function = new MyConnectorFunction();
+    var function = new KubeflowConnectorFunction();
     var context = OutboundConnectorContextBuilder.create()
         .variables(objectMapper.writeValueAsString(input))
         .build();
