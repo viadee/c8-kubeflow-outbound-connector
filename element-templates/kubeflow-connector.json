@@ -4,7 +4,7 @@
   "id" : "de.viadee.bpm.camunda.connectors.kubeflow.v1",
   "description" : "Connector for communicating with Kubeflow from Camunda",
   "documentationRef" : "https://docs.camunda.io/docs/components/connectors/out-of-the-box-connectors/available-connectors-overview/",
-  "version": 1,
+  "version": 2,
   "category": {
     "id": "connectors",
     "name": "Connectors"
@@ -15,6 +15,16 @@
   "elementType": {
     "value": "bpmn:ServiceTask"
   },
+  "groups" : [ {
+    "id" : "authentication",
+    "label" : "Authentication"
+  },{
+    "id" : "kubeflowapi",
+    "label" : "Kubeflow API"
+  },{
+    "id" : "output",
+    "label" : "Output"
+  }],
   "properties": [
     {
       "type": "Hidden",
@@ -24,13 +34,14 @@
       }
     },
     {
-      "id": "kubeflowUrl",
+      "id": "authentication.kubeflowUrl",
       "label": "Kubeflow URL",
       "description": "Specify the url of the Kubeflow server to talk to.",
       "type": "String",
+      "group": "authentication",
       "binding": {
-        "type": "zeebe:taskHeader",
-        "key": "url"
+        "type": "zeebe:input",
+        "name": "authentication.kubeflowUrl"
       },
       "constraints": {
         "notEmpty": true,
@@ -45,7 +56,8 @@
       "label": "Kubeflow API",
       "description": "Specify the Kubeflow API to use.",
       "type": "Dropdown",
-      "value": "get",
+      "group": "kubeflowapi",
+      "value": "pipelines",
       "choices": [
         {
           "name": "Pipelines",
@@ -62,6 +74,7 @@
       "label": "Pipelines API operatiom",
       "description": "Specify the pipeline operation to execute.",
       "type": "Dropdown",
+      "group": "kubeflowapi",
       "value": "",
       "optional": false,
       "choices": [
@@ -80,12 +93,14 @@
       }
     },
     {
+      "id": "authentication.cookievalue",
       "label": "Cookie value (for testing)",
       "description": "Specify the cookie value of a valid Kubeflow session.",
       "type": "String",
+      "group": "authentication",
       "binding": {
-        "type": "zeebe:taskHeader",
-        "key": "authCookie"
+        "type": "zeebe:input",
+        "name": "authentication.cookievalue"
       },
       "constraints": {
         "notEmpty": true
@@ -95,6 +110,7 @@
       "label": "Result Variable",
       "description": "Name of variable to store the response in",
       "type": "String",
+      "group": "output",
       "binding": {
         "type": "zeebe:taskHeader",
         "key": "resultVariable"
@@ -104,6 +120,7 @@
       "label": "Result Expression",
       "description": "Expression to map the response into process variables",
       "type": "Text",
+      "group": "output",
       "feel": "required",
       "binding": {
         "type": "zeebe:taskHeader",

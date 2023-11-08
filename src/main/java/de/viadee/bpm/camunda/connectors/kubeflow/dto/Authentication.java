@@ -5,9 +5,8 @@ import jakarta.validation.constraints.NotEmpty;
 
 public record Authentication(
     @NotEmpty
-    @TemplateProperty(group = "authentication", label = "Username", description = "The username for authentication")
-    String user,
-    @NotEmpty @TemplateProperty(group = "authentication", description = "The token for authentication")
-    String token) { 
-    
+    @TemplateProperty(group = "authentication", label = "Cookievalue", description = "Cookievalue for authentication (for testing)")
+    String cookievalue,
+    @TemplateProperty(group = "authentication", label = "Kubeflow URL", description = "URL of Kubeflow")
+    String kubeflowUrl) { 
     }

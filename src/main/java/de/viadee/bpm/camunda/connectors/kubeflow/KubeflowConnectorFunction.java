@@ -13,7 +13,7 @@ import io.camunda.connector.generator.annotation.ElementTemplate;
 
 @OutboundConnector(
     name = "Kubeflow Connector",
-    inputVariables = {"kubeflowUrl", "kubeflowApi", "apiOperation"},
+    inputVariables = {"authentication", "kubeflowUrl", "kubeflowApi", "apiOperation"},
     type = "de.viadee.bpm.camunda:connector-kubeflow:1")
 @ElementTemplate(
     id = "de.viadee.bpm.camunda.connectors.kubeflow.v1",
@@ -23,8 +23,7 @@ import io.camunda.connector.generator.annotation.ElementTemplate;
     icon = "icon.svg",
     documentationRef = "https://docs.camunda.io/docs/components/connectors/out-of-the-box-connectors/available-connectors-overview/",
     propertyGroups = {
-      @ElementTemplate.PropertyGroup(id = "authentication", label = "Authentication"),
-      @ElementTemplate.PropertyGroup(id = "compose", label = "Compose")
+      @ElementTemplate.PropertyGroup(id = "authentication", label = "Authentication")
     },
     inputDataClass = KubeflowConnectorRequest.class)
 public class KubeflowConnectorFunction implements OutboundConnectorFunction {
@@ -40,10 +39,11 @@ public class KubeflowConnectorFunction implements OutboundConnectorFunction {
   private KubeflowConnectorResult executeConnector(final KubeflowConnectorRequest connectorRequest) {
     // TODO: implement connector logic
     LOGGER.info("Executing my connector with request {}", connectorRequest);
-    String message = connectorRequest.message();
-    if (message != null && message.toLowerCase().startsWith("fail")) {
-      throw new ConnectorException("FAIL", "My property started with 'fail', was: " + message);
+    String cookievalue = connectorRequest.authentication().cookievalue();
+    String kubeflowUrl = connectorRequest.authentication().kubeflowUrl();
+    if (cookievalue != null && cookievalue.toLowerCase().startsWith("fail")) {
+      throw new ConnectorException("FAIL", "My property started with 'fail', was: " + cookievalue);
     }
-    return new KubeflowConnectorResult("Message received: " + message);
+    return new KubeflowConnectorResult("Message received: " + cookievalue);
   }
 }
