@@ -13,11 +13,11 @@ import io.camunda.connector.generator.annotation.ElementTemplate;
 
 @OutboundConnector(
     name = "Kubeflow Connector",
-    inputVariables = {"authentication", "message"},
-    type = "io.camunda:template:1")
+    inputVariables = {"kubeflowUrl", "kubeflowApi", "apiOperation"},
+    type = "de.viadee.bpm.camunda:connector-kubeflow:1")
 @ElementTemplate(
-    id = "io.camunda.connector.Template.v1",
-    name = "Template connector",
+    id = "de.viadee.bpm.camunda.connectors.kubeflow.v1",
+    name = "Kubeflow connector",
     version = 1,
     description = "Connector for communicating with Kubeflow from Camunda",
     icon = "icon.svg",

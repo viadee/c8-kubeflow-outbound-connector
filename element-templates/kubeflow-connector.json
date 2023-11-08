@@ -24,6 +24,7 @@
       }
     },
     {
+      "id": "kubeflowUrl",
       "label": "Kubeflow URL",
       "description": "Specify the url of the Kubeflow server to talk to.",
       "type": "String",
@@ -57,7 +58,7 @@
       }
     },
     {
-      "id": "pieplinesOperation",
+      "id": "apiOperation",
       "label": "Pipelines API operatiom",
       "description": "Specify the pipeline operation to execute.",
       "type": "Dropdown",
@@ -71,7 +72,7 @@
       ],
       "binding": {
         "type": "zeebe:input",
-        "name": "authentication.type"
+        "name": "apiOperation"
       },
       "condition": {
         "property": "kubeflowApi",
