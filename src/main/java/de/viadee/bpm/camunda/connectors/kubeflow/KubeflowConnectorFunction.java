@@ -63,7 +63,6 @@ public class KubeflowConnectorFunction implements OutboundConnectorFunction {
   public Object execute(final OutboundConnectorContext context)
       throws IOException, InstantiationException, IllegalAccessException {
         final var connectorRequest = context.bindVariables(KubeflowConnectorRequest.class);
-        
         return httpService.executeConnectorRequest(connectorRequest.getHttpRequest());
   }
 }

@@ -10,7 +10,6 @@ import org.apache.http.client.utils.URIBuilder;
 import de.viadee.bpm.camunda.connectors.kubeflow.dto.input.Authentication;
 import de.viadee.bpm.camunda.connectors.kubeflow.dto.input.KubeflowApi;
 import io.camunda.connector.http.base.model.HttpCommonRequest;
-import io.camunda.connector.http.base.model.HttpMethod;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
@@ -20,22 +19,23 @@ public record KubeflowConnectorRequest(
 
     public HttpCommonRequest getHttpRequest() {
 
-        String url = buildKubeflowUrl();
-
-        HttpCommonRequest httpRequest = new HttpCommonRequest();
+        HttpCommonRequest httpRequest = buildHttpRequest();
 
         // TODO replace with actual authentication when implemented
         httpRequest.setHeaders(Map.of("Cookie", "authservice_session=" + authentication().cookievalue()));
-        httpRequest.setMethod(HttpMethod.GET);
-        httpRequest.setUrl(url);
 
         return httpRequest;
     }
 
-    private String buildKubeflowUrl() {
-        
-        String url = "";
+    private HttpCommonRequest buildHttpRequest() {
+        HttpCommonRequest httpRequest = new HttpCommonRequest();
+        httpRequest.setUrl(buildKubeflowUrl());
+        httpRequest.setMethod(KubeflowApiOperationsEnum.fromValue(kubeflowapi().operation()).getHttpMethod());
+        return httpRequest;
+    }
 
+    private String buildKubeflowUrl() {
+        String url = "";
         try {
             URIBuilder uriBuilder = new URIBuilder(authentication().kubeflowUrl());
             uriBuilder.setPath(KubeflowApiOperationsEnum.fromValue(kubeflowapi().operation()).getApiUrl());
@@ -43,8 +43,7 @@ public record KubeflowConnectorRequest(
             url = uriBuilder.build().toString();
             url += buildFilter();
         } catch (URISyntaxException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         
         return url;
@@ -57,8 +56,7 @@ public record KubeflowConnectorRequest(
         try {
             encodedFilter = "&filter=" + URLEncoder.encode(filter, "UTF-8").replace("+", "%20");
         } catch (UnsupportedEncodingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return encodedFilter;
     }
