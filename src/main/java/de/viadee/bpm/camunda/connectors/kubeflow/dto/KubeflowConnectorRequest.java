@@ -53,7 +53,7 @@ public record KubeflowConnectorRequest(
             // remove new lines and escaping of " before url encoding
             String filter = kubeflowapi().filter().replaceAll("[\\\\r]?\\\\n", "").replace("\\\"", "\"");
             try {
-                uriBuilder.addParameter("filter", URLEncoder.encode(filter, "UTF-8").replace("+", "%20"));
+                uriBuilder.addParameter("filter", URLEncoder.encode(filter, "UTF-8"));
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException(e);
             }

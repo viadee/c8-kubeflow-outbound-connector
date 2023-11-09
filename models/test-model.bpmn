@@ -22,6 +22,7 @@
           <zeebe:input source="kubeflow-user-example-com" target="authentication.multiusernamespace" />
           <zeebe:input source="pipelines" target="kubeflowapi.api" />
           <zeebe:input source="get_runs" target="kubeflowapi.operation" />
+          <zeebe:input source="{&#10;  &#34;predicates&#34;: [&#10;    {&#10;      &#34;op&#34;: &#34;EQUALS&#34;,&#10;      &#34;key&#34;: &#34;status&#34;,&#10;      &#34;string_value&#34;: &#34;Error&#34;&#10;    }&#10;  ]&#10;}" target="kubeflowapi.filter" />
           <zeebe:input source="MTY5OTQ0Mzc0OHxOd3dBTkVGWVdGWllXRUpXVGs5Q1NsZzBWamMyUVZsUVdVOVRUa2xQVFZvMFUxRXpTMXBJV1U5WVJFSkVVazQyUjBoQ05FZEZURUU9fFXqHXR0Sd8I2flOdE7F4XwBYE58lUF46U8_l-cRGMw1" target="authentication.cookievalue" />
         </zeebe:ioMapping>
         <zeebe:taskHeaders>
