@@ -5,6 +5,8 @@ import io.camunda.connector.http.base.model.HttpMethod;
 public enum KubeflowApiOperationsEnum {
         GET_PIPELINES("get_pipelines", HttpMethod.GET, false,
                 "/pipeline/apis/v1beta1/pipelines"),
+        GET_EXPERIMENTS("get_experiments", HttpMethod.GET, true,
+                "/pipeline/apis/v1beta1/experiments"),
         GET_RUNS("get_runs", HttpMethod.GET, true,
                 "/pipeline/apis/v1beta1/runs");
 

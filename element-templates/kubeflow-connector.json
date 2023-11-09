@@ -94,6 +94,10 @@
           "value": "get_pipelines"
         },
         {
+          "name": "Get Experiments",
+          "value": "get_experiments"
+        },
+        {
           "name": "Get Runs",
           "value": "get_runs"
         }
@@ -120,7 +124,7 @@
       },
       "condition": {
         "property": "kubeflowapi.operation",
-        "oneOf": ["get_pipelines", "get_runs"]
+        "oneOf": ["get_pipelines", "get_experiments", "get_runs"]
       }
     },
     {
