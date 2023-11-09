@@ -39,6 +39,7 @@
       "description": "Specify the url of the Kubeflow server to talk to.",
       "type": "String",
       "group": "authentication",
+      "feel": "optional",
       "binding": {
         "type": "zeebe:input",
         "name": "authentication.kubeflowUrl"
@@ -57,6 +58,7 @@
       "description": "If Kubeflow is running in a multiuser mode, define namespace to use.",
       "type": "String",
       "group": "authentication",
+      "feel": "optional",
       "binding": {
         "type": "zeebe:input",
         "name": "authentication.multiusernamespace"
@@ -117,7 +119,7 @@
       "description": "Specify the filter to apply, if any.",
       "type": "Text",
       "group": "kubeflowapi",
-      "optional": true,
+      "feel": "optional",
       "binding": {
         "type": "zeebe:input",
         "name": "kubeflowapi.filter"
