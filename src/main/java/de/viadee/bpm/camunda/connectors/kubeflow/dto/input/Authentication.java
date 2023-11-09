@@ -1,4 +1,4 @@
-package de.viadee.bpm.camunda.connectors.kubeflow.dto;
+package de.viadee.bpm.camunda.connectors.kubeflow.dto.input;
 
 import io.camunda.connector.generator.annotation.TemplateProperty;
 import jakarta.validation.constraints.NotEmpty;

@@ -52,7 +52,7 @@
       }
     },
     {
-      "id": "kubeflowApi",
+      "id": "kubeflowapi.api",
       "label": "Kubeflow API",
       "description": "Specify the Kubeflow API to use.",
       "type": "Dropdown",
@@ -65,12 +65,12 @@
         }
       ],
       "binding": {
-        "type": "zeebe:taskHeader",
-        "key": "kubeflow_api"
+        "type": "zeebe:input",
+        "name": "kubeflowapi.api"
       }
     },
     {
-      "id": "apiOperation",
+      "id": "kubeflowapi.operation",
       "label": "Pipelines API operatiom",
       "description": "Specify the pipeline operation to execute.",
       "type": "Dropdown",
@@ -85,11 +85,27 @@
       ],
       "binding": {
         "type": "zeebe:input",
-        "name": "apiOperation"
+        "name": "kubeflowapi.operation"
       },
       "condition": {
-        "property": "kubeflowApi",
+        "property": "kubeflowapi.api",
         "equals": "pipelines"
+      }
+    },
+    {
+      "id": "kubeflowapi.filter",
+      "label": "Filter",
+      "description": "Specify the cookie value of a valid Kubeflow session.",
+      "type": "Text",
+      "group": "kubeflowapi",
+      "optional": true,
+      "binding": {
+        "type": "zeebe:input",
+        "name": "kubeflowapi.filter"
+      },
+      "condition": {
+        "property": "kubeflowapi.operation",
+        "equals": "get_pipelines"
       }
     },
     {

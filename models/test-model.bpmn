@@ -16,14 +16,20 @@
           <zeebe:input source="23" target="authentication.token" />
           <zeebe:input source="&#34;dsd&#34;" target="message" />
           <zeebe:input source="cooooookieeee" target="cookievalue" />
-          <zeebe:input source="http://192.168.1.143:31527" target="authentication.kubeflowUrl" />
           <zeebe:input source="get_pipelines" target="apiOperation" />
-          <zeebe:input source="Coookiiiiee" target="authentication.cookievalue" />
+          <zeebe:input source="{&#10;  &#34;predicates&#34;: [&#10;    {&#10;      &#34;op&#34;: &#34;EQUALS&#34;,&#10;      &#34;key&#34;: &#34;status&#34;,&#10;      &#34;string_value&#34;: &#34;Error&#34;&#10;    }&#10;  ]&#10;}" target="filter" />
+          <zeebe:input source="http://192.168.1.143:31527" target="authentication.kubeflowUrl" />
+          <zeebe:input source="pipelines" target="kubeflowapi.api" />
+          <zeebe:input source="get_pipelines" target="kubeflowapi.operation" />
+          <zeebe:input source="{&#10;  &#34;predicates&#34;: [&#10;    {&#10;      &#34;op&#34;: &#34;EQUALS&#34;,&#10;      &#34;key&#34;: &#34;status&#34;,&#10;      &#34;string_value&#34;: &#34;Error&#34;&#10;    }&#10;  ]&#10;}" target="kubeflowapi.filter" />
+          <zeebe:input source="MTY5OTQ0Mzc0OHxOd3dBTkVGWVdGWllXRUpXVGs5Q1NsZzBWamMyUVZsUVdVOVRUa2xQVFZvMFUxRXpTMXBJV1U5WVJFSkVVazQyUjBoQ05FZEZURUU9fFXqHXR0Sd8I2flOdE7F4XwBYE58lUF46U8_l-cRGMw1" target="authentication.cookievalue" />
         </zeebe:ioMapping>
         <zeebe:taskHeaders>
           <zeebe:header key="authCookie" value="MTY5OTQ0Mzc0OHxOd3dBTkVGWVdGWllXRUpXVGs5Q1NsZzBWamMyUVZsUVdVOVRUa2xQVFZvMFUxRXpTMXBJV1U5WVJFSkVVazQyUjBoQ05FZEZURUU9fFXqHXR0Sd8I2flOdE7F4XwBYE58lUF46U8_l-cRGMw1" />
           <zeebe:header key="url" value="http://192.168.1.143:31527" />
           <zeebe:header key="kubeflow_api" value="pipelines" />
+          <zeebe:header key="resultVariable" value="completeResult" />
+          <zeebe:header key="resultExpression" value="={result:body}" />
         </zeebe:taskHeaders>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_18a4hsh</bpmn:incoming>
