@@ -3,16 +3,20 @@ package de.viadee.bpm.camunda.connectors.kubeflow.dto;
 import io.camunda.connector.http.base.model.HttpMethod;
 
 public enum KubeflowApiOperationsEnum {
-        KubeflowApiOperationsEnum("get_pipelines", HttpMethod.GET,
+        GET_PIPELINES("get_pipelines", HttpMethod.GET, false,
+                "/pipeline/apis/v1beta1/pipelines"),
+        GET_RUNS("get_runs", HttpMethod.GET, true,
                 "/pipeline/apis/v1beta1/runs");
 
         private final String value;
         private final HttpMethod httpMethod;
+        private final boolean requiresMultiuserFilter;
         private final String apiUrl;
 
-        KubeflowApiOperationsEnum(String value, HttpMethod httpMethod, String apiUrl) {
+        KubeflowApiOperationsEnum(String value, HttpMethod httpMethod, boolean requiresMultiuserFilter, String apiUrl) {
             this.value = value;
             this.httpMethod = httpMethod;
+            this.requiresMultiuserFilter = requiresMultiuserFilter;
             this.apiUrl = apiUrl;
         }
 
@@ -22,6 +26,10 @@ public enum KubeflowApiOperationsEnum {
 
         public HttpMethod getHttpMethod() {
             return httpMethod;
+        }
+
+        public boolean requiresMultiuserFilter() {
+            return requiresMultiuserFilter;
         }
 
         public String getApiUrl() {

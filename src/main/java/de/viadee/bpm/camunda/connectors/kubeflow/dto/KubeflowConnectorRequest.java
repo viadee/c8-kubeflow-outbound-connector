@@ -40,29 +40,28 @@ public record KubeflowConnectorRequest(
             URIBuilder uriBuilder = new URIBuilder(authentication().kubeflowUrl());
             uriBuilder.setPath(KubeflowApiOperationsEnum.fromValue(kubeflowapi().operation()).getApiUrl());
             addMultisiteFilter(uriBuilder);
+            addFilter(uriBuilder);
             url = uriBuilder.build().toString();
-            url += buildFilter();
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
-        
         return url;
     }
 
-    private String buildFilter() {
-        // remove new lines and escaping of " before url encoding
-        String filter = kubeflowapi().filter().replaceAll("[\\\\r]?\\\\n", "").replace("\\\"", "\"");
-        String encodedFilter = "";
-        try {
-            encodedFilter = "&filter=" + URLEncoder.encode(filter, "UTF-8").replace("+", "%20");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
+    private void addFilter(URIBuilder uriBuilder) {
+        if(kubeflowapi().filter() != null) {
+            // remove new lines and escaping of " before url encoding
+            String filter = kubeflowapi().filter().replaceAll("[\\\\r]?\\\\n", "").replace("\\\"", "\"");
+            try {
+                uriBuilder.addParameter("filter", URLEncoder.encode(filter, "UTF-8").replace("+", "%20"));
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
         }
-        return encodedFilter;
     }
 
     private void addMultisiteFilter(URIBuilder uriBuilder) {
-        if(!authentication().multiusernamespace().equals("")) {
+        if(KubeflowApiOperationsEnum.fromValue(kubeflowapi().operation()).requiresMultiuserFilter() && !authentication().multiusernamespace().equals("")) {
             uriBuilder.addParameter("resource_reference_key.type", "NAMESPACE");
             uriBuilder.addParameter("resource_reference_key.id", authentication().multiusernamespace());
         }

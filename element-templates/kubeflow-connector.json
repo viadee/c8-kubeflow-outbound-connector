@@ -92,6 +92,10 @@
         {
           "name": "Get Pipelines",
           "value": "get_pipelines"
+        },
+        {
+          "name": "Get Runs",
+          "value": "get_runs"
         }
       ],
       "binding": {
@@ -106,7 +110,7 @@
     {
       "id": "kubeflowapi.filter",
       "label": "Filter",
-      "description": "Specify the cookie value of a valid Kubeflow session.",
+      "description": "Specify the filter to apply, if any.",
       "type": "Text",
       "group": "kubeflowapi",
       "optional": true,
@@ -116,7 +120,7 @@
       },
       "condition": {
         "property": "kubeflowapi.operation",
-        "equals": "get_pipelines"
+        "oneOf": ["get_pipelines", "get_runs"]
       }
     },
     {
