@@ -1,8 +1,11 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.dto;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.Map;
+
+import org.apache.http.client.utils.URIBuilder;
 
 import de.viadee.bpm.camunda.connectors.kubeflow.dto.input.Authentication;
 import de.viadee.bpm.camunda.connectors.kubeflow.dto.input.KubeflowApi;
@@ -30,9 +33,20 @@ public record KubeflowConnectorRequest(
     }
 
     private String buildKubeflowUrl() {
-        String url = authentication().kubeflowUrl()
-                + KubeflowApiOperationsEnum.fromValue(kubeflowapi().operation()).getApiUrl()
-                + buildFilter();
+        
+        String url = "";
+
+        try {
+            URIBuilder uriBuilder = new URIBuilder(authentication().kubeflowUrl());
+            uriBuilder.setPath(KubeflowApiOperationsEnum.fromValue(kubeflowapi().operation()).getApiUrl());
+            addMultisiteFilter(uriBuilder);
+            url = uriBuilder.build().toString();
+            url += buildFilter();
+        } catch (URISyntaxException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
         return url;
     }
 
@@ -47,5 +61,12 @@ public record KubeflowConnectorRequest(
             e.printStackTrace();
         }
         return encodedFilter;
+    }
+
+    private void addMultisiteFilter(URIBuilder uriBuilder) {
+        if(!authentication().multiusernamespace().equals("")) {
+            uriBuilder.addParameter("resource_reference_key.type", "NAMESPACE");
+            uriBuilder.addParameter("resource_reference_key.id", authentication().multiusernamespace());
+        }
     }
 }

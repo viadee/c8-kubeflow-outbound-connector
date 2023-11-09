@@ -2,7 +2,7 @@ package de.viadee.bpm.camunda.connectors.kubeflow.dto;
 
 public enum KubeflowApiOperationsEnum {
         KubeflowApiOperationsEnum("get_pipelines",
-                "/pipeline/apis/v1beta1/runs?resource_reference_key.type=NAMESPACE&resource_reference_key.id=kubeflow-user-example-com");
+                "/pipeline/apis/v1beta1/runs");
 
         private final String value;
         private final String apiUrl;

@@ -8,5 +8,7 @@ public record Authentication(
     @TemplateProperty(group = "authentication", label = "Cookievalue", description = "Cookievalue for authentication (for testing)")
     String cookievalue,
     @TemplateProperty(group = "authentication", label = "Kubeflow URL", description = "URL of Kubeflow")
-    String kubeflowUrl) { 
+    String kubeflowUrl,
+    @TemplateProperty(group = "authentication", label = "Kubeflow Namespace", description = "Kubeflow namespace in multiuser mode")
+    String multiusernamespace) { 
     }

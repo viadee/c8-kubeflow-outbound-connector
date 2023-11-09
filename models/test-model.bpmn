@@ -19,6 +19,7 @@
           <zeebe:input source="get_pipelines" target="apiOperation" />
           <zeebe:input source="{&#10;  &#34;predicates&#34;: [&#10;    {&#10;      &#34;op&#34;: &#34;EQUALS&#34;,&#10;      &#34;key&#34;: &#34;status&#34;,&#10;      &#34;string_value&#34;: &#34;Error&#34;&#10;    }&#10;  ]&#10;}" target="filter" />
           <zeebe:input source="http://192.168.1.143:31527" target="authentication.kubeflowUrl" />
+          <zeebe:input source="kubeflow-user-example-com" target="authentication.multiusernamespace" />
           <zeebe:input source="pipelines" target="kubeflowapi.api" />
           <zeebe:input source="get_pipelines" target="kubeflowapi.operation" />
           <zeebe:input source="{&#10;  &#34;predicates&#34;: [&#10;    {&#10;      &#34;op&#34;: &#34;EQUALS&#34;,&#10;      &#34;key&#34;: &#34;status&#34;,&#10;      &#34;string_value&#34;: &#34;Error&#34;&#10;    }&#10;  ]&#10;}" target="kubeflowapi.filter" />

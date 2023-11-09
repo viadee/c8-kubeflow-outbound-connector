@@ -52,6 +52,17 @@
       }
     },
     {
+      "id": "authentication.multiusernamespace",
+      "label": "Kubeflow Namespace",
+      "description": "If Kubeflow is running in a multiuser mode, define namespace to use.",
+      "type": "String",
+      "group": "authentication",
+      "binding": {
+        "type": "zeebe:input",
+        "name": "authentication.multiusernamespace"
+      }
+    },
+    {
       "id": "kubeflowapi.api",
       "label": "Kubeflow API",
       "description": "Specify the Kubeflow API to use.",
