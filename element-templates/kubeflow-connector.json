@@ -102,6 +102,18 @@
         {
           "name": "Get Runs",
           "value": "get_runs"
+        },
+        {
+          "name": "Get Run by ID",
+          "value": "get_run_by_id"
+        },
+        {
+          "name": "Get Run by name",
+          "value": "get_run_by_name"
+        },
+        {
+          "name": "Start Run",
+          "value": "start_run"
         }
       ],
       "binding": {
@@ -114,12 +126,47 @@
       }
     },
     {
+      "id": "kubeflowapi.runid",
+      "label": "Run ID",
+      "description": "Specify the id of the run.",
+      "type": "String",
+      "group": "kubeflowapi",
+      "feel": "optional",
+      "optional": true,
+      "binding": {
+        "type": "zeebe:input",
+        "name": "kubeflowapi.runid"
+      },
+      "condition": {
+        "property": "kubeflowapi.operation",
+        "oneOf": ["get_run_by_id"]
+      }
+    },
+    {
+      "id": "kubeflowapi.runname",
+      "label": "Run Name",
+      "description": "Specify the name of the run.",
+      "type": "String",
+      "group": "kubeflowapi",
+      "feel": "optional",
+      "optional": true,
+      "binding": {
+        "type": "zeebe:input",
+        "name": "kubeflowapi.runname"
+      },
+      "condition": {
+        "property": "kubeflowapi.operation",
+        "oneOf": ["get_run_by_name"]
+      }
+    },
+    {
       "id": "kubeflowapi.filter",
       "label": "Filter",
       "description": "Specify the filter to apply, if any.",
       "type": "Text",
       "group": "kubeflowapi",
       "feel": "optional",
+      "optional": true,
       "binding": {
         "type": "zeebe:input",
         "name": "kubeflowapi.filter"

@@ -8,6 +8,12 @@ public enum KubeflowApiOperationsEnum {
         GET_EXPERIMENTS("get_experiments", HttpMethod.GET, true,
                 "/pipeline/apis/v1beta1/experiments"),
         GET_RUNS("get_runs", HttpMethod.GET, true,
+                "/pipeline/apis/v1beta1/runs"),
+        GET_RUN_BY_ID("get_run_by_id", HttpMethod.GET, false,
+                "/pipeline/apis/v1beta1/runs"),
+        GET_RUN_BY_NAME("get_run_by_name", HttpMethod.GET, true,
+                "/pipeline/apis/v1beta1/runs"),
+        START_RUN("start_run", HttpMethod.POST, false,
                 "/pipeline/apis/v1beta1/runs");
 
         private final String value;
