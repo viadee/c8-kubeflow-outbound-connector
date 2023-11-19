@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -46,7 +45,8 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 
         // is run already started?
         final String alreadyRunningId = getIdOfAlreadyStartedRun(httpService, Long.toString(processInstanceKey));
-        KubeflowCallable kubeflowCallable = new KubeflowCallable(connectorRequest, processInstanceKey, httpService, alreadyRunningId);
+        KubeflowCallable kubeflowCallable = new KubeflowCallable(connectorRequest, processInstanceKey, httpService,
+                alreadyRunningId);
 
         if (alreadyRunningId != null) {
             try {
@@ -70,13 +70,16 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
         } else {
             // start run
             result = httpService
-                    .executeConnectorRequest(ExecutionHandler.getExecutor(connectorRequest, processInstanceKey).getHttpRequest());
+                    .executeConnectorRequest(
+                            ExecutionHandler.getExecutor(connectorRequest, processInstanceKey).getHttpRequest());
             LinkedHashMap<String, Object> body = (LinkedHashMap<String, Object>) result.getBody();
             LinkedHashMap<String, Object> map = (LinkedHashMap<String, Object>) body.get("run");
             String newRunId = (String) map.get("id");
             while (!status.equals("Succeeded") && !status.equals("Failed")) {
                 try {
-                    status = CallableRunner.runCallableAfterDelay(new KubeflowCallable(connectorRequest, processInstanceKey, httpService, newRunId), 5, TimeUnit.SECONDS);
+                    status = CallableRunner.runCallableAfterDelay(
+                            new KubeflowCallable(connectorRequest, processInstanceKey, httpService, newRunId), 5,
+                            TimeUnit.SECONDS);
                 } catch (InterruptedException | ExecutionException e) {
                     throw new RuntimeException(e);
                 }
@@ -89,23 +92,34 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 
     private String getIdOfAlreadyStartedRun(HttpService httpService, String runName)
             throws InstantiationException, IllegalAccessException, IOException {
-        KubeflowApi kubeflowApi = new KubeflowApi(KubeflowApiOperationsEnum.GET_RUN_BY_NAME.getValue(), null, runName, null);
+        KubeflowApi kubeflowApi = new KubeflowApi(KubeflowApiOperationsEnum.GET_RUN_BY_NAME.getValue(), null, runName,
+                null);
         KubeflowConnectorRequest getRunByNameConnectorRequest = new KubeflowConnectorRequest(
                 connectorRequest.authentication(), kubeflowApi);
         KubeflowConnectorExecutor getRunByNameExecutor = ExecutionHandler.getExecutor(
                 getRunByNameConnectorRequest,
                 processInstanceKey);
         HttpCommonResult result = getRunByNameExecutor.execute(httpService);
-        LinkedHashMap<String, Object> body = (LinkedHashMap<String, Object>) result.getBody();
-        if (body.size() > 0) {
-            LinkedHashMap<String, Object> map = (LinkedHashMap<String, Object>) ((ArrayList<LinkedHashMap<String, Object>>) body
-                    .get("runs")).get(0);
-            String id = (String) map.get("id");
-            return id;
+        if (result.getBody() instanceof LinkedHashMap) {
+            LinkedHashMap<String, Object> body = (LinkedHashMap<String, Object>) result.getBody();
+            if (body.size() > 0) {
+                if (body.get("runs") instanceof ArrayList) {
+                    ArrayList<?> runs = (ArrayList<?>) body.get("runs");
+                    if (!runs.isEmpty() && runs.get(0) instanceof LinkedHashMap) {
+                        LinkedHashMap<String, Object> map = (LinkedHashMap<String, Object>) runs.get(0);
+                        String id = (String) map.get("id");
+                        return id;
+                    }
+                }
+                // error: throw RuntimeException
+                throw new RuntimeException("result auf kubeflow api contained unexpected data");
+            } else {
+                return null;
+            }
         } else {
-            return null;
+            // error: throw RuntimeException
+            throw new RuntimeException("result auf kubeflow api contained unexpected data");
         }
     }
 
-    
 }

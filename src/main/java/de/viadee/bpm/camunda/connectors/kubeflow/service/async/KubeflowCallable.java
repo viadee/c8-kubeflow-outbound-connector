@@ -17,7 +17,8 @@ public class KubeflowCallable implements Callable<String> {
     private final KubeflowConnectorRequest connectorRequest;
     private final long processInstanceKey;
 
-    public KubeflowCallable(KubeflowConnectorRequest connectorRequest, long processInstanceKey, HttpService httpService, String runId) {
+    public KubeflowCallable(KubeflowConnectorRequest connectorRequest, long processInstanceKey, HttpService httpService,
+            String runId) {
         this.connectorRequest = connectorRequest;
         this.processInstanceKey = processInstanceKey;
         this.httpService = httpService;
@@ -34,21 +35,31 @@ public class KubeflowCallable implements Callable<String> {
 
     private String getStatusOfRunById(HttpService httpService, String runId)
             throws InstantiationException, IllegalAccessException, IOException {
-        KubeflowApi kubeflowApi = new KubeflowApi(KubeflowApiOperationsEnum.GET_RUN_BY_ID.getValue(), runId, null, null);
+        KubeflowApi kubeflowApi = new KubeflowApi(KubeflowApiOperationsEnum.GET_RUN_BY_ID.getValue(), runId, null,
+                null);
         KubeflowConnectorRequest getRunByIdConnectorRequest = new KubeflowConnectorRequest(
                 connectorRequest.authentication(), kubeflowApi);
         KubeflowConnectorExecutor getRunByIdExecutor = ExecutionHandler.getExecutor(
                 getRunByIdConnectorRequest,
                 processInstanceKey);
         HttpCommonResult result = getRunByIdExecutor.execute(httpService);
-        LinkedHashMap<String, Object> body = (LinkedHashMap<String, Object>) result.getBody();
-        if (body.size() > 0) {
-            LinkedHashMap<String, Object> map = (LinkedHashMap<String, Object>) body
-                    .get("run");
-            String status = (String) map.get("status");
-            return status;
+
+        if (result.getBody() instanceof LinkedHashMap) {
+            LinkedHashMap<String, Object> body = (LinkedHashMap<String, Object>) result.getBody();
+            if (body.size() > 0) {
+                if (body.get("run") instanceof LinkedHashMap) {
+                    LinkedHashMap<String, Object> run = (LinkedHashMap<String, Object>) body.get("run");
+                    String status = (String) run.get("status");
+                    return status;
+                }
+                // error: throw RuntimeException
+                throw new RuntimeException("result auf kubeflow api contained unexpected data");
+            } else {
+                return null;
+            }
         } else {
-            throw new RuntimeException("Run with id '" + runId + "' could not ne found");
+            // error: throw RuntimeException
+            throw new RuntimeException("result auf kubeflow api contained unexpected data");
         }
     }
 }
