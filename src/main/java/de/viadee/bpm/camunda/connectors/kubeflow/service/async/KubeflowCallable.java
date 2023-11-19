@@ -1,7 +1,6 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.service.async;
 
 import java.io.IOException;
-import java.util.LinkedHashMap;
 import java.util.concurrent.Callable;
 
 import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApiOperationsEnum;
@@ -44,22 +43,7 @@ public class KubeflowCallable implements Callable<String> {
                 processInstanceKey);
         HttpCommonResult result = getRunByIdExecutor.execute(httpService);
 
-        if (result.getBody() instanceof LinkedHashMap) {
-            LinkedHashMap<String, Object> body = (LinkedHashMap<String, Object>) result.getBody();
-            if (body.size() > 0) {
-                if (body.get("run") instanceof LinkedHashMap) {
-                    LinkedHashMap<String, Object> run = (LinkedHashMap<String, Object>) body.get("run");
-                    String status = (String) run.get("status");
-                    return status;
-                }
-                // error: throw RuntimeException
-                throw new RuntimeException("result auf kubeflow api contained unexpected data");
-            } else {
-                return null;
-            }
-        } else {
-            // error: throw RuntimeException
-            throw new RuntimeException("result auf kubeflow api contained unexpected data");
-        }
+        String status = ExecutionHandler.getFieldFromGetRunResponse(result, "status");
+        return status;
     }
 }

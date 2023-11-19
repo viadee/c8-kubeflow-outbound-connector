@@ -8,10 +8,11 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowConnectorResponse;
+
 import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApiOperationsEnum;
 import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowConnectorRequest;
 import de.viadee.bpm.camunda.connectors.kubeflow.dto.input.KubeflowApi;
-import de.viadee.bpm.camunda.connectors.kubeflow.service.async.CallableRunner;
 import de.viadee.bpm.camunda.connectors.kubeflow.service.async.ExecutionHandler;
 import de.viadee.bpm.camunda.connectors.kubeflow.service.async.KubeflowCallable;
 import io.camunda.connector.http.base.model.HttpCommonResult;
@@ -50,7 +51,7 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 
         if (alreadyRunningId != null) {
             try {
-                status = CallableRunner.runCallableAfterDelay(kubeflowCallable, 0, TimeUnit.SECONDS);
+                status = ExecutionHandler.runCallableImmediately(kubeflowCallable);
             } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
             }
@@ -59,9 +60,13 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
                 result.setStatus(200);
             } else {
                 // keep checking
-                while (!status.equals("Succeeded") && !status.equals("Failed")) {
+                while (!Arrays.asList(
+                        KubeflowConnectorResponse.RUN_STATUS_SUCCEEDED,
+                        KubeflowConnectorResponse.RUN_STATUS_ERROR,
+                        KubeflowConnectorResponse.RUN_STATUS_FAILED,
+                        KubeflowConnectorResponse.RUN_STATUS_SKIPPED).contains(status)) {
                     try {
-                        status = CallableRunner.runCallableAfterDelay(kubeflowCallable, 5, TimeUnit.SECONDS);
+                        status = ExecutionHandler.runCallableAfterDelay(kubeflowCallable, 5, TimeUnit.SECONDS);
                     } catch (InterruptedException | ExecutionException e) {
                         throw new RuntimeException(e);
                     }
@@ -72,12 +77,15 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
             result = httpService
                     .executeConnectorRequest(
                             ExecutionHandler.getExecutor(connectorRequest, processInstanceKey).getHttpRequest());
-            LinkedHashMap<String, Object> body = (LinkedHashMap<String, Object>) result.getBody();
-            LinkedHashMap<String, Object> map = (LinkedHashMap<String, Object>) body.get("run");
-            String newRunId = (String) map.get("id");
-            while (!status.equals("Succeeded") && !status.equals("Failed")) {
+
+            String newRunId = ExecutionHandler.getFieldFromGetRunResponse(result, "id");
+            while (!Arrays.asList(
+                    KubeflowConnectorResponse.RUN_STATUS_SUCCEEDED,
+                    KubeflowConnectorResponse.RUN_STATUS_ERROR,
+                    KubeflowConnectorResponse.RUN_STATUS_FAILED,
+                    KubeflowConnectorResponse.RUN_STATUS_SKIPPED).contains(status)) {
                 try {
-                    status = CallableRunner.runCallableAfterDelay(
+                    status = ExecutionHandler.runCallableAfterDelay(
                             new KubeflowCallable(connectorRequest, processInstanceKey, httpService, newRunId), 5,
                             TimeUnit.SECONDS);
                 } catch (InterruptedException | ExecutionException e) {
@@ -100,26 +108,9 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
                 getRunByNameConnectorRequest,
                 processInstanceKey);
         HttpCommonResult result = getRunByNameExecutor.execute(httpService);
-        if (result.getBody() instanceof LinkedHashMap) {
-            LinkedHashMap<String, Object> body = (LinkedHashMap<String, Object>) result.getBody();
-            if (body.size() > 0) {
-                if (body.get("runs") instanceof ArrayList) {
-                    ArrayList<?> runs = (ArrayList<?>) body.get("runs");
-                    if (!runs.isEmpty() && runs.get(0) instanceof LinkedHashMap) {
-                        LinkedHashMap<String, Object> map = (LinkedHashMap<String, Object>) runs.get(0);
-                        String id = (String) map.get("id");
-                        return id;
-                    }
-                }
-                // error: throw RuntimeException
-                throw new RuntimeException("result auf kubeflow api contained unexpected data");
-            } else {
-                return null;
-            }
-        } else {
-            // error: throw RuntimeException
-            throw new RuntimeException("result auf kubeflow api contained unexpected data");
-        }
+
+        String id = (String) ExecutionHandler.getFieldFromGetRunsResponse(result, "id");
+        return id;
     }
 
 }
