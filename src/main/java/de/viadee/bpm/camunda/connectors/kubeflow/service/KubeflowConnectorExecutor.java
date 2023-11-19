@@ -5,33 +5,49 @@ import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.http.client.utils.URIBuilder;
 
 import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApiOperationsEnum;
 import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowConnectorRequest;
+import de.viadee.bpm.camunda.connectors.kubeflow.service.async.ExecutionHandler;
 import io.camunda.connector.http.base.model.HttpCommonRequest;
 import io.camunda.connector.http.base.model.HttpCommonResult;
 import io.camunda.connector.http.base.services.HttpService;
 
 public class KubeflowConnectorExecutor {
-    
     protected long processInstanceKey;
     protected KubeflowConnectorRequest connectorRequest;
 
     protected HttpCommonRequest httpRequest;
+    private String kubeflowUrl;
+    private String kubeflowCookie;
+    private String kubeflowMultiNs;
 
     public KubeflowConnectorExecutor(KubeflowConnectorRequest connectorRequest, long processInstanceKey) {
         this.connectorRequest = connectorRequest;
         this.processInstanceKey = processInstanceKey;
 
+        setAuthenticationParameters();
+
         buildHttpRequest();
+    }
+
+    private void setAuthenticationParameters() {
+        kubeflowUrl = System.getenv("KF_CONNECTOR_URL");
+        if (connectorRequest.authentication() != null) {
+            kubeflowUrl = connectorRequest.authentication().kubeflowUrl();
+        }
+
+        kubeflowCookie = System.getenv("KF_CONNECTOR_COOKIE");
+        if (connectorRequest.authentication() != null) {
+            kubeflowCookie = connectorRequest.authentication().cookievalue();
+        }
+
+        kubeflowMultiNs = System.getenv("KF_CONNECTOR_MULTIUSER_NS");
+        if (connectorRequest.authentication() != null) {
+            kubeflowMultiNs = connectorRequest.authentication().multiusernamespace();
+        }
     }
 
     public HttpCommonRequest getHttpRequest() {
@@ -41,13 +57,15 @@ public class KubeflowConnectorExecutor {
     private void buildHttpRequest() {
         httpRequest = new HttpCommonRequest();
         httpRequest.setUrl(buildKubeflowUrl());
-        httpRequest.setMethod(KubeflowApiOperationsEnum.fromValue(connectorRequest.kubeflowapi().operation()).getHttpMethod());
-        if(buildPayload() != null) {
+        httpRequest.setMethod(
+                KubeflowApiOperationsEnum.fromValue(connectorRequest.kubeflowapi().operation()).getHttpMethod());
+        if (buildPayload() != null) {
             httpRequest.setBody(buildPayload());
         }
 
         // TODO replace with actual authentication when implemented
-        httpRequest.setHeaders(Map.of("Cookie", "authservice_session=" + connectorRequest.authentication().cookievalue()));
+        httpRequest
+                .setHeaders(Map.of("Cookie", "authservice_session=" + kubeflowCookie));
     }
 
     protected String buildKubeflowUrlPath() {
@@ -57,9 +75,9 @@ public class KubeflowConnectorExecutor {
     private String buildKubeflowUrl() {
         String url = "";
         try {
-            URIBuilder uriBuilder = new URIBuilder(connectorRequest.authentication().kubeflowUrl());
+            URIBuilder uriBuilder = new URIBuilder(kubeflowUrl);
             uriBuilder.setPath(buildKubeflowUrlPath());
-            if(!buildFilter().equals("")) {
+            if (!buildFilter().equals("")) {
                 uriBuilder.addParameter("filter", URLEncoder.encode(buildFilter(), "UTF-8"));
             }
             addMultisiteFilter(uriBuilder);
@@ -83,7 +101,7 @@ public class KubeflowConnectorExecutor {
 
     private String buildFilter() {
         String filter = "";
-        if(getFilterString() != null) {
+        if (getFilterString() != null) {
             // remove new lines and escaping of " before url encoding
             filter = getFilterString().replaceAll("[\\\\r]?\\\\n", "").replace("\\\"", "\"");
         }
@@ -91,43 +109,17 @@ public class KubeflowConnectorExecutor {
     }
 
     private void addMultisiteFilter(URIBuilder uriBuilder) {
-        if(KubeflowApiOperationsEnum.fromValue(connectorRequest.kubeflowapi().operation()).requiresMultiuserFilter() && !connectorRequest.authentication().multiusernamespace().equals("")) {
+        if (KubeflowApiOperationsEnum.fromValue(connectorRequest.kubeflowapi().operation()).requiresMultiuserFilter()
+                && !kubeflowMultiNs.equals("")) {
             uriBuilder.addParameter("resource_reference_key.type", "NAMESPACE");
-            uriBuilder.addParameter("resource_reference_key.id", connectorRequest.authentication().multiusernamespace());
+            uriBuilder.addParameter("resource_reference_key.id",
+                    kubeflowMultiNs);
         }
     }
 
-    public HttpCommonResult execute(HttpService httpService) throws InstantiationException, IllegalAccessException, IOException {
-        return httpService.executeConnectorRequest(getExecutor(connectorRequest, processInstanceKey).getHttpRequest());
+    public HttpCommonResult execute(HttpService httpService)
+            throws InstantiationException, IllegalAccessException, IOException {
+        return httpService.executeConnectorRequest(
+                ExecutionHandler.getExecutor(connectorRequest, processInstanceKey).getHttpRequest());
     }
-
-    protected <T> T runCallableAfterDelay(Callable<T> task, long delay, TimeUnit timeUnit) throws InterruptedException, ExecutionException {
-        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        try {
-            // Schedule the callable task to run after the specified delay
-            ScheduledFuture<T> future = scheduler.schedule(task, delay, timeUnit);
-
-            // Wait for the callable to finish and retrieve the result
-            T result = future.get(); // This blocks until the result is available
-
-            // Use the result
-            return result;
-        } finally {
-            scheduler.shutdown(); // It's important to shut down the executor service to avoid resource leaks
-        }
-    }
-
-    public static KubeflowConnectorExecutor getExecutor(KubeflowConnectorRequest connectorRequest, long processInstanceKey) {
-        switch (connectorRequest.kubeflowapi().operation()) {
-            case "get_run_by_id":
-                return new KubeflowConnectorExecutorGetRunById(connectorRequest, processInstanceKey);
-            case "get_run_by_name":
-                return new KubeflowConnectorExecutorGetRunByName(connectorRequest, processInstanceKey);
-            case "start_run":
-                return new KubeflowConnectorExecutorStartRun(connectorRequest, processInstanceKey);
-            default:
-                return new KubeflowConnectorExecutor(connectorRequest, processInstanceKey);
-        }
-    }
-    
 }

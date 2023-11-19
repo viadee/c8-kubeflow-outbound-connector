@@ -6,6 +6,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
 public record KubeflowConnectorRequest(
-        @Valid @NotNull Authentication authentication,
+        @Valid Authentication authentication,
         @Valid @NotNull KubeflowApi kubeflowapi) {
 }
