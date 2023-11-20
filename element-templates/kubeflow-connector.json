@@ -123,6 +123,10 @@
         {
           "name": "Start Run",
           "value": "start_run"
+        },
+        {
+          "name": "Start Run and monitor",
+          "value": "start_run_and_monitor"
         }
       ],
       "binding": {

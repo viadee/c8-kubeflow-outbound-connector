@@ -14,6 +14,8 @@ public enum KubeflowApiOperationsEnum {
         GET_RUN_BY_NAME("get_run_by_name", HttpMethod.GET, true,
                 "/pipeline/apis/v1beta1/runs"),
         START_RUN("start_run", HttpMethod.POST, false,
+                "/pipeline/apis/v1beta1/runs"),
+        START_RUN_AND_MONITOR("start_run_and_monitor", HttpMethod.POST, false,
                 "/pipeline/apis/v1beta1/runs");
 
         private final String value;

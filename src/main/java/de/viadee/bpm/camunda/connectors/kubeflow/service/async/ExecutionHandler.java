@@ -31,6 +31,8 @@ public class ExecutionHandler {
                 return new KubeflowConnectorExecutorGetRunByName(connectorRequest, processInstanceKey);
             case START_RUN:
                 return new KubeflowConnectorExecutorStartRun(connectorRequest, processInstanceKey);
+            case START_RUN_AND_MONITOR:
+                return new KubeflowConnectorExecutorStartRun(connectorRequest, processInstanceKey);
             default:
                 return new KubeflowConnectorExecutor(connectorRequest, processInstanceKey);
         }
