@@ -139,6 +139,40 @@
       }
     },
     {
+      "id": "kubeflowapi.pipelineid",
+      "label": "Pipeline ID",
+      "description": "Specify the id of the pipeline to run.",
+      "type": "String",
+      "group": "kubeflowapi",
+      "feel": "optional",
+      "optional": true,
+      "binding": {
+        "type": "zeebe:input",
+        "name": "kubeflowapi.pipelineid"
+      },
+      "condition": {
+        "property": "kubeflowapi.operation",
+        "oneOf": ["start_run", "start_run_and_monitor"]
+      }
+    },
+    {
+      "id": "kubeflowapi.experimentid",
+      "label": "Experiment ID",
+      "description": "Specify the id of the experiment in which to start the run.",
+      "type": "String",
+      "group": "kubeflowapi",
+      "feel": "optional",
+      "optional": true,
+      "binding": {
+        "type": "zeebe:input",
+        "name": "kubeflowapi.experimentid"
+      },
+      "condition": {
+        "property": "kubeflowapi.operation",
+        "oneOf": ["start_run", "start_run_and_monitor"]
+      }
+    },
+    {
       "id": "kubeflowapi.runid",
       "label": "Run ID",
       "description": "Specify the id of the run.",

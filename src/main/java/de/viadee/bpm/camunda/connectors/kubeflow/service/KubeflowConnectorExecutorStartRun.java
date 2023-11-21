@@ -25,10 +25,10 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 
     @Override
     protected Object buildPayload() {
-        final Map<String, String> pipeline_spec = Map.of("pipeline_id", "28abf431-7475-442c-8ea6-4dacb252fa02");
+        final Map<String, String> pipeline_spec = Map.of("pipeline_id", connectorRequest.kubeflowapi().pipelineid());
 
         final Map<String, Object> resource_reference_key = Map.of("type", "EXPERIMENT", "id",
-                "4ce6a43d-81d3-4a3f-a191-7dd1b04bb203");
+                connectorRequest.kubeflowapi().experimentid());
         final Map<String, Object> resource_references = Map.of("key", resource_reference_key);
 
         final Map<String, Object> payload = Map.of("name", Long.toString(processInstanceKey), "pipeline_spec",
@@ -113,7 +113,7 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
     private String getIdOfAlreadyStartedRun(HttpService httpService, String runName)
             throws InstantiationException, IllegalAccessException, IOException {
         KubeflowApi kubeflowApi = new KubeflowApi(KubeflowApiOperationsEnum.GET_RUN_BY_NAME.getValue(), null, runName,
-                null);
+                null, null, null);
         KubeflowConnectorRequest getRunByNameConnectorRequest = new KubeflowConnectorRequest(
                 connectorRequest.authentication(), kubeflowApi);
         KubeflowConnectorExecutor getRunByNameExecutor = ExecutionHandler.getExecutor(

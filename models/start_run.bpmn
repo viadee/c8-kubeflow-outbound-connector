@@ -11,6 +11,8 @@
         <zeebe:ioMapping>
           <zeebe:input source="pipelines" target="kubeflowapi.api" />
           <zeebe:input source="start_run" target="kubeflowapi.operation" />
+          <zeebe:input source="28abf431-7475-442c-8ea6-4dacb252fa02" target="kubeflowapi.pipelineid" />
+          <zeebe:input source="4ce6a43d-81d3-4a3f-a191-7dd1b04bb203" target="kubeflowapi.experimentid" />
         </zeebe:ioMapping>
         <zeebe:taskHeaders>
           <zeebe:header key="resultVariable" value="startedIdComplete" />
@@ -75,6 +77,9 @@
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="start_run">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="152" y="152" width="36" height="36" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_052rwkq_di" bpmnElement="Activity_1v3913d">
         <dc:Bounds x="270" y="130" width="100" height="80" />
         <bpmndi:BPMNLabel />
@@ -91,9 +96,6 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_1mu722g_di" bpmnElement="Gateway_1mu722g" isMarkerVisible="true">
         <dc:Bounds x="415" y="145" width="50" height="50" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
-        <dc:Bounds x="152" y="152" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_00p1jwl_di" bpmnElement="Gateway_00p1jwl" isMarkerVisible="true">
         <dc:Bounds x="745" y="145" width="50" height="50" />
@@ -122,10 +124,6 @@
         <di:waypoint x="548" y="170" />
         <di:waypoint x="600" y="170" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_01dbmko_di" bpmnElement="Flow_01dbmko">
-        <di:waypoint x="700" y="170" />
-        <di:waypoint x="745" y="170" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1y46oti_di" bpmnElement="Flow_1y46oti">
         <di:waypoint x="465" y="170" />
         <di:waypoint x="512" y="170" />
@@ -138,6 +136,10 @@
         <bpmndi:BPMNLabel>
           <dc:Bounds x="585" y="82" width="41" height="14" />
         </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_01dbmko_di" bpmnElement="Flow_01dbmko">
+        <di:waypoint x="700" y="170" />
+        <di:waypoint x="745" y="170" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1xxfwr1_di" bpmnElement="Flow_1xxfwr1">
         <di:waypoint x="795" y="170" />

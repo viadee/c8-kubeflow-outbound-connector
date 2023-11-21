@@ -28,6 +28,8 @@
         <zeebe:ioMapping>
           <zeebe:input source="pipelines" target="kubeflowapi.api" />
           <zeebe:input source="start_run_and_monitor" target="kubeflowapi.operation" />
+          <zeebe:input source="28abf431-7475-442c-8ea6-4dacb252fa02" target="kubeflowapi.pipelineid" />
+          <zeebe:input source="4ce6a43d-81d3-4a3f-a191-7dd1b04bb203" target="kubeflowapi.experimentid" />
         </zeebe:ioMapping>
         <zeebe:taskHeaders>
           <zeebe:header key="resultVariable" value="completeResult" />
@@ -41,9 +43,6 @@
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="start_run_and_monitor">
-      <bpmndi:BPMNShape id="Activity_0vdhxwk_di" bpmnElement="Activity_0k8flub">
-        <dc:Bounds x="250" y="127" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
         <dc:Bounds x="152" y="149" width="36" height="36" />
       </bpmndi:BPMNShape>
@@ -62,14 +61,9 @@
           <dc:Bounds x="626" y="125" width="69" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_0ppmo2y_di" bpmnElement="Flow_0ppmo2y">
-        <di:waypoint x="188" y="167" />
-        <di:waypoint x="250" y="167" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0eu8udu_di" bpmnElement="Flow_0eu8udu">
-        <di:waypoint x="350" y="167" />
-        <di:waypoint x="395" y="167" />
-      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_0vdhxwk_di" bpmnElement="Activity_0k8flub">
+        <dc:Bounds x="250" y="127" width="100" height="80" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_05h3wns_di" bpmnElement="Flow_05h3wns">
         <di:waypoint x="445" y="167" />
         <di:waypoint x="642" y="167" />
@@ -84,6 +78,14 @@
         <bpmndi:BPMNLabel>
           <dc:Bounds x="425" y="107" width="30" height="14" />
         </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0eu8udu_di" bpmnElement="Flow_0eu8udu">
+        <di:waypoint x="350" y="167" />
+        <di:waypoint x="395" y="167" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ppmo2y_di" bpmnElement="Flow_0ppmo2y">
+        <di:waypoint x="188" y="167" />
+        <di:waypoint x="250" y="167" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
