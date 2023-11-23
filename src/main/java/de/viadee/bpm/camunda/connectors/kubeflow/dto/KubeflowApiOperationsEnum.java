@@ -1,6 +1,7 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.dto;
 
 import io.camunda.connector.http.base.model.HttpMethod;
+import java.util.Arrays;
 
 public enum KubeflowApiOperationsEnum {
         GET_PIPELINES("get_pipelines", HttpMethod.GET, false,
@@ -47,11 +48,12 @@ public enum KubeflowApiOperationsEnum {
         }
 
         public static KubeflowApiOperationsEnum fromValue(String value) {
-            for (KubeflowApiOperationsEnum apiOperations : values()) {
-                if (apiOperations.getValue().equals(value)) {
-                    return apiOperations;
-                }
-            }
-            throw new IllegalArgumentException("Unbekannter Wert: " + value);
+            return Arrays
+                .stream(values())
+                .filter(kubeflowApiOperationsEnum -> kubeflowApiOperationsEnum.value.equals(value))
+                .findFirst()
+                .orElseThrow(
+                    () -> new IllegalArgumentException("Unbekannter Wert: " + value)
+                );
         }
     }

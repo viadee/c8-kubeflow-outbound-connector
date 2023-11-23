@@ -30,8 +30,6 @@ import io.camunda.connector.http.base.services.HttpService;
 }, inputDataClass = KubeflowConnectorRequest.class)
 public class KubeflowConnectorFunction implements OutboundConnectorFunction {
 
-  public static final String TYPE = "de.viadee.bpm.camunda:connector-kubeflow:1";
-
   private final HttpService httpService;
   private static final ObjectMapper objectMapper = JsonMapper.builder()
       .addModules(new JacksonModuleFeelFunction(), new Jdk8Module(), new JavaTimeModule())

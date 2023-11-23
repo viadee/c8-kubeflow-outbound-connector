@@ -24,16 +24,19 @@ import io.camunda.connector.http.base.model.HttpCommonResult;
 public class ExecutionHandler {
     public static KubeflowConnectorExecutor getExecutor(KubeflowConnectorRequest connectorRequest,
             long processInstanceKey) {
-        switch (KubeflowApiOperationsEnum.fromValue(connectorRequest.kubeflowapi().operation())) {
+
+        var selectedOperation = KubeflowApiOperationsEnum.fromValue(
+            connectorRequest.kubeflowapi().operation()
+        );
+
+        switch (selectedOperation) {
             case GET_RUN_BY_ID:
                 return new KubeflowConnectorExecutorGetRunById(connectorRequest, processInstanceKey);
             case GET_RUN_BY_NAME:
                 return new KubeflowConnectorExecutorGetRunByName(connectorRequest, processInstanceKey);
-            case START_RUN:
+            case START_RUN, START_RUN_AND_MONITOR:
                 return new KubeflowConnectorExecutorStartRun(connectorRequest, processInstanceKey);
-            case START_RUN_AND_MONITOR:
-                return new KubeflowConnectorExecutorStartRun(connectorRequest, processInstanceKey);
-            default:
+            default: // GET_RUNS, GET_EXPERIMENTS, GET_PIPELINES
                 return new KubeflowConnectorExecutor(connectorRequest, processInstanceKey);
         }
     }

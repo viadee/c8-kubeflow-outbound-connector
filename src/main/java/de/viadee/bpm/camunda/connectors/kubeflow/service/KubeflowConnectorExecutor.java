@@ -16,6 +16,10 @@ import io.camunda.connector.http.base.model.HttpCommonResult;
 import io.camunda.connector.http.base.services.HttpService;
 
 public class KubeflowConnectorExecutor {
+    private static final String KUBEFLOW_URL_ENV = "KF_CONNECTOR_URL";
+    private static final String KUBEFLOW_COOKIE_ENV = "KF_CONNECTOR_COOKIE";
+    private static final String KUBEFLOW_NAMESPACE_ENV = "KF_CONNECTOR_MULTIUSER_NS";
+
     protected long processInstanceKey;
     protected KubeflowConnectorRequest connectorRequest;
 
@@ -34,19 +38,23 @@ public class KubeflowConnectorExecutor {
     }
 
     private void setAuthenticationParameters() {
-        kubeflowUrl = System.getenv("KF_CONNECTOR_URL");
-        if (connectorRequest.authentication() != null) {
-            kubeflowUrl = connectorRequest.authentication().kubeflowUrl();
+        var authPropertyGroup = connectorRequest.authentication();
+
+        kubeflowUrl = System.getenv(KUBEFLOW_URL_ENV);
+        kubeflowCookie = System.getenv(KUBEFLOW_COOKIE_ENV);
+        kubeflowMultiNs = System.getenv(KUBEFLOW_NAMESPACE_ENV);
+
+        if (authPropertyGroup != null) {
+            kubeflowUrl = authPropertyGroup.kubeflowUrl() == null ?
+                kubeflowUrl : authPropertyGroup.kubeflowUrl();
+            kubeflowCookie = authPropertyGroup.cookievalue() == null ?
+                kubeflowCookie : authPropertyGroup.cookievalue();
+            kubeflowMultiNs = authPropertyGroup.multiusernamespace() == null ?
+                kubeflowMultiNs : authPropertyGroup.multiusernamespace();
         }
 
-        kubeflowCookie = System.getenv("KF_CONNECTOR_COOKIE");
-        if (connectorRequest.authentication() != null) {
-            kubeflowCookie = connectorRequest.authentication().cookievalue();
-        }
-
-        kubeflowMultiNs = System.getenv("KF_CONNECTOR_MULTIUSER_NS");
-        if (connectorRequest.authentication() != null) {
-            kubeflowMultiNs = connectorRequest.authentication().multiusernamespace();
+        if (kubeflowUrl == null || kubeflowCookie == null || kubeflowMultiNs == null) {
+            throw new RuntimeException("Authentication parameters not found: url, cookie, and/or namespace null.");
         }
     }
 

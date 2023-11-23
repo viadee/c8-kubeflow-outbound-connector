@@ -10,6 +10,7 @@ public class KubeflowConnectorExecutorGetRunByName extends KubeflowConnectorExec
 
   @Override
   protected String getFilterString() {
+    // TODO use some json library?
     String filter = "{\"predicates\": [{\"op\": \"EQUALS\",\"key\": \"name\", \"string_value\": \"" + processInstanceKey + "\"}]}";
     return filter;
   }
