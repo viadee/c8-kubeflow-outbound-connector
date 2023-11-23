@@ -5,12 +5,14 @@ import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowConnectorRequest;
 
 public class KubeflowConnectorExecutorGetRunById extends KubeflowConnectorExecutor {
 
-    public KubeflowConnectorExecutorGetRunById(KubeflowConnectorRequest connectorRequest, long processInstanceKey) {
+    public KubeflowConnectorExecutorGetRunById(KubeflowConnectorRequest connectorRequest, Long processInstanceKey) {
         super(connectorRequest, processInstanceKey);
     }
 
     @Override
     protected String buildKubeflowUrlPath() {
-        return KubeflowApiOperationsEnum.fromValue(connectorRequest.kubeflowapi().operation()).getApiUrl()+"/"+connectorRequest.kubeflowapi().runid();
+        return String.format("%s/%s",
+            KubeflowApiOperationsEnum.GET_RUN_BY_ID.getApiUrl(),
+            connectorRequest.kubeflowapi().runid());
     }
 }
