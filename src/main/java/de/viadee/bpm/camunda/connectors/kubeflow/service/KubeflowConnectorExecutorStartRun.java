@@ -19,16 +19,16 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 
     private HttpService httpService;
 
-    public KubeflowConnectorExecutorStartRun(KubeflowConnectorRequest connectorRequest, long processInstanceKey) {
-        super(connectorRequest, processInstanceKey);
+    public KubeflowConnectorExecutorStartRun(KubeflowConnectorRequest connectorRequest, long processInstanceKey, KubeflowApiOperationsEnum kubeflowApiOperationsEnum) {
+        super(connectorRequest, processInstanceKey, kubeflowApiOperationsEnum);
     }
 
     @Override
-    protected Object buildPayload() {
-        final Map<String, String> pipeline_spec = Map.of("pipeline_id", connectorRequest.kubeflowapi().pipelineid());
+    protected Object buildPayloadForKubeflowEndpoint() {
+        final Map<String, String> pipeline_spec = Map.of("pipeline_id", connectorRequest.kubeflowapi().pipelineId());
 
         final Map<String, Object> resource_reference_key = Map.of("type", "EXPERIMENT", "id",
-                connectorRequest.kubeflowapi().experimentid());
+                connectorRequest.kubeflowapi().experimentId());
         final Map<String, Object> resource_references = Map.of("key", resource_reference_key);
 
         final Map<String, Object> payload = Map.of("name", Long.toString(processInstanceKey), "pipeline_spec",
@@ -43,11 +43,9 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
         
         HttpCommonResult result = new HttpCommonResult();
 
-        if (KubeflowApiOperationsEnum.fromValue(connectorRequest.kubeflowapi().operation()).equals(
-                KubeflowApiOperationsEnum.START_RUN)) {
+        if (kubeflowApiOperationsEnum.equals(KubeflowApiOperationsEnum.START_RUN)) {
             result = startRun();
-        } else if (KubeflowApiOperationsEnum.fromValue(connectorRequest.kubeflowapi().operation()).equals(
-                KubeflowApiOperationsEnum.START_RUN_AND_MONITOR)) {
+        } else if (kubeflowApiOperationsEnum.equals(KubeflowApiOperationsEnum.START_RUN_AND_MONITOR)) {
             String status = "";
 
             // is run already started?
@@ -106,14 +104,13 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
     }
 
     private HttpCommonResult startRun() throws InstantiationException, IllegalAccessException, IOException {
-        return httpService.executeConnectorRequest(
-                ExecutionHandler.getExecutor(connectorRequest, processInstanceKey).getHttpRequest());
+        return httpService.executeConnectorRequest(httpRequest);
     }
 
     private String getIdOfAlreadyStartedRun(HttpService httpService, String runName)
             throws InstantiationException, IllegalAccessException, IOException {
-        KubeflowApi kubeflowApi = new KubeflowApi(KubeflowApiOperationsEnum.GET_RUN_BY_NAME.getValue(), null, runName,
-                null, null, null);
+        KubeflowApi kubeflowApi = new KubeflowApi(KubeflowApiOperationsEnum.GET_RUN_BY_NAME.getValue(), null,
+                null, null, runName);
         KubeflowConnectorRequest getRunByNameConnectorRequest = new KubeflowConnectorRequest(
                 connectorRequest.authentication(), kubeflowApi);
         KubeflowConnectorExecutor getRunByNameExecutor = ExecutionHandler.getExecutor(

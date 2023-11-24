@@ -31,13 +31,28 @@ public class ExecutionHandler {
 
         switch (selectedOperation) {
             case GET_RUN_BY_ID:
-                return new KubeflowConnectorExecutorGetRunById(connectorRequest, processInstanceKey);
+                return new KubeflowConnectorExecutorGetRunById(connectorRequest, processInstanceKey,
+                    KubeflowApiOperationsEnum.GET_RUN_BY_ID);
             case GET_RUN_BY_NAME:
-                return new KubeflowConnectorExecutorGetRunByName(connectorRequest, processInstanceKey);
-            case START_RUN, START_RUN_AND_MONITOR:
-                return new KubeflowConnectorExecutorStartRun(connectorRequest, processInstanceKey);
-            default: // GET_RUNS, GET_EXPERIMENTS, GET_PIPELINES
-                return new KubeflowConnectorExecutor(connectorRequest, processInstanceKey);
+                return new KubeflowConnectorExecutorGetRunByName(connectorRequest, processInstanceKey,
+                    KubeflowApiOperationsEnum.GET_RUN_BY_NAME);
+            case START_RUN:
+                return new KubeflowConnectorExecutorStartRun(connectorRequest, processInstanceKey,
+                    KubeflowApiOperationsEnum.START_RUN);
+            case START_RUN_AND_MONITOR:
+                return new KubeflowConnectorExecutorStartRun(connectorRequest, processInstanceKey,
+                    KubeflowApiOperationsEnum.START_RUN_AND_MONITOR);
+            case GET_RUNS:
+                return new KubeflowConnectorExecutor(connectorRequest, processInstanceKey,
+                    KubeflowApiOperationsEnum.GET_RUNS);
+            case GET_EXPERIMENTS:
+                return new KubeflowConnectorExecutor(connectorRequest, processInstanceKey,
+                    KubeflowApiOperationsEnum.GET_EXPERIMENTS);
+            case GET_PIPELINES:
+                return new KubeflowConnectorExecutor(connectorRequest, processInstanceKey,
+                    KubeflowApiOperationsEnum.GET_PIPELINES);
+            default: // OTHER
+                throw new RuntimeException("Selected operation is not supported");
         }
     }
 
