@@ -9,13 +9,8 @@
       <bpmn:extensionElements>
         <zeebe:taskDefinition type="de.viadee.bpm.camunda:connector-kubeflow:1" />
         <zeebe:ioMapping>
-          <zeebe:input source="http://localhost:30545" target="authentication.kubeflowUrl" />
-          <zeebe:input source="kubeflow-user-example-com" target="authentication.multiusernamespace" />
-          <zeebe:input source="MTcwMDc1NzAzMnxOd3dBTkZoVFVEUXlOMFkyVGpOV1FsUXlWMDFUV0VoS05GWlNVVlEyUVZSTVdFdzNTRkZRU2pReVMxbFZOMW8wUWtReVRUWllOa0U9fBZw3QUIMNmh1ZXLsqWG1ypMdlTRLlpIDwTk6t7Rx1gS" target="authentication.cookievalue" />
           <zeebe:input source="pipelines" target="kubeflowapi.api" />
-          <zeebe:input source="start_run_and_monitor" target="kubeflowapi.operation" />
-          <zeebe:input source="877337aa-69fd-4f9e-b8d8-82b4c639eacb" target="kubeflowapi.pipelineId" />
-          <zeebe:input source="a915a640-4b93-4aa2-b49b-279be6014580" target="kubeflowapi.experimentId" />
+          <zeebe:input source="start_run" target="kubeflowapi.operation" />
         </zeebe:ioMapping>
         <zeebe:taskHeaders>
           <zeebe:header key="resultVariable" value="startedIdComplete" />
@@ -44,7 +39,7 @@
       <bpmn:incoming>Flow_1y46oti</bpmn:incoming>
       <bpmn:outgoing>Flow_1tihx3n</bpmn:outgoing>
       <bpmn:timerEventDefinition id="TimerEventDefinition_0v5smiz">
-        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT60S</bpmn:timeDuration>
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT5s</bpmn:timeDuration>
       </bpmn:timerEventDefinition>
     </bpmn:intermediateCatchEvent>
     <bpmn:sequenceFlow id="Flow_0hw37pz" sourceRef="Activity_1v3913d" targetRef="Gateway_1mu722g" />

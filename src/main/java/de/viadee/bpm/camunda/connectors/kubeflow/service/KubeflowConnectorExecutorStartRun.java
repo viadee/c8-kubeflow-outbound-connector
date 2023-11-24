@@ -1,6 +1,7 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.service;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -46,60 +47,29 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
         if (kubeflowApiOperationsEnum.equals(KubeflowApiOperationsEnum.START_RUN)) {
             result = startRun();
         } else if (kubeflowApiOperationsEnum.equals(KubeflowApiOperationsEnum.START_RUN_AND_MONITOR)) {
-            String status = "";
+            final String idOfAlreadyStartedRun = getIdOfAlreadyStartedRun(httpService, Long.toString(processInstanceKey));
+            final Duration pollingInterval = Duration.parse(connectorRequest.kubeflowapi().pollingInterval());
+            var statusOfRun = "";
 
-            // is run already started?
-            final String alreadyRunningId = getIdOfAlreadyStartedRun(httpService, Long.toString(processInstanceKey));
-            KubeflowCallable kubeflowCallable = new KubeflowCallable(connectorRequest, processInstanceKey, httpService,
-                    alreadyRunningId);
-
-            if (alreadyRunningId != null) {
-                try {
-                    status = ExecutionHandler.runCallableImmediately(kubeflowCallable);
-                } catch (InterruptedException | ExecutionException e) {
-                    throw new RuntimeException(e);
-                }
-                if (status.equals("Succeeded")) {
-                    result.setBody(status);
-                    result.setStatus(200);
-                } else {
-                    // keep checking
-                    while (!Arrays.asList(
-                            KubeflowConnectorResponse.RUN_STATUS_SUCCEEDED,
-                            KubeflowConnectorResponse.RUN_STATUS_ERROR,
-                            KubeflowConnectorResponse.RUN_STATUS_FAILED,
-                            KubeflowConnectorResponse.RUN_STATUS_SKIPPED).contains(status)) {
-                        try {
-                            status = ExecutionHandler.runCallableAfterDelay(kubeflowCallable, 5, TimeUnit.SECONDS);
-                        } catch (InterruptedException | ExecutionException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                }
-            } else {
-                // start run
+            if (idOfAlreadyStartedRun == null) { // run not yet started
                 result = startRun();
-
                 String newRunId = ExecutionHandler.getFieldFromGetRunResponse(result, "id");
-                while (!Arrays.asList(
-                        KubeflowConnectorResponse.RUN_STATUS_SUCCEEDED,
-                        KubeflowConnectorResponse.RUN_STATUS_ERROR,
-                        KubeflowConnectorResponse.RUN_STATUS_FAILED,
-                        KubeflowConnectorResponse.RUN_STATUS_SKIPPED).contains(status)) {
-                    try {
-                        status = ExecutionHandler.runCallableAfterDelay(
-                                new KubeflowCallable(connectorRequest, processInstanceKey, httpService, newRunId), 5,
-                                TimeUnit.SECONDS);
-                    } catch (InterruptedException | ExecutionException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
+                KubeflowCallable kubeflowCallableRunNotStarted = new KubeflowCallable(connectorRequest, processInstanceKey, httpService, newRunId);
+                statusOfRun = retrieveRunStatusWithDelay(kubeflowCallableRunNotStarted, pollingInterval.getSeconds(), false);
+
+            } else { // run already started
+                KubeflowCallable kubeflowCallableRunStarted = new KubeflowCallable(connectorRequest, processInstanceKey, httpService,
+                    idOfAlreadyStartedRun);
+                statusOfRun = retrieveRunStatusWithDelay(kubeflowCallableRunStarted, pollingInterval.getSeconds(), true);
             }
-            result.setBody(status);
+
+            result.setBody(statusOfRun);
             result.setStatus(200);
+
         } else {
             throw new RuntimeException("Unknown kubeflow operation: " + connectorRequest.kubeflowapi().operation());
         }
+
         return result;
     }
 
@@ -110,7 +80,7 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
     private String getIdOfAlreadyStartedRun(HttpService httpService, String runName)
             throws InstantiationException, IllegalAccessException, IOException {
         KubeflowApi kubeflowApi = new KubeflowApi(KubeflowApiOperationsEnum.GET_RUN_BY_NAME.getValue(), null,
-                null, null, runName);
+                null, null, runName, null);
         KubeflowConnectorRequest getRunByNameConnectorRequest = new KubeflowConnectorRequest(
                 connectorRequest.authentication(), kubeflowApi);
         KubeflowConnectorExecutor getRunByNameExecutor = ExecutionHandler.getExecutor(
@@ -120,6 +90,27 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 
         String id = (String) ExecutionHandler.getFieldFromGetRunsResponse(result, "id");
         return id;
+    }
+
+    private String retrieveRunStatusWithDelay(KubeflowCallable kubeflowCallable, long delay, boolean isPerformPreCheck) {
+        var status = "";
+        while (!Arrays.asList(
+            KubeflowConnectorResponse.RUN_STATUS_SUCCEEDED,
+            KubeflowConnectorResponse.RUN_STATUS_ERROR,
+            KubeflowConnectorResponse.RUN_STATUS_FAILED,
+            KubeflowConnectorResponse.RUN_STATUS_SKIPPED).contains(status)) {
+            try {
+                if (isPerformPreCheck) {
+                    status = ExecutionHandler.runCallableAfterDelay(kubeflowCallable, 0, TimeUnit.SECONDS);
+                    isPerformPreCheck = false;
+                } else {
+                    status = ExecutionHandler.runCallableAfterDelay(kubeflowCallable, delay, TimeUnit.SECONDS);
+                }
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return status;
     }
 
 }

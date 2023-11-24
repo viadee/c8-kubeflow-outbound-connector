@@ -102,20 +102,4 @@ public class ExecutionHandler {
             scheduler.shutdown(); // It's important to shut down the executor service to avoid resource leaks
         }
     }
-
-    public static <T> T runCallableImmediately(Callable<T> task) throws InterruptedException, ExecutionException {
-        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        try {
-            // Schedule the callable task to run after the specified delay
-            Future<T> future = scheduler.submit(task);
-
-            // Wait for the callable to finish and retrieve the result
-            T result = future.get(); // This blocks until the result is available
-
-            // Use the result
-            return result;
-        } finally {
-            scheduler.shutdown(); // It's important to shut down the executor service to avoid resource leaks
-        }
-    }
 }
