@@ -28,10 +28,10 @@ public class KubeflowConnectorExecutor {
     protected KubeflowApiOperationsEnum kubeflowApiOperationsEnum;
     protected HttpCommonRequest httpRequest;
     protected ObjectMapper objectMapper;
+    protected String kubeflowMultiNs;
 
     private String kubeflowUrl;
     private String kubeflowCookie;
-    private String kubeflowMultiNs;
 
     public KubeflowConnectorExecutor(KubeflowConnectorRequest connectorRequest, long processInstanceKey, KubeflowApiOperationsEnum kubeflowApiOperationsEnum) {
         this.connectorRequest = connectorRequest;

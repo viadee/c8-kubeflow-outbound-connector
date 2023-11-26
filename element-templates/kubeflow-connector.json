@@ -96,12 +96,15 @@
     },
     {
       "id": "kubeflowapi.operation",
-      "label": "Pipelines API operatiom",
+      "label": "Pipelines API operation",
       "description": "Specify the pipeline operation to execute.",
       "type": "Dropdown",
       "group": "kubeflowapi",
       "value": "",
       "optional": false,
+      "constraints": {
+        "notEmpty": true
+      },
       "choices": [
         {
           "name": "Get Pipelines",
@@ -130,6 +133,10 @@
         {
           "name": "Start Run and Monitor",
           "value": "start_run_and_monitor"
+        },
+        {
+          "name": "Create Experiment",
+          "value": "create_experiment"
         }
       ],
       "binding": {
@@ -148,10 +155,13 @@
       "type": "String",
       "group": "kubeflowapi",
       "feel": "optional",
-      "optional": true,
+      "optional": false,
       "binding": {
         "type": "zeebe:input",
         "name": "kubeflowapi.pipelineId"
+      },
+      "constraints": {
+        "notEmpty": true
       },
       "condition": {
         "property": "kubeflowapi.operation",
@@ -165,14 +175,54 @@
       "type": "String",
       "group": "kubeflowapi",
       "feel": "optional",
-      "optional": true,
+      "optional": false,
       "binding": {
         "type": "zeebe:input",
         "name": "kubeflowapi.experimentId"
       },
+      "constraints": {
+        "notEmpty": true
+      },
       "condition": {
         "property": "kubeflowapi.operation",
         "oneOf": ["start_run", "start_run_and_monitor"]
+      }
+    },
+    {
+      "id": "kubeflowapi.experimentName",
+      "label": "Experiment Name",
+      "description": "Specify the name of the experiment.",
+      "type": "String",
+      "group": "kubeflowapi",
+      "feel": "optional",
+      "optional": false,
+      "binding": {
+        "type": "zeebe:input",
+        "name": "kubeflowapi.experimentName"
+      },
+      "constraints": {
+        "notEmpty": true
+      },
+      "condition": {
+        "property": "kubeflowapi.operation",
+        "oneOf": ["create_experiment"]
+      }
+    },
+    {
+      "id": "kubeflowapi.experimentDescription",
+      "label": "Experiment Description",
+      "description": "Describe the experiment.",
+      "type": "Text",
+      "group": "kubeflowapi",
+      "feel": "optional",
+      "optional": true,
+      "binding": {
+        "type": "zeebe:input",
+        "name": "kubeflowapi.experimentDescription"
+      },
+      "condition": {
+        "property": "kubeflowapi.operation",
+        "oneOf": ["create_experiment"]
       }
     },
     {
@@ -207,7 +257,10 @@
       "type": "String",
       "group": "kubeflowapi",
       "feel": "optional",
-      "optional": true,
+      "optional": false,
+      "constraints": {
+        "notEmpty": true
+      },
       "binding": {
         "type": "zeebe:input",
         "name": "kubeflowapi.runId"
@@ -224,7 +277,10 @@
       "type": "String",
       "group": "kubeflowapi",
       "feel": "optional",
-      "optional": true,
+      "optional": false,
+      "constraints": {
+        "notEmpty": true
+      },
       "binding": {
         "type": "zeebe:input",
         "name": "kubeflowapi.filter"

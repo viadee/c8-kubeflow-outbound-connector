@@ -16,5 +16,9 @@ public record KubeflowApi(
     @TemplateProperty(group = "kubeflowapi", label = "Filter", description = "Filter to apply")
     String filter,
     @TemplateProperty(group = "kubeflowapi", label = "Polling Interval", description = "The interval to regularly check for a change in the state")
-    String pollingInterval
+    String pollingInterval,
+    @TemplateProperty(group = "kubeflowapi", label = "Experiment Name", description = "The name of the experiment")
+    String experimentName,
+    @TemplateProperty(group = "kubeflowapi", label = "Experiment Description", description = "The description of the experiment")
+    String experimentDescription
 ) { }

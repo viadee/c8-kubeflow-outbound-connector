@@ -1,5 +1,6 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.service.async;
 
+import de.viadee.bpm.camunda.connectors.kubeflow.service.KubeflowConnectorExecutorCreateExperiment;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -51,6 +52,9 @@ public class ExecutionHandler {
             case GET_PIPELINES:
                 return new KubeflowConnectorExecutor(connectorRequest, processInstanceKey,
                     KubeflowApiOperationsEnum.GET_PIPELINES);
+            case CREATE_EXPERIMENT:
+                return new KubeflowConnectorExecutorCreateExperiment(connectorRequest, processInstanceKey,
+                    KubeflowApiOperationsEnum.CREATE_EXPERIMENT);
             default: // OTHER
                 throw new RuntimeException("Selected operation is not supported");
         }
