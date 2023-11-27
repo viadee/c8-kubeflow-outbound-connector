@@ -19,7 +19,7 @@ public enum KubeflowApiOperationsEnum {
         START_RUN_AND_MONITOR("start_run_and_monitor", HttpMethod.POST, false,
                 "/pipeline/apis/v1beta1/runs"),
         CREATE_EXPERIMENT("create_experiment", HttpMethod.POST, false,
-            "/pipeline/apis/v2beta1/experiments");
+            "/pipeline/apis/v1beta1/experiments");
 
         private final String value;
         private final HttpMethod httpMethod;
