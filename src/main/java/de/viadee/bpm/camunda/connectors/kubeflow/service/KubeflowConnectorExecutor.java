@@ -121,8 +121,7 @@ public class KubeflowConnectorExecutor {
     private void addFilter(URIBuilder uriBuilder) throws UnsupportedEncodingException {
         String filter = "";
         if (getFilterString() != null) {
-            // remove new lines and escaping of " before url encoding
-            // TODO what does this regex do?
+            // this regex removes all new lines and escaping of " before url encoding is applied
             filter = getFilterString().replaceAll("[\\\\r]?\\\\n", "").replace("\\\"", "\"");
         }
 
