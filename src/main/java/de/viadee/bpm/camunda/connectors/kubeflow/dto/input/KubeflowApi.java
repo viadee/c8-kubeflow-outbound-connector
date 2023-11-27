@@ -8,13 +8,17 @@ public record KubeflowApi(
     @TemplateProperty(group = "kubeflowapi", label = "API Operation", description = "API operation to execute")
     String operation,
     @TemplateProperty(group = "kubeflowapi", label = "Run ID", description = "The ID of the run to get")
-    String runid,
-    @TemplateProperty(group = "kubeflowapi", label = "Run Name", description = "The name of the run to get")
-    String runname,
+    String runId,
     @TemplateProperty(group = "kubeflowapi", label = "Pipeline ID", description = "The ID of the pipeline to start")
-    String pipelineid,
+    String pipelineId,
     @TemplateProperty(group = "kubeflowapi", label = "Experiment ID", description = "The ID of the experiment in which to start the run")
-    String experimentid,
+    String experimentId,
     @TemplateProperty(group = "kubeflowapi", label = "Filter", description = "Filter to apply")
-    String filter) { 
-    }
+    String filter,
+    @TemplateProperty(group = "kubeflowapi", label = "Polling Interval", description = "The interval to regularly check for a change in the state")
+    String pollingInterval,
+    @TemplateProperty(group = "kubeflowapi", label = "Experiment Name", description = "The name of the experiment")
+    String experimentName,
+    @TemplateProperty(group = "kubeflowapi", label = "Experiment Description", description = "The description of the experiment")
+    String experimentDescription
+) { }

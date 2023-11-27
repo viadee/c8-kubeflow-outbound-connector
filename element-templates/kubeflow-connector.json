@@ -43,6 +43,7 @@
       "group": "authentication",
       "feel": "optional",
       "optional": true,
+      "tooltip": "If left empty, URL is read from environment variable 'KF_CONNECTOR_URL'.",
       "binding": {
         "type": "zeebe:input",
         "name": "authentication.kubeflowUrl"
@@ -56,6 +57,7 @@
       "group": "authentication",
       "feel": "optional",
       "optional": true,
+      "tooltip": "If left empty, namespace is read from environment variable 'KF_CONNECTOR_MULTIUSER_NS'.",
       "binding": {
         "type": "zeebe:input",
         "name": "authentication.multiusernamespace"
@@ -63,11 +65,12 @@
     },
     {
       "id": "authentication.cookievalue",
-      "label": "Cookie value (for testing)",
+      "label": "Cookie Value",
       "description": "Specify the cookie value of a valid Kubeflow session.",
       "type": "String",
       "group": "authentication",
       "optional": true,
+      "tooltip": "If left empty, cookie is read from environment variable 'KF_CONNECTOR_COOKIE'.",
       "binding": {
         "type": "zeebe:input",
         "name": "authentication.cookievalue"
@@ -93,12 +96,15 @@
     },
     {
       "id": "kubeflowapi.operation",
-      "label": "Pipelines API operatiom",
+      "label": "Pipelines API operation",
       "description": "Specify the pipeline operation to execute.",
       "type": "Dropdown",
       "group": "kubeflowapi",
       "value": "",
       "optional": false,
+      "constraints": {
+        "notEmpty": true
+      },
       "choices": [
         {
           "name": "Get Pipelines",
@@ -117,7 +123,7 @@
           "value": "get_run_by_id"
         },
         {
-          "name": "Get Run by name",
+          "name": "Get Run by Name",
           "value": "get_run_by_name"
         },
         {
@@ -125,8 +131,12 @@
           "value": "start_run"
         },
         {
-          "name": "Start Run and monitor",
+          "name": "Start Run and Monitor",
           "value": "start_run_and_monitor"
+        },
+        {
+          "name": "Create Experiment",
+          "value": "create_experiment"
         }
       ],
       "binding": {
@@ -139,16 +149,19 @@
       }
     },
     {
-      "id": "kubeflowapi.pipelineid",
+      "id": "kubeflowapi.pipelineId",
       "label": "Pipeline ID",
       "description": "Specify the id of the pipeline to run.",
       "type": "String",
       "group": "kubeflowapi",
       "feel": "optional",
-      "optional": true,
+      "optional": false,
       "binding": {
         "type": "zeebe:input",
-        "name": "kubeflowapi.pipelineid"
+        "name": "kubeflowapi.pipelineId"
+      },
+      "constraints": {
+        "notEmpty": true
       },
       "condition": {
         "property": "kubeflowapi.operation",
@@ -156,16 +169,19 @@
       }
     },
     {
-      "id": "kubeflowapi.experimentid",
+      "id": "kubeflowapi.experimentId",
       "label": "Experiment ID",
       "description": "Specify the id of the experiment in which to start the run.",
       "type": "String",
       "group": "kubeflowapi",
       "feel": "optional",
-      "optional": true,
+      "optional": false,
       "binding": {
         "type": "zeebe:input",
-        "name": "kubeflowapi.experimentid"
+        "name": "kubeflowapi.experimentId"
+      },
+      "constraints": {
+        "notEmpty": true
       },
       "condition": {
         "property": "kubeflowapi.operation",
@@ -173,16 +189,81 @@
       }
     },
     {
-      "id": "kubeflowapi.runid",
-      "label": "Run ID",
-      "description": "Specify the id of the run.",
+      "id": "kubeflowapi.experimentName",
+      "label": "Experiment Name",
+      "description": "Specify the name of the experiment.",
       "type": "String",
+      "group": "kubeflowapi",
+      "feel": "optional",
+      "optional": false,
+      "binding": {
+        "type": "zeebe:input",
+        "name": "kubeflowapi.experimentName"
+      },
+      "constraints": {
+        "notEmpty": true
+      },
+      "condition": {
+        "property": "kubeflowapi.operation",
+        "oneOf": ["create_experiment"]
+      }
+    },
+    {
+      "id": "kubeflowapi.experimentDescription",
+      "label": "Experiment Description",
+      "description": "Describe the experiment.",
+      "type": "Text",
       "group": "kubeflowapi",
       "feel": "optional",
       "optional": true,
       "binding": {
         "type": "zeebe:input",
-        "name": "kubeflowapi.runid"
+        "name": "kubeflowapi.experimentDescription"
+      },
+      "condition": {
+        "property": "kubeflowapi.operation",
+        "oneOf": ["create_experiment"]
+      }
+    },
+    {
+      "id": "kubeflowapi.pollingInterval",
+      "label": "Polling Interval",
+      "description": "Specify an interval to regularly check for a change in the state.",
+      "type": "String",
+      "group": "kubeflowapi",
+      "tooltip": "A time duration defined as ISO 8601 durations format.",
+      "feel": "optional",
+      "optional": false,
+      "binding": {
+        "type": "zeebe:input",
+        "name": "kubeflowapi.pollingInterval"
+      },
+      "constraints": {
+        "notEmpty": true,
+        "pattern": {
+          "value": "^(-?)P(?=\\d|T\\d)(?:(\\d+)Y)?(?:(\\d+)M)?(?:(\\d+)([DW]))?(?:T(?:(\\d+)H)?(?:(\\d+)M)?(?:(\\d+(?:\\.\\d+)?)S)?)?$",
+          "message": "must be an ISO 8601 Interval."
+        }
+      },
+      "condition": {
+        "property": "kubeflowapi.operation",
+        "oneOf": ["start_run_and_monitor"]
+      }
+    },
+    {
+      "id": "kubeflowapi.runId",
+      "label": "Run ID",
+      "description": "Specify the id of the run.",
+      "type": "String",
+      "group": "kubeflowapi",
+      "feel": "optional",
+      "optional": false,
+      "constraints": {
+        "notEmpty": true
+      },
+      "binding": {
+        "type": "zeebe:input",
+        "name": "kubeflowapi.runId"
       },
       "condition": {
         "property": "kubeflowapi.operation",
@@ -190,16 +271,19 @@
       }
     },
     {
-      "id": "kubeflowapi.runname",
+      "id": "kubeflowapi.runName",
       "label": "Run Name",
       "description": "Specify the name of the run.",
       "type": "String",
       "group": "kubeflowapi",
       "feel": "optional",
-      "optional": true,
+      "optional": false,
+      "constraints": {
+        "notEmpty": true
+      },
       "binding": {
         "type": "zeebe:input",
-        "name": "kubeflowapi.runname"
+        "name": "kubeflowapi.filter"
       },
       "condition": {
         "property": "kubeflowapi.operation",
@@ -225,7 +309,7 @@
     },
     {
       "label": "Result Variable",
-      "description": "Name of variable to store the response in",
+      "description": "Name of variable to store the response in.",
       "type": "String",
       "group": "output",
       "binding": {
@@ -235,7 +319,7 @@
     },
     {
       "label": "Result Expression",
-      "description": "Expression to map the response into process variables",
+      "description": "Expression to map the response into process variables.",
       "type": "Text",
       "group": "output",
       "feel": "required",

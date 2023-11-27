@@ -28,6 +28,7 @@
         <zeebe:ioMapping>
           <zeebe:input source="pipelines" target="kubeflowapi.api" />
           <zeebe:input source="start_run_and_monitor" target="kubeflowapi.operation" />
+          <zeebe:input source="PT60S" target="kubeflowapi.pollingInterval" />
         </zeebe:ioMapping>
         <zeebe:taskHeaders>
           <zeebe:header key="resultVariable" value="completeResult" />

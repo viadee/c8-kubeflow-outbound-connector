@@ -1,5 +1,6 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.service.async;
 
+import de.viadee.bpm.camunda.connectors.kubeflow.service.KubeflowConnectorExecutorCreateExperiment;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -31,13 +32,31 @@ public class ExecutionHandler {
 
         switch (selectedOperation) {
             case GET_RUN_BY_ID:
-                return new KubeflowConnectorExecutorGetRunById(connectorRequest, processInstanceKey);
+                return new KubeflowConnectorExecutorGetRunById(connectorRequest, processInstanceKey,
+                    KubeflowApiOperationsEnum.GET_RUN_BY_ID);
             case GET_RUN_BY_NAME:
-                return new KubeflowConnectorExecutorGetRunByName(connectorRequest, processInstanceKey);
-            case START_RUN, START_RUN_AND_MONITOR:
-                return new KubeflowConnectorExecutorStartRun(connectorRequest, processInstanceKey);
-            default: // GET_RUNS, GET_EXPERIMENTS, GET_PIPELINES
-                return new KubeflowConnectorExecutor(connectorRequest, processInstanceKey);
+                return new KubeflowConnectorExecutorGetRunByName(connectorRequest, processInstanceKey,
+                    KubeflowApiOperationsEnum.GET_RUN_BY_NAME);
+            case START_RUN:
+                return new KubeflowConnectorExecutorStartRun(connectorRequest, processInstanceKey,
+                    KubeflowApiOperationsEnum.START_RUN);
+            case START_RUN_AND_MONITOR:
+                return new KubeflowConnectorExecutorStartRun(connectorRequest, processInstanceKey,
+                    KubeflowApiOperationsEnum.START_RUN_AND_MONITOR);
+            case GET_RUNS:
+                return new KubeflowConnectorExecutor(connectorRequest, processInstanceKey,
+                    KubeflowApiOperationsEnum.GET_RUNS);
+            case GET_EXPERIMENTS:
+                return new KubeflowConnectorExecutor(connectorRequest, processInstanceKey,
+                    KubeflowApiOperationsEnum.GET_EXPERIMENTS);
+            case GET_PIPELINES:
+                return new KubeflowConnectorExecutor(connectorRequest, processInstanceKey,
+                    KubeflowApiOperationsEnum.GET_PIPELINES);
+            case CREATE_EXPERIMENT:
+                return new KubeflowConnectorExecutorCreateExperiment(connectorRequest, processInstanceKey,
+                    KubeflowApiOperationsEnum.CREATE_EXPERIMENT);
+            default: // OTHER
+                throw new RuntimeException("Selected operation is not supported");
         }
     }
 
@@ -77,22 +96,6 @@ public class ExecutionHandler {
         try {
             // Schedule the callable task to run after the specified delay
             ScheduledFuture<T> future = scheduler.schedule(task, delay, timeUnit);
-
-            // Wait for the callable to finish and retrieve the result
-            T result = future.get(); // This blocks until the result is available
-
-            // Use the result
-            return result;
-        } finally {
-            scheduler.shutdown(); // It's important to shut down the executor service to avoid resource leaks
-        }
-    }
-
-    public static <T> T runCallableImmediately(Callable<T> task) throws InterruptedException, ExecutionException {
-        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        try {
-            // Schedule the callable task to run after the specified delay
-            Future<T> future = scheduler.submit(task);
 
             // Wait for the callable to finish and retrieve the result
             T result = future.get(); // This blocks until the result is available

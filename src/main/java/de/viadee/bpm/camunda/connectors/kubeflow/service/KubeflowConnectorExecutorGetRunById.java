@@ -2,17 +2,19 @@ package de.viadee.bpm.camunda.connectors.kubeflow.service;
 
 import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApiOperationsEnum;
 import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowConnectorRequest;
+import org.apache.http.client.utils.URIBuilder;
 
 public class KubeflowConnectorExecutorGetRunById extends KubeflowConnectorExecutor {
 
-    public KubeflowConnectorExecutorGetRunById(KubeflowConnectorRequest connectorRequest, Long processInstanceKey) {
-        super(connectorRequest, processInstanceKey);
+    public KubeflowConnectorExecutorGetRunById(KubeflowConnectorRequest connectorRequest, long processInstanceKey, KubeflowApiOperationsEnum kubeflowApiOperationsEnum) {
+        super(connectorRequest, processInstanceKey, kubeflowApiOperationsEnum);
     }
 
     @Override
-    protected String buildKubeflowUrlPath() {
-        return String.format("%s/%s",
-            KubeflowApiOperationsEnum.GET_RUN_BY_ID.getApiUrl(),
-            connectorRequest.kubeflowapi().runid());
+    protected void addKubeflowUrlPath(URIBuilder uriBuilder) {
+        var kubeflowUrilPath = String.format("%s/%s",
+            kubeflowApiOperationsEnum.getApiUrl(),
+            connectorRequest.kubeflowapi().runId());
+        uriBuilder.setPath(kubeflowUrilPath);
     }
 }
