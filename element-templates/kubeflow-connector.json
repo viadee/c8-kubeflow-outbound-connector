@@ -44,6 +44,13 @@
       "feel": "optional",
       "optional": true,
       "tooltip": "If left empty, URL is read from environment variable 'KF_CONNECTOR_URL'.",
+      "constraints": {
+        "notEmpty": false,
+        "pattern": {
+          "value": "(^$|^(https?)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|])",
+          "message": "must be valid."
+        }
+      },
       "binding": {
         "type": "zeebe:input",
         "name": "authentication.kubeflowUrl"
