@@ -1,6 +1,7 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApisEnum;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
@@ -25,6 +26,7 @@ public class KubeflowConnectorExecutor {
 
     protected long processInstanceKey;
     protected KubeflowConnectorRequest connectorRequest;
+    protected KubeflowApisEnum kubeflowApisEnum;
     protected KubeflowApiOperationsEnum kubeflowApiOperationsEnum;
     protected HttpCommonRequest httpRequest;
     protected ObjectMapper objectMapper;
@@ -33,14 +35,16 @@ public class KubeflowConnectorExecutor {
     private String kubeflowUrl;
     private String kubeflowCookie;
 
-    public KubeflowConnectorExecutor(KubeflowConnectorRequest connectorRequest, long processInstanceKey, KubeflowApiOperationsEnum kubeflowApiOperationsEnum) {
+    public KubeflowConnectorExecutor(KubeflowConnectorRequest connectorRequest, long processInstanceKey, KubeflowApisEnum kubeflowApisEnum,
+        KubeflowApiOperationsEnum kubeflowApiOperationsEnum) {
         this.connectorRequest = connectorRequest;
         this.processInstanceKey = processInstanceKey;
+        this.kubeflowApisEnum = kubeflowApisEnum;
         this.kubeflowApiOperationsEnum = kubeflowApiOperationsEnum;
 
         objectMapper = new ObjectMapper();
 
-        setAuthenticationParameters();
+        setConfigurationParameters();
 
         buildHttpRequest();
     }
@@ -51,7 +55,9 @@ public class KubeflowConnectorExecutor {
     }
 
     protected void addKubeflowUrlPath(URIBuilder uriBuilder) {
-        uriBuilder.setPath(kubeflowApiOperationsEnum.getApiUrl());
+        uriBuilder.setPath(
+            String.format(kubeflowApiOperationsEnum.getApiUrl(), kubeflowApisEnum.getUrlPathVersion())
+        );
     }
 
     protected Object buildPayloadForKubeflowEndpoint() {
@@ -63,8 +69,8 @@ public class KubeflowConnectorExecutor {
         return connectorRequest.kubeflowapi().filter();
     }
 
-    private void setAuthenticationParameters() {
-        var authPropertyGroup = connectorRequest.authentication();
+    private void setConfigurationParameters() {
+        var authPropertyGroup = connectorRequest.configuration();
 
         kubeflowUrl = System.getenv(KUBEFLOW_URL_ENV);
         kubeflowCookie = System.getenv(KUBEFLOW_COOKIE_ENV);
@@ -80,7 +86,7 @@ public class KubeflowConnectorExecutor {
         }
 
         if (kubeflowUrl == null || kubeflowCookie == null || kubeflowMultiNs == null) {
-            throw new RuntimeException("Authentication parameters not found: url, cookie, and/or namespace null.");
+            throw new RuntimeException("Configuration parameters not found: url, cookie, and/or namespace null.");
         }
     }
 
@@ -107,7 +113,7 @@ public class KubeflowConnectorExecutor {
 
             addKubeflowUrlPath(uriBuilder);
             addFilter(uriBuilder);
-            addMultisiteFilter(uriBuilder);
+            addNamespaceFilter(uriBuilder);
 
             url = uriBuilder.build().toString();
         } catch (URISyntaxException e) {
@@ -130,10 +136,14 @@ public class KubeflowConnectorExecutor {
         }
     }
 
-    private void addMultisiteFilter(URIBuilder uriBuilder) {
-        if (kubeflowApiOperationsEnum.requiresMultiuserFilter() && !kubeflowMultiNs.equals("")) {
-            uriBuilder.addParameter(URI_PARAMETER_NAMESPACE_TYPE_PAIR.getKey(), URI_PARAMETER_NAMESPACE_TYPE_PAIR.getValue());
-            uriBuilder.addParameter(URI_PARAMETER_NAMESPACE_ID_KEY, kubeflowMultiNs);
+    protected void addNamespaceFilter(URIBuilder uriBuilder) {
+        if (kubeflowApiOperationsEnum.requiresMultiuserFilter()) {
+            if (KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum)) {
+                uriBuilder.addParameter(URI_PARAMETER_NAMESPACE_TYPE_PAIR.getKey(), URI_PARAMETER_NAMESPACE_TYPE_PAIR.getValue());
+                uriBuilder.addParameter(URI_PARAMETER_NAMESPACE_ID_KEY, kubeflowMultiNs);
+            } else {
+                uriBuilder.addParameter("namespace", kubeflowMultiNs);
+            }
         }
     }
 }

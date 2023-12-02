@@ -5,6 +5,9 @@ import jakarta.validation.constraints.NotEmpty;
 
 public record KubeflowApi(
     @NotEmpty
+    @TemplateProperty(group = "kubeflowapi", label = "API", description = "API")
+    String api,
+    @NotEmpty
     @TemplateProperty(group = "kubeflowapi", label = "API Operation", description = "API operation to execute")
     String operation,
     @TemplateProperty(group = "kubeflowapi", label = "Run ID", description = "The ID of the run to get")

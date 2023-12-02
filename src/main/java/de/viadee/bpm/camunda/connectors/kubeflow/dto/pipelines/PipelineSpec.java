@@ -1,5 +1,6 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.dto.pipelines;
 
+// TODO
 public class PipelineSpec {
 
     private String pipeline_id;

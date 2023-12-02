@@ -5,21 +5,21 @@ import java.util.Arrays;
 
 public enum KubeflowApiOperationsEnum {
         GET_PIPELINES("get_pipelines", HttpMethod.GET, false,
-                "/pipeline/apis/v1beta1/pipelines"),
+                "/pipeline/apis/%s/pipelines"),
         GET_EXPERIMENTS("get_experiments", HttpMethod.GET, true,
-                "/pipeline/apis/v1beta1/experiments"),
+                "/pipeline/apis/%s/experiments"),
         GET_RUNS("get_runs", HttpMethod.GET, true,
-                "/pipeline/apis/v1beta1/runs"),
+                "/pipeline/apis/%s/runs"),
         GET_RUN_BY_ID("get_run_by_id", HttpMethod.GET, false,
-                "/pipeline/apis/v1beta1/runs"),
+                "/pipeline/apis/%s/runs"),
         GET_RUN_BY_NAME("get_run_by_name", HttpMethod.GET, true,
-                "/pipeline/apis/v1beta1/runs"),
+                "/pipeline/apis/%s/runs"),
         START_RUN("start_run", HttpMethod.POST, false,
-                "/pipeline/apis/v1beta1/runs"),
+                "/pipeline/apis/%s/runs"),
         START_RUN_AND_MONITOR("start_run_and_monitor", HttpMethod.POST, false,
-                "/pipeline/apis/v1beta1/runs"),
+                "/pipeline/apis/%s/runs"),
         CREATE_EXPERIMENT("create_experiment", HttpMethod.POST, false,
-            "/pipeline/apis/v1beta1/experiments");
+            "/pipeline/apis/%s/experiments");
 
         private final String value;
         private final HttpMethod httpMethod;
