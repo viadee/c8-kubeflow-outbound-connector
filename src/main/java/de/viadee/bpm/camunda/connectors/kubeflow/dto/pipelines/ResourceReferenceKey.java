@@ -1,5 +1,6 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.dto.pipelines;
 
+// TODO
 public class ResourceReferenceKey {
     
     private String type;

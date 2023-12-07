@@ -9,8 +9,10 @@
       <bpmn:extensionElements>
         <zeebe:taskDefinition type="de.viadee.bpm.camunda:connector-kubeflow:1" />
         <zeebe:ioMapping>
-          <zeebe:input source="pipelines" target="kubeflowapi.api" />
+          <zeebe:input source="pipelinesV1" target="kubeflowapi.api" />
           <zeebe:input source="start_run" target="kubeflowapi.operation" />
+          <zeebe:input target="kubeflowapi.pipelineId" />
+          <zeebe:input target="kubeflowapi.experimentId" />
         </zeebe:ioMapping>
         <zeebe:taskHeaders>
           <zeebe:header key="resultVariable" value="startedIdComplete" />
@@ -24,9 +26,10 @@
       <bpmn:extensionElements>
         <zeebe:taskDefinition type="de.viadee.bpm.camunda:connector-kubeflow:1" />
         <zeebe:ioMapping>
-          <zeebe:input source="pipelines" target="kubeflowapi.api" />
-          <zeebe:input source="get_run_by_id" target="kubeflowapi.operation" />
           <zeebe:input source="=startedId" target="kubeflowapi.runid" />
+          <zeebe:input source="pipelinesV1" target="kubeflowapi.api" />
+          <zeebe:input source="get_run_by_id" target="kubeflowapi.operation" />
+          <zeebe:input target="kubeflowapi.runId" />
         </zeebe:ioMapping>
         <zeebe:taskHeaders>
           <zeebe:header key="resultExpression" value="={startedRunStatus:body.run.status}" />

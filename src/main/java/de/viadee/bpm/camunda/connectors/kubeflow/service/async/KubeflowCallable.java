@@ -1,5 +1,6 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.service.async;
 
+import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApisEnum;
 import java.io.IOException;
 import java.util.concurrent.Callable;
 
@@ -34,16 +35,19 @@ public class KubeflowCallable implements Callable<String> {
 
     private String getStatusOfRunById(HttpService httpService, String runId)
             throws InstantiationException, IllegalAccessException, IOException {
-        KubeflowApi kubeflowApi = new KubeflowApi(KubeflowApiOperationsEnum.GET_RUN_BY_ID.getValue(), runId, null,
-                null, null, null, null, null);
+        KubeflowApi kubeflowApi = new KubeflowApi(connectorRequest.kubeflowapi().api(), KubeflowApiOperationsEnum.GET_RUN_BY_ID.getValue(),
+            runId, null, null, null, null, null, null);
         KubeflowConnectorRequest getRunByIdConnectorRequest = new KubeflowConnectorRequest(
-                connectorRequest.authentication(), kubeflowApi);
+                connectorRequest.configuration(), kubeflowApi);
         KubeflowConnectorExecutor getRunByIdExecutor = ExecutionHandler.getExecutor(
                 getRunByIdConnectorRequest,
                 processInstanceKey);
         HttpCommonResult result = getRunByIdExecutor.execute(httpService);
 
-        String status = ExecutionHandler.getFieldFromGetRunResponse(result, "status");
+        String status = KubeflowApisEnum.PIPELINES_V1.equals(KubeflowApisEnum.fromValue(kubeflowApi.api())) ?
+            ExecutionHandler.getFieldFromCreateRunResponseV1(result, "status") :
+            ExecutionHandler.getFieldFromCreateRunResponseV2(result, "state");
+
         return status;
     }
 }
