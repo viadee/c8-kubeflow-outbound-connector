@@ -26,8 +26,10 @@
       <bpmn:extensionElements>
         <zeebe:taskDefinition type="de.viadee.bpm.camunda:connector-kubeflow:1" />
         <zeebe:ioMapping>
-          <zeebe:input source="pipelines" target="kubeflowapi.api" />
+          <zeebe:input source="pipelinesV1" target="kubeflowapi.api" />
           <zeebe:input source="start_run_and_monitor" target="kubeflowapi.operation" />
+          <zeebe:input target="kubeflowapi.pipelineId" />
+          <zeebe:input target="kubeflowapi.experimentId" />
           <zeebe:input source="PT60S" target="kubeflowapi.pollingInterval" />
         </zeebe:ioMapping>
         <zeebe:taskHeaders>

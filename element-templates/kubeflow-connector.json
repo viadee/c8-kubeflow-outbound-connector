@@ -16,8 +16,8 @@
     "value": "bpmn:ServiceTask"
   },
   "groups" : [ {
-    "id" : "authentication",
-    "label" : "Authentication",
+    "id" : "configuration",
+    "label" : "Configuration",
     "openByDefault": false,
     "tooltip": "Can also be configured via environment variables."
   },{
@@ -36,44 +36,51 @@
       }
     },
     {
-      "id": "authentication.kubeflowUrl",
+      "id": "configuration.kubeflowUrl",
       "label": "Kubeflow URL",
       "description": "Specify the url of the Kubeflow server to talk to.",
       "type": "String",
-      "group": "authentication",
+      "group": "configuration",
       "feel": "optional",
       "optional": true,
       "tooltip": "If left empty, URL is read from environment variable 'KF_CONNECTOR_URL'.",
+      "constraints": {
+        "notEmpty": false,
+        "pattern": {
+          "value": "(^$|^(https?)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|])",
+          "message": "must be valid."
+        }
+      },
       "binding": {
         "type": "zeebe:input",
-        "name": "authentication.kubeflowUrl"
+        "name": "configuration.kubeflowUrl"
       }
     },
     {
-      "id": "authentication.multiusernamespace",
+      "id": "configuration.multiusernamespace",
       "label": "Kubeflow Namespace",
       "description": "If Kubeflow is running in a multiuser mode, define namespace to use.",
       "type": "String",
-      "group": "authentication",
+      "group": "configuration",
       "feel": "optional",
       "optional": true,
       "tooltip": "If left empty, namespace is read from environment variable 'KF_CONNECTOR_MULTIUSER_NS'.",
       "binding": {
         "type": "zeebe:input",
-        "name": "authentication.multiusernamespace"
+        "name": "configuration.multiusernamespace"
       }
     },
     {
-      "id": "authentication.cookievalue",
+      "id": "configuration.cookievalue",
       "label": "Cookie Value",
       "description": "Specify the cookie value of a valid Kubeflow session.",
       "type": "String",
-      "group": "authentication",
+      "group": "configuration",
       "optional": true,
       "tooltip": "If left empty, cookie is read from environment variable 'KF_CONNECTOR_COOKIE'.",
       "binding": {
         "type": "zeebe:input",
-        "name": "authentication.cookievalue"
+        "name": "configuration.cookievalue"
       }
     },
     {
@@ -82,11 +89,15 @@
       "description": "Specify the Kubeflow API to use.",
       "type": "Dropdown",
       "group": "kubeflowapi",
-      "value": "pipelines",
+      "value": "pipelinesV1",
       "choices": [
         {
-          "name": "Pipelines",
-          "value": "pipelines"
+          "name": "Pipelines v1",
+          "value": "pipelinesV1"
+        },
+        {
+          "name": "Pipelines v2",
+          "value": "pipelinesV2"
         }
       ],
       "binding": {
@@ -145,7 +156,7 @@
       },
       "condition": {
         "property": "kubeflowapi.api",
-        "equals": "pipelines"
+        "oneOf": ["pipelinesV1", "pipelinesV2"]
       }
     },
     {

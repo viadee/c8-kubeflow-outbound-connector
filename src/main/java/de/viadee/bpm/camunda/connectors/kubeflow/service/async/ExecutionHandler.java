@@ -1,12 +1,12 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.service.async;
 
+import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApisEnum;
 import de.viadee.bpm.camunda.connectors.kubeflow.service.KubeflowConnectorExecutorCreateExperiment;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -23,8 +23,13 @@ import de.viadee.bpm.camunda.connectors.kubeflow.service.KubeflowConnectorExecut
 import io.camunda.connector.http.base.model.HttpCommonResult;
 
 public class ExecutionHandler {
+
     public static KubeflowConnectorExecutor getExecutor(KubeflowConnectorRequest connectorRequest,
             long processInstanceKey) {
+
+        var selectedApi = KubeflowApisEnum.fromValue(
+            connectorRequest.kubeflowapi().api()
+        );
 
         var selectedOperation = KubeflowApiOperationsEnum.fromValue(
             connectorRequest.kubeflowapi().operation()
@@ -32,57 +37,68 @@ public class ExecutionHandler {
 
         switch (selectedOperation) {
             case GET_RUN_BY_ID:
-                return new KubeflowConnectorExecutorGetRunById(connectorRequest, processInstanceKey,
+                return new KubeflowConnectorExecutorGetRunById(connectorRequest, processInstanceKey, selectedApi,
                     KubeflowApiOperationsEnum.GET_RUN_BY_ID);
             case GET_RUN_BY_NAME:
-                return new KubeflowConnectorExecutorGetRunByName(connectorRequest, processInstanceKey,
+                return new KubeflowConnectorExecutorGetRunByName(connectorRequest, processInstanceKey, selectedApi,
                     KubeflowApiOperationsEnum.GET_RUN_BY_NAME);
             case START_RUN:
-                return new KubeflowConnectorExecutorStartRun(connectorRequest, processInstanceKey,
+                return new KubeflowConnectorExecutorStartRun(connectorRequest, processInstanceKey, selectedApi,
                     KubeflowApiOperationsEnum.START_RUN);
             case START_RUN_AND_MONITOR:
-                return new KubeflowConnectorExecutorStartRun(connectorRequest, processInstanceKey,
+                return new KubeflowConnectorExecutorStartRun(connectorRequest, processInstanceKey, selectedApi,
                     KubeflowApiOperationsEnum.START_RUN_AND_MONITOR);
             case GET_RUNS:
-                return new KubeflowConnectorExecutor(connectorRequest, processInstanceKey,
+                return new KubeflowConnectorExecutor(connectorRequest, processInstanceKey, selectedApi,
                     KubeflowApiOperationsEnum.GET_RUNS);
             case GET_EXPERIMENTS:
-                return new KubeflowConnectorExecutor(connectorRequest, processInstanceKey,
+                return new KubeflowConnectorExecutor(connectorRequest, processInstanceKey, selectedApi,
                     KubeflowApiOperationsEnum.GET_EXPERIMENTS);
             case GET_PIPELINES:
-                return new KubeflowConnectorExecutor(connectorRequest, processInstanceKey,
+                return new KubeflowConnectorExecutor(connectorRequest, processInstanceKey, selectedApi,
                     KubeflowApiOperationsEnum.GET_PIPELINES);
             case CREATE_EXPERIMENT:
-                return new KubeflowConnectorExecutorCreateExperiment(connectorRequest, processInstanceKey,
+                return new KubeflowConnectorExecutorCreateExperiment(connectorRequest, processInstanceKey, selectedApi,
                     KubeflowApiOperationsEnum.CREATE_EXPERIMENT);
             default: // OTHER
                 throw new RuntimeException("Selected operation is not supported");
         }
     }
 
-    public static String getFieldFromGetRunResponse(HttpCommonResult httpCommonResult, String field)
+    public static String getFieldFromCreateRunResponseV1(HttpCommonResult httpCommonResult, String field)
             throws JsonMappingException, JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode json = objectMapper.readTree(objectMapper.writeValueAsString(httpCommonResult));
-        json.hasNonNull("body");
         if (json.hasNonNull("body")
                 && json.path("body").hasNonNull("run")
                 && json.path("body").path("run").hasNonNull(field)) {
             String fieldValue = json.path("body").path("run").get(field).asText();
             return fieldValue;
         } else {
-            throw new RuntimeException("unexpected result from kubeflow get run API request");
+            throw new RuntimeException(String.format("unexpected result from kubeflow: could not read %s from 'create run'-response (v1)", field));
         }
     }
 
-    public static String getFieldFromGetRunsResponse(HttpCommonResult httpCommonResult, String field)
+    public static String getFieldFromCreateRunResponseV2(HttpCommonResult httpCommonResult, String field)
+        throws JsonMappingException, JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode json = objectMapper.readTree(objectMapper.writeValueAsString(httpCommonResult));
+        if (json.hasNonNull("body")
+            && json.path("body").hasNonNull(field)) {
+            String fieldValue = json.path("body").get(field).asText();
+            return fieldValue;
+        } else {
+            throw new RuntimeException(String.format("unexpected result from kubeflow: could not read %s from 'create run'-response (v1)", field));
+        }
+    }
+
+    public static String getFieldFromGetRunByNameResponse(HttpCommonResult httpCommonResult, String field)
             throws JsonMappingException, JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode json = objectMapper.readTree(objectMapper.writeValueAsString(httpCommonResult));
-        json.hasNonNull("body");
         if (json.hasNonNull("body")
                 && json.path("body").hasNonNull("runs")
-                && json.path("body").get("runs").size() > 0
+                && json.path("body").get("runs").size() < 2 // if more than 1 found, we would have failed in KubeflowConnectorExecutorGetRunByName's execute method
                 && json.path("body").path("runs").get(0).hasNonNull(field)) {
                 String fieldValue = json.path("body").path("runs").get(0).get(field).asText();
                 return fieldValue;

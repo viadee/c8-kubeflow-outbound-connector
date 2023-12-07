@@ -2,6 +2,7 @@ package de.viadee.bpm.camunda.connectors.kubeflow.dto.pipelines;
 
 import com.google.gson.annotations.SerializedName;
 
+// TODO
 public class Pipeline {
     private String id;
 

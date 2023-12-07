@@ -2,6 +2,7 @@ package de.viadee.bpm.camunda.connectors.kubeflow.dto.pipelines;
 
 import java.util.List;
 
+// TODO
 public class GetPipelinesResult {
     private List<Pipeline> pipelines;
 
