@@ -104,22 +104,13 @@ public class Oauth2Test {
             e.printStackTrace();
         }
 
-        final HttpGet request = new HttpGet("http://192.168.1.169:30663/login/oidc/callback");
-        request.setHeader("Authorization", "Bearer "+accesstoken);
-        try (CloseableHttpClient httpClient = HttpClientBuilder.create()
-                .build()) {
-            httpClient.execute(request, response -> {
-                response.getHeaders("Set-Cookie");
-                return response;
-            });
-        }
-
         HttpCommonRequest testRequest = new HttpCommonRequest();
         testRequest.setMethod(HttpMethod.GET);
-        testRequest.setUrl("http://192.168.1.169:30663/login/oidc/callback");
+        testRequest.setUrl("http://k8s.micudaj.de/pipeline/apis/v1beta1/pipelines");
         
         BearerAuthentication bearerAuth = new BearerAuthentication();
         bearerAuth.setToken(accesstoken);
+        testRequest.setAuthentication(bearerAuth);
 
 
         try {
