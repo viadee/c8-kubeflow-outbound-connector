@@ -26,10 +26,16 @@
       <bpmn:extensionElements>
         <zeebe:taskDefinition type="de.viadee.bpm.camunda:connector-kubeflow:1" />
         <zeebe:ioMapping>
+          <zeebe:input source="oauth-client-credentials-flow" target="authentication.type" />
+          <zeebe:input source="https://id.micudaj.de/auth/realms/micudaj/protocol/openid-connect/token" target="authentication.oauthTokenEndpoint" />
+          <zeebe:input source="kubeflow" target="authentication.clientId" />
+          <zeebe:input source="ilL6NwEmMyRupqp0gWfXgPJjyEEvqgdk" target="authentication.clientSecret" />
+          <zeebe:input source="basicAuthHeader" target="authentication.clientAuthentication" />
+          <zeebe:input source="openid email profile" target="authentication.scopes" />
           <zeebe:input source="pipelinesV1" target="kubeflowapi.api" />
           <zeebe:input source="start_run_and_monitor" target="kubeflowapi.operation" />
-          <zeebe:input target="kubeflowapi.pipelineId" />
-          <zeebe:input target="kubeflowapi.experimentId" />
+          <zeebe:input source="45a09475-ef2c-452a-939e-e0b53726a66c" target="kubeflowapi.pipelineId" />
+          <zeebe:input source="4447cdaf-6064-4b5c-8edf-ba46f4e96ca5" target="kubeflowapi.experimentId" />
           <zeebe:input source="PT60S" target="kubeflowapi.pollingInterval" />
         </zeebe:ioMapping>
         <zeebe:taskHeaders>

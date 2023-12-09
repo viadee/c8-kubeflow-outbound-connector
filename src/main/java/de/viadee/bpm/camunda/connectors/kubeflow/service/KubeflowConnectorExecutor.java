@@ -100,10 +100,7 @@ public class KubeflowConnectorExecutor {
         if (payload != null) {
             httpRequest.setBody(payload);
         }
-
-        // TODO replace with actual authentication when implemented
-        httpRequest
-            .setHeaders(Map.of("Cookie", "authservice_session=" + kubeflowCookie));
+        httpRequest.setAuthentication(connectorRequest.authentication());
     }
 
     private String buildUrlForKubeflowEndpoint() {

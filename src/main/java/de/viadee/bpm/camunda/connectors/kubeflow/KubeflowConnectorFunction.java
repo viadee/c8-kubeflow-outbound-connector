@@ -23,10 +23,12 @@ import io.camunda.connector.http.base.components.HttpTransportComponentSupplier;
 import io.camunda.connector.http.base.model.HttpCommonResult;
 import io.camunda.connector.http.base.services.HttpService;
 
-@OutboundConnector(name = "Kubeflow Connector", inputVariables = { "configuration",
+@OutboundConnector(name = "Kubeflow Connector", inputVariables = { "authentication", "configuration",
     "kubeflowapi" }, type = "de.viadee.bpm.camunda:connector-kubeflow:1")
 @ElementTemplate(id = "de.viadee.bpm.camunda.connectors.kubeflow.v1", name = "Kubeflow connector", version = 1, description = "Connector for communicating with Kubeflow from Camunda", icon = "icon.svg", documentationRef = "https://docs.camunda.io/docs/components/connectors/out-of-the-box-connectors/available-connectors-overview/", propertyGroups = {
-    @ElementTemplate.PropertyGroup(id = "configuration", label = "Configuration")
+    @ElementTemplate.PropertyGroup(id = "authentication", label = "Authentication"),
+    @ElementTemplate.PropertyGroup(id = "configuration", label = "Configuration"),
+    @ElementTemplate.PropertyGroup(id = "kubeflowapi", label = "Kubeflow API")
 }, inputDataClass = KubeflowConnectorRequest.class)
 public class KubeflowConnectorFunction implements OutboundConnectorFunction {
 

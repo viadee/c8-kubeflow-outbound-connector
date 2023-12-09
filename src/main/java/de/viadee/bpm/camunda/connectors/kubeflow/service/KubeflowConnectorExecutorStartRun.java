@@ -118,7 +118,7 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
             throws InstantiationException, IllegalAccessException, IOException {
         KubeflowApi kubeflowApi = new KubeflowApi(kubeflowApisEnum.getValue(), KubeflowApiOperationsEnum.GET_RUN_BY_NAME.getValue(), null,
                 null, null, runName, null, null, null);
-        KubeflowConnectorRequest getRunByNameConnectorRequest = new KubeflowConnectorRequest(
+        KubeflowConnectorRequest getRunByNameConnectorRequest = new KubeflowConnectorRequest(connectorRequest.authentication(),
                 connectorRequest.configuration(), kubeflowApi);
         KubeflowConnectorExecutor getRunByNameExecutor = ExecutionHandler.getExecutor(
                 getRunByNameConnectorRequest,
