@@ -280,8 +280,6 @@
                             <generateModels>true</generateModels>
                             <generateApiDocumentation>false</generateApiDocumentation>
                             <generateModelDocumentation>false</generateModelDocumentation>
-                            <!-- for avoiding duplicated classes -->
-                            <modelNamePrefix>V2</modelNamePrefix>
                         </configuration>
                     </execution>
                 </executions>

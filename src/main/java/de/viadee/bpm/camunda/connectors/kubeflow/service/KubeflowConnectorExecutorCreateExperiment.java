@@ -1,22 +1,18 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApisEnum;
-import java.util.Map;
-import java.util.Arrays;
+import io.swagger.client.model.V1ApiExperiment;
+import io.swagger.client.model.V1ApiResourceKey;
+import io.swagger.client.model.V1ApiResourceReference;
+import io.swagger.client.model.V1ApiResourceType;
+import io.swagger.client.model.V2beta1Experiment;
 
 import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApiOperationsEnum;
 import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowConnectorRequest;
-
+import java.util.Map;
 
 public class KubeflowConnectorExecutorCreateExperiment extends KubeflowConnectorExecutor {
-
-    private static final String IN_EXPERIMENT_NAME_V1 = "name";
-    private static final String IN_EXPERIMENT_NAME_V2 = "display_name";
-    private static final String IN_EXPERIMENT_NAMESPACE_V1 = "NAMESPACE";
-    private static final String IN_EXPERIMENT_NAMESPACE_V2 = "namespace";
-    private static final String IN_EXPERIMENT_RESOURCE_REFERENCES_V1 = "resource_references";
-    private static final String IN_EXPERIMENT_DESCRIPTION = "description";
-
 
     public KubeflowConnectorExecutorCreateExperiment(KubeflowConnectorRequest connectorRequest, long processInstanceKey, KubeflowApisEnum kubeflowApisEnum,
         KubeflowApiOperationsEnum kubeflowApiOperationsEnum) {
@@ -32,27 +28,42 @@ public class KubeflowConnectorExecutorCreateExperiment extends KubeflowConnector
     }
 
     private Map<String, Object> getPayloadForEndpointV1() {
-        return Map.of(
-            IN_EXPERIMENT_NAME_V1, connectorRequest.kubeflowapi().experimentName(),
-            IN_EXPERIMENT_RESOURCE_REFERENCES_V1, Arrays.asList(Map.of("key", Map.of("type",
-                IN_EXPERIMENT_NAMESPACE_V1, "id", super.kubeflowMultiNs))),
-            IN_EXPERIMENT_DESCRIPTION, getDescriptionOfExperiment()
-        );
+        var v1ApiResourceReference = new V1ApiResourceReference()
+            .key(new V1ApiResourceKey()
+                .type(V1ApiResourceType.NAMESPACE)
+                .id(super.kubeflowMultiNs));
+
+        var v1ApiExperiment = new V1ApiExperiment()
+            .name(getName())
+            .description(getDescription())
+            .addResourceReferencesItem(v1ApiResourceReference);
+
+        return objectMapper.convertValue(v1ApiExperiment,
+            new TypeReference<>() {});
     }
 
-    private Map<String, String> getPayloadForEndpointV2() {
-        return Map.of(
-            IN_EXPERIMENT_NAME_V2, connectorRequest.kubeflowapi().experimentName(),
-            IN_EXPERIMENT_NAMESPACE_V2, super.kubeflowMultiNs,
-            IN_EXPERIMENT_DESCRIPTION, getDescriptionOfExperiment()
-        );
+    private Map<String, Object> getPayloadForEndpointV2() {
+        var v2Beta1Experiment = new V2beta1Experiment()
+            .displayName(getName())
+            .description(getDescription())
+            .namespace(super.kubeflowMultiNs);
+        return objectMapper.convertValue(v2Beta1Experiment,
+            new TypeReference<>() {});
     }
 
-    private String getDescriptionOfExperiment() {
+    private String getDescription() {
         var description = connectorRequest.kubeflowapi().experimentDescription();
         if (description == null) {
             return "";
         }
         return description;
+    }
+
+    private String getName() {
+        var name = connectorRequest.kubeflowapi().experimentName();
+        if (name == null) {
+            return "";
+        }
+        return name;
     }
 }
