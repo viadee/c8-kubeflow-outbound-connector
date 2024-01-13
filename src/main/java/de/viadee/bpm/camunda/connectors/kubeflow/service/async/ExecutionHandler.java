@@ -9,18 +9,12 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApiOperationsEnum;
 import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowConnectorRequest;
 import de.viadee.bpm.camunda.connectors.kubeflow.service.KubeflowConnectorExecutor;
 import de.viadee.bpm.camunda.connectors.kubeflow.service.KubeflowConnectorExecutorGetRunById;
 import de.viadee.bpm.camunda.connectors.kubeflow.service.KubeflowConnectorExecutorGetRunByName;
 import de.viadee.bpm.camunda.connectors.kubeflow.service.KubeflowConnectorExecutorStartRun;
-import io.camunda.connector.http.base.model.HttpCommonResult;
 
 public class ExecutionHandler {
 
@@ -63,47 +57,6 @@ public class ExecutionHandler {
             default: // OTHER
                 throw new RuntimeException("Selected operation is not supported");
         }
-    }
-
-    public static String getFieldFromCreateRunResponseV1(HttpCommonResult httpCommonResult, String field)
-            throws JsonMappingException, JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode json = objectMapper.readTree(objectMapper.writeValueAsString(httpCommonResult));
-        if (json.hasNonNull("body")
-                && json.path("body").hasNonNull("run")
-                && json.path("body").path("run").hasNonNull(field)) {
-            String fieldValue = json.path("body").path("run").get(field).asText();
-            return fieldValue;
-        } else {
-            throw new RuntimeException(String.format("unexpected result from kubeflow: could not read %s from 'create run'-response (v1)", field));
-        }
-    }
-
-    public static String getFieldFromCreateRunResponseV2(HttpCommonResult httpCommonResult, String field)
-        throws JsonMappingException, JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode json = objectMapper.readTree(objectMapper.writeValueAsString(httpCommonResult));
-        if (json.hasNonNull("body")
-            && json.path("body").hasNonNull(field)) {
-            String fieldValue = json.path("body").get(field).asText();
-            return fieldValue;
-        } else {
-            throw new RuntimeException(String.format("unexpected result from kubeflow: could not read %s from 'create run'-response (v1)", field));
-        }
-    }
-
-    public static String getFieldFromGetRunByNameResponse(HttpCommonResult httpCommonResult, String field)
-            throws JsonMappingException, JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode json = objectMapper.readTree(objectMapper.writeValueAsString(httpCommonResult));
-        if (json.hasNonNull("body")
-                && json.path("body").hasNonNull("runs")
-                && json.path("body").get("runs").size() < 2 // if more than 1 found, we would have failed in KubeflowConnectorExecutorGetRunByName's execute method
-                && json.path("body").path("runs").get(0).hasNonNull(field)) {
-                String fieldValue = json.path("body").path("runs").get(0).get(field).asText();
-                return fieldValue;
-        }
-        return null;
     }
 
     public static <T> T runCallableAfterDelay(Callable<T> task, long delay, TimeUnit timeUnit)

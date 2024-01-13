@@ -1,11 +1,24 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApisEnum;
 import de.viadee.bpm.camunda.connectors.kubeflow.dto.PipelineRunStatusV1;
-import de.viadee.bpm.camunda.connectors.kubeflow.dto.PipelineRunStatusV2;
+import de.viadee.bpm.camunda.connectors.kubeflow.util.OffsetDateTimeDeserializer;
+import de.viadee.bpm.camunda.connectors.kubeflow.util.RunUtil;
+import io.swagger.client.model.V1ApiPipelineSpec;
+import io.swagger.client.model.V1ApiResourceKey;
+import io.swagger.client.model.V1ApiResourceReference;
+import io.swagger.client.model.V1ApiResourceType;
+import io.swagger.client.model.V1ApiRun;
+import io.swagger.client.model.V2beta1PipelineVersionReference;
+import io.swagger.client.model.V2beta1Run;
+import io.swagger.client.model.V2beta1RuntimeState;
 import java.io.IOException;
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -18,6 +31,7 @@ import de.viadee.bpm.camunda.connectors.kubeflow.service.async.ExecutionHandler;
 import de.viadee.bpm.camunda.connectors.kubeflow.service.async.KubeflowCallable;
 import io.camunda.connector.http.base.model.HttpCommonResult;
 import io.camunda.connector.http.base.services.HttpService;
+import org.threeten.bp.OffsetDateTime;
 
 public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor {
 
@@ -29,28 +43,35 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
     );
 
     private static final List RUN_STATUS_LIST_V2 = List.of(
-        PipelineRunStatusV2.SUCCEEDED.name(),
-        PipelineRunStatusV2.FAILED.name(),
-        PipelineRunStatusV2.SKIPPED.name(),
-        PipelineRunStatusV2.CANCELED.name()
+        V2beta1RuntimeState.SUCCEEDED.getValue(),
+        V2beta1RuntimeState.FAILED.getValue(),
+        V2beta1RuntimeState.SKIPPED.getValue(),
+        V2beta1RuntimeState.CANCELED.getValue()
     );
 
+    private static final ObjectMapper objectMapper = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .registerModule(new SimpleModule().addDeserializer(OffsetDateTime.class,
+            new OffsetDateTimeDeserializer()))
+        .setPropertyNamingStrategy(SnakeCaseStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES);
+
     private HttpService httpService;
+
+    private RunUtil runUtil;
 
     public KubeflowConnectorExecutorStartRun(KubeflowConnectorRequest connectorRequest, long processInstanceKey, KubeflowApisEnum kubeflowApisEnum,
         KubeflowApiOperationsEnum kubeflowApiOperationsEnum) {
         super(connectorRequest, processInstanceKey, kubeflowApisEnum, kubeflowApiOperationsEnum);
+        runUtil = new RunUtil();
     }
 
     @Override
     protected Object buildPayloadForKubeflowEndpoint() {
-        var pipelineSpec = Map.of("pipeline_id", connectorRequest.kubeflowapi().pipelineId());
-
         // use process instance key as name of run to be created
         if (KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum)) {
-            return getPayloadForEndpointV1(pipelineSpec);
+            return getPayloadForEndpointV1();
         }
-        return getPayloadForEndpointV2(pipelineSpec);
+        return getPayloadForEndpointV2();
     }
 
     @Override
@@ -70,8 +91,7 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
             if (idOfAlreadyStartedRun == null) { // run not yet started
                 result = startRun();
                 String newRunId = KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum) ?
-                    ExecutionHandler.getFieldFromCreateRunResponseV1(result, "id") :
-                    ExecutionHandler.getFieldFromCreateRunResponseV2(result, "run_id");
+                    runUtil.extractIdFromV1RunResponse(result) : runUtil.extractIdFromV2RunResponse(result);
                 KubeflowCallable kubeflowCallableRunNotStarted = new KubeflowCallable(connectorRequest, processInstanceKey, httpService, newRunId);
                 statusOfRun = retrieveRunStatusWithDelay(kubeflowCallableRunNotStarted, pollingInterval.getSeconds(), false);
 
@@ -81,7 +101,7 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
                 statusOfRun = retrieveRunStatusWithDelay(kubeflowCallableRunStarted, pollingInterval.getSeconds(), true);
             }
 
-            result.setBody(statusOfRun);
+            result.setBody(statusOfRun); // TODO warum hier nicht auch neben dem Status des Runs auch die Run-Details zurueckgeben?
             result.setStatus(200);
 
         } else {
@@ -91,23 +111,35 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
         return result;
     }
 
-    private Map<String, Object> getPayloadForEndpointV1(Map<String, String> pipelineSpec) {
-        var resource_reference_key = Map.of("type", "EXPERIMENT", "id",
-            connectorRequest.kubeflowapi().experimentId());
-        var resource_references = Map.of("key", resource_reference_key);
+    private Map<String, Object> getPayloadForEndpointV1() {
+        var v1ApiPipelineSpec = new V1ApiPipelineSpec()
+            .pipelineId(connectorRequest.kubeflowapi().pipelineId());
 
-        var payload = Map.of("name", Long.toString(processInstanceKey), "pipeline_spec",
-            pipelineSpec, "resource_references", Arrays.asList(resource_references));
+        var v1ApiResourceReference = new V1ApiResourceReference()
+            .key(new V1ApiResourceKey()
+                .type(V1ApiResourceType.EXPERIMENT)
+                .id(connectorRequest.kubeflowapi().experimentId()));
 
-        return payload;
+        var v1ApiRun = new V1ApiRun()
+            .name(Long.toString(processInstanceKey))
+            .pipelineSpec(v1ApiPipelineSpec)
+            .addResourceReferencesItem(v1ApiResourceReference);
+
+        return objectMapper.convertValue(v1ApiRun,
+            new TypeReference<>() {});
     }
 
-    private Map<String, Object> getPayloadForEndpointV2(Map<String, String> pipelineSpec) {
-        return Map.of(
-            "display_name", Long.toString(processInstanceKey),
-            "pipeline_version_reference", pipelineSpec,
-            "experiment_id", connectorRequest.kubeflowapi().experimentId()
-        );
+    private Map<String, Object> getPayloadForEndpointV2() {
+        var v2beta1PipelineVersionReference = new V2beta1PipelineVersionReference()
+            .pipelineId(connectorRequest.kubeflowapi().pipelineId());
+
+        var v2ApiRun = new V2beta1Run()
+            .displayName(Long.toString(processInstanceKey))
+            .pipelineVersionReference(v2beta1PipelineVersionReference)
+            .experimentId(connectorRequest.kubeflowapi().experimentId());
+
+        return objectMapper.convertValue(v2ApiRun,
+            new TypeReference<>() {});
     }
 
     private HttpCommonResult startRun() throws InstantiationException, IllegalAccessException, IOException {
@@ -118,16 +150,18 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
             throws InstantiationException, IllegalAccessException, IOException {
         KubeflowApi kubeflowApi = new KubeflowApi(kubeflowApisEnum.getValue(), KubeflowApiOperationsEnum.GET_RUN_BY_NAME.getValue(), null,
                 null, null, runName, null, null, null);
+
         KubeflowConnectorRequest getRunByNameConnectorRequest = new KubeflowConnectorRequest(
                 connectorRequest.configuration(), kubeflowApi);
-        KubeflowConnectorExecutor getRunByNameExecutor = ExecutionHandler.getExecutor(
+
+        KubeflowConnectorExecutorGetRunByName getRunByNameExecutor = (KubeflowConnectorExecutorGetRunByName) ExecutionHandler.getExecutor(
                 getRunByNameConnectorRequest,
                 processInstanceKey);
-        HttpCommonResult result = getRunByNameExecutor.execute(httpService);
 
         String id = KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum) ?
-            ExecutionHandler.getFieldFromGetRunByNameResponse(result, "id") :
-            ExecutionHandler.getFieldFromGetRunByNameResponse(result, "run_id");
+            getRunByNameExecutor.getRunByNameV1Typed(httpService).map(V1ApiRun::getId).orElse(null) :
+            getRunByNameExecutor.getRunByNameV2Typed(httpService).map(V2beta1Run::getRunId).orElse(null);
+
         return id;
     }
 
@@ -149,5 +183,4 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
         }
         return status;
     }
-
 }

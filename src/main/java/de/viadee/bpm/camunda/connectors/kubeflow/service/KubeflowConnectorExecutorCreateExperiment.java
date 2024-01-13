@@ -1,6 +1,7 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApisEnum;
 import io.swagger.client.model.V1ApiExperiment;
 import io.swagger.client.model.V1ApiResourceKey;
@@ -13,6 +14,8 @@ import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowConnectorRequest;
 import java.util.Map;
 
 public class KubeflowConnectorExecutorCreateExperiment extends KubeflowConnectorExecutor {
+
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public KubeflowConnectorExecutorCreateExperiment(KubeflowConnectorRequest connectorRequest, long processInstanceKey, KubeflowApisEnum kubeflowApisEnum,
         KubeflowApiOperationsEnum kubeflowApiOperationsEnum) {

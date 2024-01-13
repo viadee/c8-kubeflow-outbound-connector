@@ -1,6 +1,5 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApisEnum;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -29,7 +28,6 @@ public class KubeflowConnectorExecutor {
     protected KubeflowApisEnum kubeflowApisEnum;
     protected KubeflowApiOperationsEnum kubeflowApiOperationsEnum;
     protected HttpCommonRequest httpRequest;
-    protected ObjectMapper objectMapper;
     protected String kubeflowMultiNs;
 
     private String kubeflowUrl;
@@ -41,8 +39,6 @@ public class KubeflowConnectorExecutor {
         this.processInstanceKey = processInstanceKey;
         this.kubeflowApisEnum = kubeflowApisEnum;
         this.kubeflowApiOperationsEnum = kubeflowApiOperationsEnum;
-
-        objectMapper = new ObjectMapper();
 
         setConfigurationParameters();
 
@@ -124,7 +120,7 @@ public class KubeflowConnectorExecutor {
         return url;
     }
 
-    private void addFilter(URIBuilder uriBuilder) throws UnsupportedEncodingException {
+    private void addFilter(URIBuilder uriBuilder) throws UnsupportedEncodingException { // TODO pojo
         String filter = "";
         if (getFilterString() != null) {
             // this regex removes all new lines and escaping of " before url encoding is
@@ -136,7 +132,7 @@ public class KubeflowConnectorExecutor {
         }
     }
 
-    protected void addNamespaceFilter(URIBuilder uriBuilder) {
+    protected void addNamespaceFilter(URIBuilder uriBuilder) { // TODO pojo
         if (kubeflowApiOperationsEnum.requiresMultiuserFilter()) {
             if (KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum)) {
                 uriBuilder.addParameter(URI_PARAMETER_NAMESPACE_TYPE_PAIR.getKey(), URI_PARAMETER_NAMESPACE_TYPE_PAIR.getValue());
