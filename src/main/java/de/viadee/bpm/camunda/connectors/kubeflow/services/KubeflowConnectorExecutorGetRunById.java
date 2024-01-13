@@ -1,9 +1,9 @@
-package de.viadee.bpm.camunda.connectors.kubeflow.service;
+package de.viadee.bpm.camunda.connectors.kubeflow.services;
 
-import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApiOperationsEnum;
-import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApisEnum;
-import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowConnectorRequest;
-import de.viadee.bpm.camunda.connectors.kubeflow.util.RunUtil;
+import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApiOperationsEnum;
+import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApisEnum;
+import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
+import de.viadee.bpm.camunda.connectors.kubeflow.utils.RunUtil;
 import io.camunda.connector.http.base.model.HttpCommonResult;
 import io.camunda.connector.http.base.services.HttpService;
 import io.swagger.client.model.V1ApiRun;

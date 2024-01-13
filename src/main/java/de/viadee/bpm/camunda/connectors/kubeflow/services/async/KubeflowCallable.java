@@ -1,16 +1,13 @@
-package de.viadee.bpm.camunda.connectors.kubeflow.service.async;
+package de.viadee.bpm.camunda.connectors.kubeflow.services.async;
 
-import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApisEnum;
-import de.viadee.bpm.camunda.connectors.kubeflow.service.KubeflowConnectorExecutorGetRunById;
-import io.swagger.client.model.V1ApiRun;
-import io.swagger.client.model.V2beta1Run;
-import io.swagger.client.model.V2beta1RuntimeState;
+import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApisEnum;
+import de.viadee.bpm.camunda.connectors.kubeflow.services.KubeflowConnectorExecutorGetRunById;
 import java.io.IOException;
 import java.util.concurrent.Callable;
 
-import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApiOperationsEnum;
-import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowConnectorRequest;
-import de.viadee.bpm.camunda.connectors.kubeflow.dto.input.KubeflowApi;
+import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApiOperationsEnum;
+import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
+import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.KubeflowApi;
 import io.camunda.connector.http.base.services.HttpService;
 
 public class KubeflowCallable implements Callable<String> {

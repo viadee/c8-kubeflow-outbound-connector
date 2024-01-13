@@ -1,4 +1,4 @@
-package de.viadee.bpm.camunda.connectors.kubeflow.util;
+package de.viadee.bpm.camunda.connectors.kubeflow.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,15 +15,13 @@ import org.threeten.bp.OffsetDateTime;
 
 public class RunUtil {
 
-  private ObjectMapper runMapper;
+  private static final ObjectMapper runMapper = new ObjectMapper()
+      .registerModule(new JavaTimeModule())
+      .registerModule(new SimpleModule().addDeserializer(OffsetDateTime.class,
+          new OffsetDateTimeDeserializer()))
+      .setPropertyNamingStrategy(SnakeCaseStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES);
 
-  public RunUtil() {
-    runMapper = new ObjectMapper()
-        .registerModule(new JavaTimeModule())
-        .registerModule(new SimpleModule().addDeserializer(OffsetDateTime.class,
-            new OffsetDateTimeDeserializer()))
-        .setPropertyNamingStrategy(SnakeCaseStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES);
-  }
+  public RunUtil() {}
 
   public V1ApiListRunsResponse readV1RunListAsTypedResponse(HttpCommonResult runResponse)
       throws JsonProcessingException {

@@ -1,4 +1,4 @@
-package de.viadee.bpm.camunda.connectors.kubeflow.dto.input;
+package de.viadee.bpm.camunda.connectors.kubeflow.entities.input;
 
 import io.camunda.connector.generator.annotation.TemplateProperty;
 

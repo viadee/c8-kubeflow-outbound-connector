@@ -1,4 +1,4 @@
-package de.viadee.bpm.camunda.connectors.kubeflow.util;
+package de.viadee.bpm.camunda.connectors.kubeflow.utils;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;

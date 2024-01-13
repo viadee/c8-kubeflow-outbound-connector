@@ -1,7 +1,7 @@
-package de.viadee.bpm.camunda.connectors.kubeflow.service.async;
+package de.viadee.bpm.camunda.connectors.kubeflow.services.async;
 
-import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApisEnum;
-import de.viadee.bpm.camunda.connectors.kubeflow.service.KubeflowConnectorExecutorCreateExperiment;
+import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApisEnum;
+import de.viadee.bpm.camunda.connectors.kubeflow.services.KubeflowConnectorExecutorCreateExperiment;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -9,12 +9,12 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApiOperationsEnum;
-import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowConnectorRequest;
-import de.viadee.bpm.camunda.connectors.kubeflow.service.KubeflowConnectorExecutor;
-import de.viadee.bpm.camunda.connectors.kubeflow.service.KubeflowConnectorExecutorGetRunById;
-import de.viadee.bpm.camunda.connectors.kubeflow.service.KubeflowConnectorExecutorGetRunByName;
-import de.viadee.bpm.camunda.connectors.kubeflow.service.KubeflowConnectorExecutorStartRun;
+import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApiOperationsEnum;
+import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
+import de.viadee.bpm.camunda.connectors.kubeflow.services.KubeflowConnectorExecutor;
+import de.viadee.bpm.camunda.connectors.kubeflow.services.KubeflowConnectorExecutorGetRunById;
+import de.viadee.bpm.camunda.connectors.kubeflow.services.KubeflowConnectorExecutorGetRunByName;
+import de.viadee.bpm.camunda.connectors.kubeflow.services.KubeflowConnectorExecutorStartRun;
 
 public class ExecutionHandler {
 

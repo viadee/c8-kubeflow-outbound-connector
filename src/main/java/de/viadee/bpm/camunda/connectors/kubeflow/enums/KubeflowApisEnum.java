@@ -1,4 +1,4 @@
-package de.viadee.bpm.camunda.connectors.kubeflow.dto;
+package de.viadee.bpm.camunda.connectors.kubeflow.enums;
 
 import java.util.Arrays;
 

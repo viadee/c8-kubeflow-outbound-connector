@@ -1,28 +1,25 @@
-package de.viadee.bpm.camunda.connectors.kubeflow.service;
+package de.viadee.bpm.camunda.connectors.kubeflow.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApiOperationsEnum;
-import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApisEnum;
-import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowConnectorRequest;
-import de.viadee.bpm.camunda.connectors.kubeflow.util.RunUtil;
+import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApiOperationsEnum;
+import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApisEnum;
+import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
+import de.viadee.bpm.camunda.connectors.kubeflow.entities.V1Filter;
+import de.viadee.bpm.camunda.connectors.kubeflow.entities.V1FilterPredicate;
+import de.viadee.bpm.camunda.connectors.kubeflow.utils.RunUtil;
 import io.camunda.connector.http.base.model.HttpCommonResult;
 import io.camunda.connector.http.base.services.HttpService;
 import io.swagger.client.model.V1ApiRun;
+import io.swagger.client.model.V2beta1Filter;
+import io.swagger.client.model.V2beta1Predicate;
+import io.swagger.client.model.V2beta1PredicateOperation;
 import io.swagger.client.model.V2beta1Run;
 import java.io.IOException;
 import java.util.Optional;
-import org.apache.commons.lang3.tuple.Pair;
 
 public class KubeflowConnectorExecutorGetRunByName extends KubeflowConnectorExecutor {
-
-  private static final Pair<String, String> FILTER_BY_OPERATION_PAIR_V1 = Pair.of("op", "EQUALS");
-  private static final Pair<String, String> FILTER_BY_OPERATION_PAIR_V2 = Pair.of("operation", "EQUALS");
-
-  private static final Pair<String, String> FILTER_BY_KEY_PAIR = Pair.of("key", "name");
-  private static final String FILTER_BY_RUN_NAME_KEY = "string_value";
+  private static final String FILTER_BY_KEY = "name";
   private static final ObjectMapper objectMapper = new ObjectMapper();
-
   private RunUtil runUtil;
 
   public KubeflowConnectorExecutorGetRunByName(KubeflowConnectorRequest connectorRequest, long processInstanceKey, KubeflowApisEnum kubeflowApisEnum,
@@ -32,10 +29,14 @@ public class KubeflowConnectorExecutorGetRunByName extends KubeflowConnectorExec
   }
 
   @Override
-  protected String getFilterString() { // TODO pojo
-    var filter = objectMapper.createObjectNode();
-    filter.put("predicates", buildArrayNode());
-    return filter.toString();
+  protected String getFilterString() {
+    var filter = KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum) ?
+        getV1Filter() : getV2Filter();
+    try {
+      return objectMapper.writeValueAsString(filter);
+    } catch (Exception e) {
+      throw new RuntimeException("Error occurred during serialization of filter object");
+    }
   }
 
   @Override
@@ -71,13 +72,23 @@ public class KubeflowConnectorExecutorGetRunByName extends KubeflowConnectorExec
     return Optional.ofNullable(v2ApiRun);
   }
 
-  private ArrayNode buildArrayNode() { // TODO pojo
-    var jsonNode = objectMapper.createObjectNode();
-    var filterByOperationPair = KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum) ?
-        FILTER_BY_OPERATION_PAIR_V1 : FILTER_BY_OPERATION_PAIR_V2;
-    jsonNode.put(filterByOperationPair.getKey(), filterByOperationPair.getValue());
-    jsonNode.put(FILTER_BY_KEY_PAIR.getKey(), FILTER_BY_KEY_PAIR.getValue());
-    jsonNode.put(FILTER_BY_RUN_NAME_KEY, connectorRequest.kubeflowapi().filter());
-    return objectMapper.createArrayNode().add(jsonNode);
+  private V1Filter getV1Filter() {
+    var predicate = new V1FilterPredicate()
+        .op(V2beta1PredicateOperation.EQUALS)
+        .key(FILTER_BY_KEY)
+        .stringValue(connectorRequest.kubeflowapi().filter());
+
+    return new V1Filter()
+        .addPredicatesItem(predicate);
+  }
+
+  private V2beta1Filter getV2Filter() {
+    var predicate = new V2beta1Predicate()
+        .operation(V2beta1PredicateOperation.EQUALS)
+        .key(FILTER_BY_KEY)
+        .stringValue(connectorRequest.kubeflowapi().filter());
+
+    return new V2beta1Filter()
+        .addPredicatesItem(predicate);
   }
 }

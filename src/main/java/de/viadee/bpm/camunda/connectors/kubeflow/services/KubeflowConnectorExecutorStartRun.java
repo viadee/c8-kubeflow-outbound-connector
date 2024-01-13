@@ -1,14 +1,14 @@
-package de.viadee.bpm.camunda.connectors.kubeflow.service;
+package de.viadee.bpm.camunda.connectors.kubeflow.services;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApisEnum;
-import de.viadee.bpm.camunda.connectors.kubeflow.dto.PipelineRunStatusV1;
-import de.viadee.bpm.camunda.connectors.kubeflow.util.OffsetDateTimeDeserializer;
-import de.viadee.bpm.camunda.connectors.kubeflow.util.RunUtil;
+import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApisEnum;
+import de.viadee.bpm.camunda.connectors.kubeflow.enums.V1PipelineRunStatusEnum;
+import de.viadee.bpm.camunda.connectors.kubeflow.utils.OffsetDateTimeDeserializer;
+import de.viadee.bpm.camunda.connectors.kubeflow.utils.RunUtil;
 import io.swagger.client.model.V1ApiPipelineSpec;
 import io.swagger.client.model.V1ApiResourceKey;
 import io.swagger.client.model.V1ApiResourceReference;
@@ -24,11 +24,11 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApiOperationsEnum;
-import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowConnectorRequest;
-import de.viadee.bpm.camunda.connectors.kubeflow.dto.input.KubeflowApi;
-import de.viadee.bpm.camunda.connectors.kubeflow.service.async.ExecutionHandler;
-import de.viadee.bpm.camunda.connectors.kubeflow.service.async.KubeflowCallable;
+import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApiOperationsEnum;
+import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
+import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.KubeflowApi;
+import de.viadee.bpm.camunda.connectors.kubeflow.services.async.ExecutionHandler;
+import de.viadee.bpm.camunda.connectors.kubeflow.services.async.KubeflowCallable;
 import io.camunda.connector.http.base.model.HttpCommonResult;
 import io.camunda.connector.http.base.services.HttpService;
 import org.threeten.bp.OffsetDateTime;
@@ -36,10 +36,10 @@ import org.threeten.bp.OffsetDateTime;
 public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor {
 
     private static final List RUN_STATUS_LIST_V1 = List.of(
-        PipelineRunStatusV1.SUCCEEDED.getValue(),
-        PipelineRunStatusV1.FAILED.getValue(),
-        PipelineRunStatusV1.SKIPPED.getValue(),
-        PipelineRunStatusV1.ERROR.getValue()
+        V1PipelineRunStatusEnum.SUCCEEDED.getValue(),
+        V1PipelineRunStatusEnum.FAILED.getValue(),
+        V1PipelineRunStatusEnum.SKIPPED.getValue(),
+        V1PipelineRunStatusEnum.ERROR.getValue()
     );
 
     private static final List RUN_STATUS_LIST_V2 = List.of(

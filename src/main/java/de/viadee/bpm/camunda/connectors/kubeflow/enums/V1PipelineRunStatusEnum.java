@@ -1,6 +1,6 @@
-package de.viadee.bpm.camunda.connectors.kubeflow.dto;
+package de.viadee.bpm.camunda.connectors.kubeflow.enums;
 
-public enum PipelineRunStatusV1 {
+public enum V1PipelineRunStatusEnum {
   SUCCEEDED("Succeeded"),
   FAILED("Failed"),
   PENDING("Pending"),
@@ -10,7 +10,7 @@ public enum PipelineRunStatusV1 {
 
   private final String value;
 
-  PipelineRunStatusV1(String value) {
+  V1PipelineRunStatusEnum(String value) {
     this.value = value;
   }
 

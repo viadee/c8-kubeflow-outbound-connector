@@ -1,6 +1,6 @@
-package de.viadee.bpm.camunda.connectors.kubeflow.service;
+package de.viadee.bpm.camunda.connectors.kubeflow.services;
 
-import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApisEnum;
+import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApisEnum;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
@@ -10,8 +10,8 @@ import java.util.Map;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.client.utils.URIBuilder;
 
-import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApiOperationsEnum;
-import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowConnectorRequest;
+import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApiOperationsEnum;
+import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
 import io.camunda.connector.http.base.model.HttpCommonRequest;
 import io.camunda.connector.http.base.model.HttpCommonResult;
 import io.camunda.connector.http.base.services.HttpService;
@@ -121,10 +121,10 @@ public class KubeflowConnectorExecutor {
     }
 
     private void addFilter(URIBuilder uriBuilder) throws UnsupportedEncodingException { // TODO pojo
-        String filter = "";
-        if (getFilterString() != null) {
+        String filter = getFilterString();
+        if (filter != null) {
             // this regex removes all new lines and escaping of " before url encoding is
-            filter = getFilterString().replaceAll("[\\\\r]?\\\\n", "").replace("\\\"", "\"");
+            filter = filter.replaceAll("[\\\\r]?\\\\n", "").replace("\\\"", "\"");
         }
 
         if (!filter.equals("")) {
