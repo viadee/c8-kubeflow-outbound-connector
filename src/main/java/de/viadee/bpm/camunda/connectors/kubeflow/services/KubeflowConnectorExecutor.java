@@ -123,13 +123,10 @@ public class KubeflowConnectorExecutor {
     }
 
     private void addFilter(URIBuilder uriBuilder) throws UnsupportedEncodingException {
-        String filter = getFilterString();
+        var filter = getFilterString();
         if (filter != null) {
             // this regex removes all new lines and escaping of " before url encoding is
             filter = filter.replaceAll("[\\\\r]?\\\\n", "").replace("\\\"", "\"");
-        }
-
-        if (!filter.equals("")) {
             uriBuilder.addParameter(URI_PARAMETER_FILTER, URLEncoder.encode(filter, "UTF-8"));
         }
     }
