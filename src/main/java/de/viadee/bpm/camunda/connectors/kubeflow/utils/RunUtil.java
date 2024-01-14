@@ -1,17 +1,19 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.utils;
 
+import org.threeten.bp.OffsetDateTime;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import io.camunda.connector.http.base.model.HttpCommonResult;
 import io.swagger.client.model.V1ApiListRunsResponse;
 import io.swagger.client.model.V1ApiRun;
 import io.swagger.client.model.V1ApiRunDetail;
 import io.swagger.client.model.V2beta1ListRunsResponse;
 import io.swagger.client.model.V2beta1Run;
-import org.threeten.bp.OffsetDateTime;
 
 public class RunUtil {
 
@@ -19,7 +21,7 @@ public class RunUtil {
       .registerModule(new JavaTimeModule())
       .registerModule(new SimpleModule().addDeserializer(OffsetDateTime.class,
           new OffsetDateTimeDeserializer()))
-      .setPropertyNamingStrategy(SnakeCaseStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES);
+      .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
 
   public RunUtil() {}
 
