@@ -1,7 +1,6 @@
-package de.viadee.bpm.camunda.connectors.kubeflow.service;
+package de.viadee.bpm.camunda.connectors.kubeflow.services;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApisEnum;
+import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApisEnum;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
@@ -11,8 +10,8 @@ import java.util.Map;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.client.utils.URIBuilder;
 
-import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApiOperationsEnum;
-import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowConnectorRequest;
+import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApiOperationsEnum;
+import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
 import io.camunda.connector.http.base.model.HttpCommonRequest;
 import io.camunda.connector.http.base.model.HttpCommonResult;
 import io.camunda.connector.http.base.services.HttpService;
@@ -21,15 +20,16 @@ public class KubeflowConnectorExecutor {
     private static final String KUBEFLOW_URL_ENV = "KF_CONNECTOR_URL";
     private static final String KUBEFLOW_COOKIE_ENV = "KF_CONNECTOR_COOKIE";
     private static final String KUBEFLOW_NAMESPACE_ENV = "KF_CONNECTOR_MULTIUSER_NS";
-    private static final Pair<String, String> URI_PARAMETER_NAMESPACE_TYPE_PAIR = Pair.of("resource_reference_key.type", "NAMESPACE");
-    private static final String URI_PARAMETER_NAMESPACE_ID_KEY = "resource_reference_key.id";
+    private static final String URI_PARAMETER_FILTER = "filter";
+    private static final Pair<String, String> URI_PARAMETER_PAIR_V1_TYPE_NS = Pair.of("resource_reference_key.type", "NAMESPACE");
+    private static final String URI_PARAMETER_V1_ID = "resource_reference_key.id";
+    private static final String URI_PARAMETER_V2_NS = "namespace";
 
     protected long processInstanceKey;
     protected KubeflowConnectorRequest connectorRequest;
     protected KubeflowApisEnum kubeflowApisEnum;
     protected KubeflowApiOperationsEnum kubeflowApiOperationsEnum;
     protected HttpCommonRequest httpRequest;
-    protected ObjectMapper objectMapper;
     protected String kubeflowMultiNs;
 
     private String kubeflowUrl;
@@ -41,8 +41,6 @@ public class KubeflowConnectorExecutor {
         this.processInstanceKey = processInstanceKey;
         this.kubeflowApisEnum = kubeflowApisEnum;
         this.kubeflowApiOperationsEnum = kubeflowApiOperationsEnum;
-
-        objectMapper = new ObjectMapper();
 
         setConfigurationParameters();
 
@@ -125,24 +123,21 @@ public class KubeflowConnectorExecutor {
     }
 
     private void addFilter(URIBuilder uriBuilder) throws UnsupportedEncodingException {
-        String filter = "";
-        if (getFilterString() != null) {
+        var filter = getFilterString();
+        if (filter != null) {
             // this regex removes all new lines and escaping of " before url encoding is
-            filter = getFilterString().replaceAll("[\\\\r]?\\\\n", "").replace("\\\"", "\"");
-        }
-
-        if (!filter.equals("")) {
-            uriBuilder.addParameter("filter", URLEncoder.encode(filter, "UTF-8"));
+            filter = filter.replaceAll("[\\\\r]?\\\\n", "").replace("\\\"", "\"");
+            uriBuilder.addParameter(URI_PARAMETER_FILTER, URLEncoder.encode(filter, "UTF-8"));
         }
     }
 
     protected void addNamespaceFilter(URIBuilder uriBuilder) {
         if (kubeflowApiOperationsEnum.requiresMultiuserFilter()) {
             if (KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum)) {
-                uriBuilder.addParameter(URI_PARAMETER_NAMESPACE_TYPE_PAIR.getKey(), URI_PARAMETER_NAMESPACE_TYPE_PAIR.getValue());
-                uriBuilder.addParameter(URI_PARAMETER_NAMESPACE_ID_KEY, kubeflowMultiNs);
+                uriBuilder.addParameter(URI_PARAMETER_PAIR_V1_TYPE_NS.getKey(), URI_PARAMETER_PAIR_V1_TYPE_NS.getValue());
+                uriBuilder.addParameter(URI_PARAMETER_V1_ID, kubeflowMultiNs);
             } else {
-                uriBuilder.addParameter("namespace", kubeflowMultiNs);
+                uriBuilder.addParameter(URI_PARAMETER_V2_NS, kubeflowMultiNs);
             }
         }
     }

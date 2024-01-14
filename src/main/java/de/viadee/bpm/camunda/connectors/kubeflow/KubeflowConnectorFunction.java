@@ -11,9 +11,9 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.api.client.http.HttpRequestFactory;
 
-import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowConnectorRequest;
-import de.viadee.bpm.camunda.connectors.kubeflow.service.KubeflowConnectorExecutor;
-import de.viadee.bpm.camunda.connectors.kubeflow.service.async.ExecutionHandler;
+import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
+import de.viadee.bpm.camunda.connectors.kubeflow.services.KubeflowConnectorExecutor;
+import de.viadee.bpm.camunda.connectors.kubeflow.services.async.ExecutionHandler;
 import io.camunda.connector.api.annotation.OutboundConnector;
 import io.camunda.connector.api.outbound.OutboundConnectorContext;
 import io.camunda.connector.api.outbound.OutboundConnectorFunction;

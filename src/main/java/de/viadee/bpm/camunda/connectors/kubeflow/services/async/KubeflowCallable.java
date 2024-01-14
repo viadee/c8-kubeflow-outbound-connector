@@ -1,14 +1,13 @@
-package de.viadee.bpm.camunda.connectors.kubeflow.service.async;
+package de.viadee.bpm.camunda.connectors.kubeflow.services.async;
 
-import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApisEnum;
+import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApisEnum;
+import de.viadee.bpm.camunda.connectors.kubeflow.services.KubeflowConnectorExecutorGetRunById;
 import java.io.IOException;
 import java.util.concurrent.Callable;
 
-import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApiOperationsEnum;
-import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowConnectorRequest;
-import de.viadee.bpm.camunda.connectors.kubeflow.dto.input.KubeflowApi;
-import de.viadee.bpm.camunda.connectors.kubeflow.service.KubeflowConnectorExecutor;
-import io.camunda.connector.http.base.model.HttpCommonResult;
+import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApiOperationsEnum;
+import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
+import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.KubeflowApi;
 import io.camunda.connector.http.base.services.HttpService;
 
 public class KubeflowCallable implements Callable<String> {
@@ -39,14 +38,13 @@ public class KubeflowCallable implements Callable<String> {
             runId, null, null, null, null, null, null);
         KubeflowConnectorRequest getRunByIdConnectorRequest = new KubeflowConnectorRequest(
                 connectorRequest.configuration(), kubeflowApi);
-        KubeflowConnectorExecutor getRunByIdExecutor = ExecutionHandler.getExecutor(
+        KubeflowConnectorExecutorGetRunById getRunByIdExecutor = (KubeflowConnectorExecutorGetRunById) ExecutionHandler.getExecutor(
                 getRunByIdConnectorRequest,
                 processInstanceKey);
-        HttpCommonResult result = getRunByIdExecutor.execute(httpService);
 
         String status = KubeflowApisEnum.PIPELINES_V1.equals(KubeflowApisEnum.fromValue(kubeflowApi.api())) ?
-            ExecutionHandler.getFieldFromCreateRunResponseV1(result, "status") :
-            ExecutionHandler.getFieldFromCreateRunResponseV2(result, "state");
+            getRunByIdExecutor.getRunByIdV1Typed(httpService).getStatus() :
+            getRunByIdExecutor.getRunByIdV2Typed(httpService).getState().getValue();
 
         return status;
     }
