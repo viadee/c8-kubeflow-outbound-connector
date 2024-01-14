@@ -1,7 +1,6 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.services.async;
 
-import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApisEnum;
-import de.viadee.bpm.camunda.connectors.kubeflow.services.KubeflowConnectorExecutorCreateExperiment;
+import java.net.http.HttpResponse;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -9,9 +8,11 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApiOperationsEnum;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
+import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApiOperationsEnum;
+import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApisEnum;
 import de.viadee.bpm.camunda.connectors.kubeflow.services.KubeflowConnectorExecutor;
+import de.viadee.bpm.camunda.connectors.kubeflow.services.KubeflowConnectorExecutorCreateExperiment;
 import de.viadee.bpm.camunda.connectors.kubeflow.services.KubeflowConnectorExecutorGetRunById;
 import de.viadee.bpm.camunda.connectors.kubeflow.services.KubeflowConnectorExecutorGetRunByName;
 import de.viadee.bpm.camunda.connectors.kubeflow.services.KubeflowConnectorExecutorStartRun;
@@ -59,15 +60,15 @@ public class ExecutionHandler {
         }
     }
 
-    public static <T> T runCallableAfterDelay(Callable<T> task, long delay, TimeUnit timeUnit)
+    public static <T> HttpResponse<String> runCallableAfterDelay(Callable<HttpResponse<String>> task, long delay, TimeUnit timeUnit)
             throws InterruptedException, ExecutionException {
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         try {
             // Schedule the callable task to run after the specified delay
-            ScheduledFuture<T> future = scheduler.schedule(task, delay, timeUnit);
+            ScheduledFuture<HttpResponse<String>> future = scheduler.schedule(task, delay, timeUnit);
 
             // Wait for the callable to finish and retrieve the result
-            T result = future.get(); // This blocks until the result is available
+            HttpResponse<String> result = future.get(); // This blocks until the result is available
 
             // Use the result
             return result;
