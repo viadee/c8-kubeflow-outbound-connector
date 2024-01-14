@@ -14,9 +14,6 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.google.api.client.http.HttpRequestFactory;
 
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
 import de.viadee.bpm.camunda.connectors.kubeflow.services.KubeflowConnectorExecutor;
@@ -62,13 +59,15 @@ public class KubeflowConnectorFunction implements OutboundConnectorFunction {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'select'");
       }
-      
+
     }).build();
   }
 
   @Override
   public Object execute(final OutboundConnectorContext context)
       throws IOException, InstantiationException, IllegalAccessException {
+    final var connectorRequest = context.bindVariables(KubeflowConnectorRequest.class);
+    long processInstanceKey = context.getJobContext().getProcessInstanceKey();
 
     KubeflowConnectorExecutor connectorExecutor = ExecutionHandler.getExecutor(connectorRequest, processInstanceKey);
     HttpResponse<String> httpResponse = connectorExecutor.execute(httpClient);

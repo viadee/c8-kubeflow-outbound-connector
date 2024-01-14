@@ -66,16 +66,16 @@ public class KubeflowConnectorExecutorGetRunByName extends KubeflowConnectorExec
 
   public Optional<V1ApiRun> getRunByNameV1Typed(HttpClient httpClient)
       throws IOException, InstantiationException, IllegalAccessException {
-    var httpCommonResult = this.execute(httpClient);
-    var v1RunList = runUtil.readV1RunListAsTypedResponse(httpCommonResult).getRuns();
+    var httpResponse = this.execute(httpClient);
+    var v1RunList = runUtil.readV1RunListAsTypedResponse(httpResponse).getRuns();
     var v1ApiRun = v1RunList == null || v1RunList.isEmpty() ? null : v1RunList.get(0);
     return Optional.ofNullable(v1ApiRun);
   }
 
   public Optional<V2beta1Run> getRunByNameV2Typed(HttpClient httpClient)
       throws IOException, InstantiationException, IllegalAccessException {
-    var httpCommonResult = this.execute(httpClient);
-    var v2RunList = runUtil.readV2RunListAsTypedResponse(httpCommonResult).getRuns();
+    var httpResponse = this.execute(httpClient);
+    var v2RunList = runUtil.readV2RunListAsTypedResponse(httpResponse).getRuns();
     var v2ApiRun = v2RunList == null || v2RunList.isEmpty() ? null : v2RunList.get(0);
     return Optional.ofNullable(v2ApiRun);
   }

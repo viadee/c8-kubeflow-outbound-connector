@@ -56,13 +56,13 @@ public class KubeflowConnectorExecutorGetRunById extends KubeflowConnectorExecut
 
     public V1ApiRun getRunByIdV1Typed(HttpClient httpClient)
         throws IOException, InstantiationException, IllegalAccessException {
-        var httpCommonResult = this.execute(httpClient);
-        return runUtil.readV1RunAsTypedResponse(httpCommonResult);
+        var httpResponse = this.execute(httpClient);
+        return runUtil.readV1RunAsTypedResponse(httpResponse);
     }
 
     public V2beta1Run getRunByIdV2Typed(HttpClient httpClient)
         throws IOException, InstantiationException, IllegalAccessException {
-        var httpCommonResult = this.execute(httpClient);
-        return runUtil.readV2RunAsTypedResponse(httpCommonResult);
+        var httpResponse = this.execute(httpClient);
+        return runUtil.readV2RunAsTypedResponse(httpResponse);
     }
 }

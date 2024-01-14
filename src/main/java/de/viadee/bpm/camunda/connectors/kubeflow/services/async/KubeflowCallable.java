@@ -1,15 +1,14 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.services.async;
 
-import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApisEnum;
-import de.viadee.bpm.camunda.connectors.kubeflow.services.KubeflowConnectorExecutorGetRunById;
 import java.io.IOException;
 import java.net.http.HttpClient;
 import java.util.concurrent.Callable;
 
-import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApiOperationsEnum;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.KubeflowApi;
-import io.camunda.connector.http.base.services.HttpService;
+import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApiOperationsEnum;
+import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApisEnum;
+import de.viadee.bpm.camunda.connectors.kubeflow.services.KubeflowConnectorExecutorGetRunById;
 
 public class KubeflowCallable implements Callable<String> {
     private final String runId;

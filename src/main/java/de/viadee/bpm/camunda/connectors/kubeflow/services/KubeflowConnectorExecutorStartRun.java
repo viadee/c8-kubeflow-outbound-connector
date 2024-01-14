@@ -16,7 +16,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.KubeflowApi;
@@ -27,7 +26,6 @@ import de.viadee.bpm.camunda.connectors.kubeflow.services.async.ExecutionHandler
 import de.viadee.bpm.camunda.connectors.kubeflow.services.async.KubeflowCallable;
 import de.viadee.bpm.camunda.connectors.kubeflow.utils.OffsetDateTimeDeserializer;
 import de.viadee.bpm.camunda.connectors.kubeflow.utils.RunUtil;
-import io.camunda.connector.http.base.model.HttpCommonResult;
 import io.swagger.client.model.V1ApiPipelineSpec;
 import io.swagger.client.model.V1ApiResourceKey;
 import io.swagger.client.model.V1ApiResourceReference;
@@ -52,7 +50,6 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
             V2beta1RuntimeState.CANCELED.getValue());
 
     private static final ObjectMapper objectMapper = new ObjectMapper()
-            .registerModule(new JavaTimeModule())
             .registerModule(new SimpleModule().addDeserializer(OffsetDateTime.class,
                     new OffsetDateTimeDeserializer()))
             .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
@@ -97,13 +94,13 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
                         ? runUtil.extractIdFromV1RunResponse(result)
                         : runUtil.extractIdFromV2RunResponse(result);
                 KubeflowCallable kubeflowCallableRunNotStarted = new KubeflowCallable(connectorRequest,
-                        processInstanceKey, httpService, newRunId);
+                        processInstanceKey, httpClient, newRunId);
                 statusOfRun = retrieveRunStatusWithDelay(kubeflowCallableRunNotStarted, pollingInterval.getSeconds(),
                         false);
 
             } else { // run already started
                 KubeflowCallable kubeflowCallableRunStarted = new KubeflowCallable(connectorRequest, processInstanceKey,
-                        httpService,
+                httpClient,
                         idOfAlreadyStartedRun);
                 statusOfRun = retrieveRunStatusWithDelay(kubeflowCallableRunStarted, pollingInterval.getSeconds(),
                         true);
@@ -159,7 +156,7 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
                 KubeflowApiOperationsEnum.GET_RUN_BY_NAME.getValue(), null,
                 null, null, runName, null, null, null);
 
-        KubeflowConnectorRequest getRunByNameConnectorRequest = new KubeflowConnectorRequest(
+        KubeflowConnectorRequest getRunByNameConnectorRequest = new KubeflowConnectorRequest(connectorRequest.authentication(),
                 connectorRequest.configuration(), kubeflowApi);
 
         KubeflowConnectorExecutorGetRunByName getRunByNameExecutor = (KubeflowConnectorExecutorGetRunByName) ExecutionHandler
@@ -168,8 +165,8 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
                         processInstanceKey);
 
         String id = KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum)
-                ? getRunByNameExecutor.getRunByNameV1Typed(httpService).map(V1ApiRun::getId).orElse(null)
-                : getRunByNameExecutor.getRunByNameV2Typed(httpService).map(V2beta1Run::getRunId).orElse(null);
+                ? getRunByNameExecutor.getRunByNameV1Typed(httpClient).map(V1ApiRun::getId).orElse(null)
+                : getRunByNameExecutor.getRunByNameV2Typed(httpClient).map(V2beta1Run::getRunId).orElse(null);
 
         return id;
     }
