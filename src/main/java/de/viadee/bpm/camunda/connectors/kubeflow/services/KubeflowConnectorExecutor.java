@@ -60,13 +60,10 @@ public class KubeflowConnectorExecutor {
         try {
             return httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new RuntimeException(e);
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-        return null;
     }
 
     protected void addKubeflowUrlPath(URIBuilder uriBuilder) {

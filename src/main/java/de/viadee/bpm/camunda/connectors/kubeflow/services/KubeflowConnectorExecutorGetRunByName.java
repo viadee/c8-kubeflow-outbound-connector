@@ -25,7 +25,8 @@ public class KubeflowConnectorExecutorGetRunByName extends KubeflowConnectorExec
   private static final ObjectMapper objectMapper = new ObjectMapper();
   private RunUtil runUtil;
 
-  public KubeflowConnectorExecutorGetRunByName(KubeflowConnectorRequest connectorRequest, long processInstanceKey, KubeflowApisEnum kubeflowApisEnum,
+  public KubeflowConnectorExecutorGetRunByName(KubeflowConnectorRequest connectorRequest, long processInstanceKey,
+      KubeflowApisEnum kubeflowApisEnum,
       KubeflowApiOperationsEnum kubeflowApiOperationsEnum) {
     super(connectorRequest, processInstanceKey, kubeflowApisEnum, kubeflowApiOperationsEnum);
     this.runUtil = new RunUtil();
@@ -33,8 +34,7 @@ public class KubeflowConnectorExecutorGetRunByName extends KubeflowConnectorExec
 
   @Override
   protected String getFilterString() {
-    var filter = KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum) ?
-        getV1Filter() : getV2Filter();
+    var filter = KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum) ? getV1Filter() : getV2Filter();
     try {
       return objectMapper.writeValueAsString(filter);
     } catch (Exception e) {
@@ -48,12 +48,11 @@ public class KubeflowConnectorExecutorGetRunByName extends KubeflowConnectorExec
 
     Integer apiListRunsResponseSize = null;
     try {
-      apiListRunsResponseSize = KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum) ?
-          runUtil.readV1RunListAsTypedResponse(runByNameHttpResult).getTotalSize() :
-          runUtil.readV2RunListAsTypedResponse(runByNameHttpResult).getTotalSize();
+      apiListRunsResponseSize = KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum)
+          ? runUtil.readV1RunListAsTypedResponse(runByNameHttpResult).getTotalSize()
+          : runUtil.readV2RunListAsTypedResponse(runByNameHttpResult).getTotalSize();
     } catch (JsonProcessingException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
 
     if (apiListRunsResponseSize == null || apiListRunsResponseSize <= 1) {

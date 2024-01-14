@@ -35,8 +35,7 @@ public class KubeflowConnectorExecutorGetRunById extends KubeflowConnectorExecut
                 runUtil.readV1RunAsTypedResponse(runByIdHttpResult) :
                 runUtil.readV2RunAsTypedResponse(runByIdHttpResult);
         } catch (JsonProcessingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         if (apiRunResponse == null) {

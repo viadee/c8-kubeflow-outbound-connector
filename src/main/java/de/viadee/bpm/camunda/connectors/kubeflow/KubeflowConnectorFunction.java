@@ -50,13 +50,11 @@ public class KubeflowConnectorFunction implements OutboundConnectorFunction {
 
       @Override
       public void connectFailed(URI arg0, SocketAddress arg1, IOException arg2) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'connectFailed'");
       }
 
       @Override
       public List<Proxy> select(URI arg0) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'select'");
       }
 
