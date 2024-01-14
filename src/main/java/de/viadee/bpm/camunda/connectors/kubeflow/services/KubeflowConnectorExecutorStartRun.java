@@ -1,12 +1,15 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.services;
 
 import java.io.IOException;
+import java.net.http.HttpClient;
+import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.http.protocol.HttpService;
 import org.threeten.bp.OffsetDateTime;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -25,7 +28,6 @@ import de.viadee.bpm.camunda.connectors.kubeflow.services.async.KubeflowCallable
 import de.viadee.bpm.camunda.connectors.kubeflow.utils.OffsetDateTimeDeserializer;
 import de.viadee.bpm.camunda.connectors.kubeflow.utils.RunUtil;
 import io.camunda.connector.http.base.model.HttpCommonResult;
-import io.camunda.connector.http.base.services.HttpService;
 import io.swagger.client.model.V1ApiPipelineSpec;
 import io.swagger.client.model.V1ApiResourceKey;
 import io.swagger.client.model.V1ApiResourceReference;
@@ -67,7 +69,7 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
     }
 
     @Override
-    protected Object buildPayloadForKubeflowEndpoint() {
+    protected Map<String, Object> buildPayloadForKubeflowEndpoint() {
         // use process instance key as name of run to be created
         if (KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum)) {
             return getPayloadForEndpointV1();
@@ -76,14 +78,13 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
     }
 
     @Override
-    public HttpCommonResult execute(HttpService httpService)
-            throws InstantiationException, IllegalAccessException, IOException {
-        this.httpService = httpService;
+    public HttpResponse<String> execute(HttpClient httpClient) {
+        this.httpClient = httpClient;
 
-        HttpCommonResult result = new HttpCommonResult();
+        HttpResponse<String> result = null;
 
         if (kubeflowApiOperationsEnum.equals(KubeflowApiOperationsEnum.START_RUN)) {
-            result = startRun();
+            result = super.execute(httpClient);
         } else if (kubeflowApiOperationsEnum.equals(KubeflowApiOperationsEnum.START_RUN_AND_MONITOR)) {
             final String idOfAlreadyStartedRun = getIdOfAlreadyStartedRunByName(httpService,
                     Long.toString(processInstanceKey));
@@ -91,7 +92,7 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
             var statusOfRun = "";
 
             if (idOfAlreadyStartedRun == null) { // run not yet started
-                result = startRun();
+                result = super.execute(httpClient);
                 String newRunId = KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum)
                         ? runUtil.extractIdFromV1RunResponse(result)
                         : runUtil.extractIdFromV2RunResponse(result);
@@ -150,10 +151,6 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
         return objectMapper.convertValue(v2ApiRun,
                 new TypeReference<>() {
                 });
-    }
-
-    private HttpCommonResult startRun() throws InstantiationException, IllegalAccessException, IOException {
-        return httpService.executeConnectorRequest(httpRequest);
     }
 
     private String getIdOfAlreadyStartedRunByName(HttpService httpService, String runName)

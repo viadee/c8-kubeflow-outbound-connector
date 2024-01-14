@@ -23,7 +23,7 @@ public class KubeflowConnectorExecutorCreateExperiment extends KubeflowConnector
     }
 
     @Override
-    protected Object buildPayloadForKubeflowEndpoint() {
+    protected Map<String, Object> buildPayloadForKubeflowEndpoint() {
         if (KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum)) {
             return getPayloadForEndpointV1();
         }

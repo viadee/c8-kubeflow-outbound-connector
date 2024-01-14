@@ -1,27 +1,34 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.services;
 
-import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApisEnum;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.Builder;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Map;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.client.utils.URIBuilder;
 
-import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApiOperationsEnum;
+import de.viadee.bpm.camunda.connectors.kubeflow.auth.BasicAuthentication;
+import de.viadee.bpm.camunda.connectors.kubeflow.auth.BearerAuthentication;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
-import io.camunda.connector.http.base.model.HttpCommonRequest;
-import io.camunda.connector.http.base.model.HttpCommonResult;
-import io.camunda.connector.http.base.services.HttpService;
+import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApiOperationsEnum;
+import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApisEnum;
 
 public class KubeflowConnectorExecutor {
     private static final String KUBEFLOW_URL_ENV = "KF_CONNECTOR_URL";
     private static final String KUBEFLOW_COOKIE_ENV = "KF_CONNECTOR_COOKIE";
     private static final String KUBEFLOW_NAMESPACE_ENV = "KF_CONNECTOR_MULTIUSER_NS";
     private static final String URI_PARAMETER_FILTER = "filter";
-    private static final Pair<String, String> URI_PARAMETER_PAIR_V1_TYPE_NS = Pair.of("resource_reference_key.type", "NAMESPACE");
+    private static final Pair<String, String> URI_PARAMETER_PAIR_V1_TYPE_NS = Pair.of("resource_reference_key.type",
+            "NAMESPACE");
     private static final String URI_PARAMETER_V1_ID = "resource_reference_key.id";
     private static final String URI_PARAMETER_V2_NS = "namespace";
 
@@ -29,14 +36,16 @@ public class KubeflowConnectorExecutor {
     protected KubeflowConnectorRequest connectorRequest;
     protected KubeflowApisEnum kubeflowApisEnum;
     protected KubeflowApiOperationsEnum kubeflowApiOperationsEnum;
-    protected HttpCommonRequest httpRequest;
+    protected HttpRequest httpRequest;
+    protected HttpClient httpClient;
     protected String kubeflowMultiNs;
 
     private String kubeflowUrl;
     private String kubeflowCookie;
 
-    public KubeflowConnectorExecutor(KubeflowConnectorRequest connectorRequest, long processInstanceKey, KubeflowApisEnum kubeflowApisEnum,
-        KubeflowApiOperationsEnum kubeflowApiOperationsEnum) {
+    public KubeflowConnectorExecutor(KubeflowConnectorRequest connectorRequest, long processInstanceKey,
+            KubeflowApisEnum kubeflowApisEnum,
+            KubeflowApiOperationsEnum kubeflowApiOperationsEnum) {
         this.connectorRequest = connectorRequest;
         this.processInstanceKey = processInstanceKey;
         this.kubeflowApisEnum = kubeflowApisEnum;
@@ -47,18 +56,25 @@ public class KubeflowConnectorExecutor {
         buildHttpRequest();
     }
 
-    public HttpCommonResult execute(HttpService httpService)
-        throws InstantiationException, IllegalAccessException, IOException {
-        return httpService.executeConnectorRequest(httpRequest);
+    public HttpResponse<String> execute(HttpClient httpClient) {
+        try {
+            return httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
     }
 
     protected void addKubeflowUrlPath(URIBuilder uriBuilder) {
         uriBuilder.setPath(
-            String.format(kubeflowApiOperationsEnum.getApiUrl(), kubeflowApisEnum.getUrlPathVersion())
-        );
+                String.format(kubeflowApiOperationsEnum.getApiUrl(), kubeflowApisEnum.getUrlPathVersion()));
     }
 
-    protected Object buildPayloadForKubeflowEndpoint() {
+    protected Map<String, Object> buildPayloadForKubeflowEndpoint() {
         // nop payload by default
         return null;
     }
@@ -75,12 +91,10 @@ public class KubeflowConnectorExecutor {
         kubeflowMultiNs = System.getenv(KUBEFLOW_NAMESPACE_ENV);
 
         if (authPropertyGroup != null) {
-            kubeflowUrl = authPropertyGroup.kubeflowUrl() == null ?
-                kubeflowUrl : authPropertyGroup.kubeflowUrl();
-            kubeflowCookie = authPropertyGroup.cookievalue() == null ?
-                kubeflowCookie : authPropertyGroup.cookievalue();
-            kubeflowMultiNs = authPropertyGroup.multiusernamespace() == null ?
-                kubeflowMultiNs : authPropertyGroup.multiusernamespace();
+            kubeflowUrl = authPropertyGroup.kubeflowUrl() == null ? kubeflowUrl : authPropertyGroup.kubeflowUrl();
+            kubeflowCookie = authPropertyGroup.cookievalue() == null ? kubeflowCookie : authPropertyGroup.cookievalue();
+            kubeflowMultiNs = authPropertyGroup.multiusernamespace() == null ? kubeflowMultiNs
+                    : authPropertyGroup.multiusernamespace();
         }
 
         if (kubeflowUrl == null || kubeflowCookie == null || kubeflowMultiNs == null) {
@@ -90,15 +104,30 @@ public class KubeflowConnectorExecutor {
 
     private void buildHttpRequest() {
         String url = buildUrlForKubeflowEndpoint();
-        Object payload = buildPayloadForKubeflowEndpoint();
 
-        httpRequest = new HttpCommonRequest();
-        httpRequest.setUrl(url);
-        httpRequest.setMethod(kubeflowApiOperationsEnum.getHttpMethod());
-        if (payload != null) {
-            httpRequest.setBody(payload);
+        Map<String, Object> payload = buildPayloadForKubeflowEndpoint();
+
+        Builder httpRequestBuilder = HttpRequest.newBuilder()
+                .method(kubeflowApiOperationsEnum.getHttpMethod(), ofFormData(payload))
+                .uri(URI.create(url))
+                .setHeader("User-Agent", "Kubeflow Camunda Connector")
+                .header("Content-Type", "application/json");
+
+        setAuthentication(httpRequestBuilder);
+
+        httpRequest = httpRequestBuilder.build();
+    }
+
+    private void setAuthentication(Builder httpRequestBuilder) {
+        if (connectorRequest.authentication() instanceof BasicAuthentication) {
+            BasicAuthentication basicAuthentication = (BasicAuthentication) connectorRequest.authentication();
+            httpRequestBuilder.setHeader("Authorization", getBasicAuthenticationHeader(basicAuthentication.getUsername(), basicAuthentication.getPassword()));
+        } else if (connectorRequest.authentication() instanceof BearerAuthentication) {
+            BearerAuthentication bearerAuthentication = (BearerAuthentication) connectorRequest.authentication();
+            httpRequestBuilder.setHeader("Authorization", bearerAuthentication.getToken());
+        } else {
+            // no authentication
         }
-        httpRequest.setAuthentication(connectorRequest.authentication());
     }
 
     private String buildUrlForKubeflowEndpoint() {
@@ -131,11 +160,31 @@ public class KubeflowConnectorExecutor {
     protected void addNamespaceFilter(URIBuilder uriBuilder) {
         if (kubeflowApiOperationsEnum.requiresMultiuserFilter()) {
             if (KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum)) {
-                uriBuilder.addParameter(URI_PARAMETER_PAIR_V1_TYPE_NS.getKey(), URI_PARAMETER_PAIR_V1_TYPE_NS.getValue());
+                uriBuilder.addParameter(URI_PARAMETER_PAIR_V1_TYPE_NS.getKey(),
+                        URI_PARAMETER_PAIR_V1_TYPE_NS.getValue());
                 uriBuilder.addParameter(URI_PARAMETER_V1_ID, kubeflowMultiNs);
             } else {
                 uriBuilder.addParameter(URI_PARAMETER_V2_NS, kubeflowMultiNs);
             }
         }
+    }
+
+    // Sample: 'password=123&custom=secret&username=abc&ts=1570704369823'
+    public static HttpRequest.BodyPublisher ofFormData(Map<String, Object> data) {
+        var builder = new StringBuilder();
+        for (Map.Entry<String, Object> entry : data.entrySet()) {
+            if (builder.length() > 0) {
+                builder.append("&");
+            }
+            builder.append(URLEncoder.encode(entry.getKey().toString(), StandardCharsets.UTF_8));
+            builder.append("=");
+            builder.append(URLEncoder.encode(entry.getValue().toString(), StandardCharsets.UTF_8));
+        }
+        return HttpRequest.BodyPublishers.ofString(builder.toString());
+    }
+
+    private String getBasicAuthenticationHeader(String username, String password) {
+        String valueToEncode = username + ":" + password;
+        return "Basic " + Base64.getEncoder().encodeToString(valueToEncode.getBytes());
     }
 }

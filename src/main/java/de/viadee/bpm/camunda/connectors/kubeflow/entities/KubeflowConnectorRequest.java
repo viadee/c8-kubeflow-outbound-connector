@@ -2,6 +2,7 @@ package de.viadee.bpm.camunda.connectors.kubeflow.entities;
 
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.Configuration;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.KubeflowApi;
+import de.viadee.bpm.camunda.connectors.kubeflow.auth.Authentication;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
