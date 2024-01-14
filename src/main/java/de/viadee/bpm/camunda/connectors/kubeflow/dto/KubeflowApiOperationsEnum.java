@@ -1,32 +1,31 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.dto;
 
-import io.camunda.connector.http.base.model.HttpMethod;
 import java.util.Arrays;
 
 public enum KubeflowApiOperationsEnum {
-        GET_PIPELINES("get_pipelines", HttpMethod.GET, false,
+        GET_PIPELINES("get_pipelines", "GET", false,
                 "/pipeline/apis/%s/pipelines"),
-        GET_EXPERIMENTS("get_experiments", HttpMethod.GET, true,
+        GET_EXPERIMENTS("get_experiments", "GET", true,
                 "/pipeline/apis/%s/experiments"),
-        GET_RUNS("get_runs", HttpMethod.GET, true,
+        GET_RUNS("get_runs", "GET", true,
                 "/pipeline/apis/%s/runs"),
-        GET_RUN_BY_ID("get_run_by_id", HttpMethod.GET, false,
+        GET_RUN_BY_ID("get_run_by_id", "GET", false,
                 "/pipeline/apis/%s/runs"),
-        GET_RUN_BY_NAME("get_run_by_name", HttpMethod.GET, true,
+        GET_RUN_BY_NAME("get_run_by_name", "GET", true,
                 "/pipeline/apis/%s/runs"),
-        START_RUN("start_run", HttpMethod.POST, false,
+        START_RUN("start_run", "POST", false,
                 "/pipeline/apis/%s/runs"),
-        START_RUN_AND_MONITOR("start_run_and_monitor", HttpMethod.POST, false,
+        START_RUN_AND_MONITOR("start_run_and_monitor","POST", false,
                 "/pipeline/apis/%s/runs"),
-        CREATE_EXPERIMENT("create_experiment", HttpMethod.POST, false,
+        CREATE_EXPERIMENT("create_experiment", "POST", false,
             "/pipeline/apis/%s/experiments");
 
         private final String value;
-        private final HttpMethod httpMethod;
+        private final String httpMethod;
         private final boolean requiresMultiuserFilter;
         private final String apiUrl;
 
-        KubeflowApiOperationsEnum(String value, HttpMethod httpMethod, boolean requiresMultiuserFilter, String apiUrl) {
+        KubeflowApiOperationsEnum(String value, String httpMethod, boolean requiresMultiuserFilter, String apiUrl) {
             this.value = value;
             this.httpMethod = httpMethod;
             this.requiresMultiuserFilter = requiresMultiuserFilter;
@@ -37,7 +36,7 @@ public enum KubeflowApiOperationsEnum {
             return value;
         }
 
-        public HttpMethod getHttpMethod() {
+        public String getHttpMethod() {
             return httpMethod;
         }
 

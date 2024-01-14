@@ -2,6 +2,7 @@ package de.viadee.bpm.camunda.connectors.kubeflow.service.async;
 
 import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApisEnum;
 import java.io.IOException;
+import java.net.http.HttpClient;
 import java.util.concurrent.Callable;
 
 import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApiOperationsEnum;
@@ -13,28 +14,29 @@ import io.camunda.connector.http.base.services.HttpService;
 
 public class KubeflowCallable implements Callable<String> {
     private final String runId;
-    private final HttpService httpService;
+    private final HttpClient httpClient;
     private final KubeflowConnectorRequest connectorRequest;
     private final long processInstanceKey;
 
-    public KubeflowCallable(KubeflowConnectorRequest connectorRequest, long processInstanceKey, HttpService httpService,
+    public KubeflowCallable(KubeflowConnectorRequest connectorRequest, long processInstanceKey, HttpClient httpClient,
             String runId) {
         this.connectorRequest = connectorRequest;
         this.processInstanceKey = processInstanceKey;
-        this.httpService = httpService;
+        this.httpClient = httpClient;
         this.runId = runId;
     }
 
     public String call() {
         try {
-            return getStatusOfRunById(httpService, runId);
+            return getStatusOfRunById(httpClient, runId);
         } catch (InstantiationException | IllegalAccessException | IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private String getStatusOfRunById(HttpService httpService, String runId)
+    private String getStatusOfRunById(HttpClient httpClient, String runId)
             throws InstantiationException, IllegalAccessException, IOException {
+        httpClient.executor()
         KubeflowApi kubeflowApi = new KubeflowApi(connectorRequest.kubeflowapi().api(), KubeflowApiOperationsEnum.GET_RUN_BY_ID.getValue(),
             runId, null, null, null, null, null, null);
         KubeflowConnectorRequest getRunByIdConnectorRequest = new KubeflowConnectorRequest(connectorRequest.authentication(),
@@ -42,7 +44,7 @@ public class KubeflowCallable implements Callable<String> {
         KubeflowConnectorExecutor getRunByIdExecutor = ExecutionHandler.getExecutor(
                 getRunByIdConnectorRequest,
                 processInstanceKey);
-        HttpCommonResult result = getRunByIdExecutor.execute(httpService);
+        HttpCommonResult result = getRunByIdExecutor.execute(httpClient);
 
         String status = KubeflowApisEnum.PIPELINES_V1.equals(KubeflowApisEnum.fromValue(kubeflowApi.api())) ?
             ExecutionHandler.getFieldFromCreateRunResponseV1(result, "status") :

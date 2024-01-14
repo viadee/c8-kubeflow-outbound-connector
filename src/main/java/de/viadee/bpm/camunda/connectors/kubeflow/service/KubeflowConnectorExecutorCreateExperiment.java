@@ -1,10 +1,10 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.service;
 
-import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApisEnum;
-import java.util.Map;
 import java.util.Arrays;
+import java.util.Map;
 
 import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApiOperationsEnum;
+import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApisEnum;
 import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowConnectorRequest;
 
 

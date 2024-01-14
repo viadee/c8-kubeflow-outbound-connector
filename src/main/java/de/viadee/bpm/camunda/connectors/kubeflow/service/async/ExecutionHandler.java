@@ -1,7 +1,6 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.service.async;
 
-import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApisEnum;
-import de.viadee.bpm.camunda.connectors.kubeflow.service.KubeflowConnectorExecutorCreateExperiment;
+import java.net.http.HttpResponse;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -15,12 +14,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApiOperationsEnum;
+import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowApisEnum;
 import de.viadee.bpm.camunda.connectors.kubeflow.dto.KubeflowConnectorRequest;
 import de.viadee.bpm.camunda.connectors.kubeflow.service.KubeflowConnectorExecutor;
+import de.viadee.bpm.camunda.connectors.kubeflow.service.KubeflowConnectorExecutorCreateExperiment;
 import de.viadee.bpm.camunda.connectors.kubeflow.service.KubeflowConnectorExecutorGetRunById;
 import de.viadee.bpm.camunda.connectors.kubeflow.service.KubeflowConnectorExecutorGetRunByName;
 import de.viadee.bpm.camunda.connectors.kubeflow.service.KubeflowConnectorExecutorStartRun;
-import io.camunda.connector.http.base.model.HttpCommonResult;
 
 public class ExecutionHandler {
 
@@ -65,10 +65,10 @@ public class ExecutionHandler {
         }
     }
 
-    public static String getFieldFromCreateRunResponseV1(HttpCommonResult httpCommonResult, String field)
+    public static String getFieldFromCreateRunResponseV1(HttpResponse<String> httpResponse, String field)
             throws JsonMappingException, JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode json = objectMapper.readTree(objectMapper.writeValueAsString(httpCommonResult));
+        JsonNode json = objectMapper.readTree(objectMapper.writeValueAsString(httpResponse));
         if (json.hasNonNull("body")
                 && json.path("body").hasNonNull("run")
                 && json.path("body").path("run").hasNonNull(field)) {
@@ -79,10 +79,10 @@ public class ExecutionHandler {
         }
     }
 
-    public static String getFieldFromCreateRunResponseV2(HttpCommonResult httpCommonResult, String field)
+    public static String getFieldFromCreateRunResponseV2(HttpResponse<String> httpResponse, String field)
         throws JsonMappingException, JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode json = objectMapper.readTree(objectMapper.writeValueAsString(httpCommonResult));
+        JsonNode json = objectMapper.readTree(objectMapper.writeValueAsString(httpResponse));
         if (json.hasNonNull("body")
             && json.path("body").hasNonNull(field)) {
             String fieldValue = json.path("body").get(field).asText();
@@ -92,10 +92,10 @@ public class ExecutionHandler {
         }
     }
 
-    public static String getFieldFromGetRunByNameResponse(HttpCommonResult httpCommonResult, String field)
+    public static String getFieldFromGetRunByNameResponse(HttpResponse<String> httpResponse, String field)
             throws JsonMappingException, JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode json = objectMapper.readTree(objectMapper.writeValueAsString(httpCommonResult));
+        JsonNode json = objectMapper.readTree(objectMapper.writeValueAsString(httpResponse));
         if (json.hasNonNull("body")
                 && json.path("body").hasNonNull("runs")
                 && json.path("body").get("runs").size() < 2 // if more than 1 found, we would have failed in KubeflowConnectorExecutorGetRunByName's execute method
