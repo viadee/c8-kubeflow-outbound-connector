@@ -55,7 +55,6 @@ public class KubeflowConnectorFunction implements OutboundConnectorFunction {
     long processInstanceKey = context.getJobContext().getProcessInstanceKey();
 
     KubeflowConnectorExecutor connectorExecutor = ExecutionHandler.getExecutor(connectorRequest, processInstanceKey);
-    HttpResponse<String> httpResponse = connectorExecutor.execute(httpClient);
-    return httpResponse;
+    return connectorExecutor.execute(httpClient);
   }
 }

@@ -13,10 +13,14 @@ import java.net.http.HttpRequest.Builder;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.client.utils.URIBuilder;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.viadee.bpm.camunda.connectors.kubeflow.auth.BasicAuthentication;
 import de.viadee.bpm.camunda.connectors.kubeflow.auth.BearerAuthentication;
@@ -58,9 +62,17 @@ public class KubeflowConnectorExecutor {
         buildHttpRequest();
     }
 
-    public HttpResponse<String> execute(HttpClient httpClient) {
+    public HashMap<String,Object> execute(HttpClient httpClient) {
         try {
-            return httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+
+            if(response.statusCode() >= 300) {
+                throw new RuntimeException(response.body());
+            }
+
+            ObjectMapper mapper = new ObjectMapper();
+            TypeReference<HashMap<String,Object>> typeRef = new TypeReference<HashMap<String,Object>>() {};
+            return mapper.readValue(response.body(), typeRef);
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (InterruptedException e) {
