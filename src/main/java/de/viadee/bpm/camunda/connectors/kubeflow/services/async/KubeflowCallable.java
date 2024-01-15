@@ -8,7 +8,6 @@ import java.util.concurrent.Callable;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.KubeflowApi;
 import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApiOperationsEnum;
-import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApisEnum;
 import de.viadee.bpm.camunda.connectors.kubeflow.services.KubeflowConnectorExecutorGetRunById;
 
 public class KubeflowCallable implements Callable<HttpResponse<String>> {
