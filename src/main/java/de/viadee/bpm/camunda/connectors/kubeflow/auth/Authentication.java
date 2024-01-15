@@ -27,7 +27,8 @@ import io.camunda.connector.generator.annotation.TemplateDiscriminatorProperty;
 @JsonSubTypes({
   @JsonSubTypes.Type(value = BasicAuthentication.class, name = BasicAuthentication.TYPE),
   @JsonSubTypes.Type(value = NoAuthentication.class, name = NoAuthentication.TYPE),
-  @JsonSubTypes.Type(value = OAuthAuthentication.class, name = OAuthAuthentication.TYPE),
+  @JsonSubTypes.Type(value = OAuthAuthenticationClientCredentialsFlow.class, name = OAuthAuthenticationClientCredentialsFlow.TYPE),
+  @JsonSubTypes.Type(value = OAuthAuthenticationPasswordFlow.class, name = OAuthAuthenticationPasswordFlow.TYPE),
   @JsonSubTypes.Type(value = BearerAuthentication.class, name = BearerAuthentication.TYPE)
 })
 @TemplateDiscriminatorProperty(
@@ -40,7 +41,8 @@ public abstract sealed class Authentication
     permits BasicAuthentication,
         BearerAuthentication,
         NoAuthentication,
-        OAuthAuthentication {
+        OAuthAuthenticationClientCredentialsFlow,
+        OAuthAuthenticationPasswordFlow {
 
   public abstract void setHeaders(Map<String, String> headers);
 }

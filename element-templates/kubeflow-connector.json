@@ -113,8 +113,12 @@
           "value": "bearer"
         },
         {
-          "name": "OAuth 2.0",
+          "name": "OAuth 2.0 (client credentials flow)",
           "value": "oauth-client-credentials-flow"
+        },
+        {
+          "name": "OAuth 2.0 (password flow)",
+          "value": "oauth-password-flow"
         }
       ],
       "binding": {
@@ -154,7 +158,10 @@
       },
       "condition": {
         "property": "authenticationType",
-        "equals": "oauth-client-credentials-flow"
+        "oneOf": [
+          "oauth-client-credentials-flow",
+          "oauth-password-flow"
+        ]
       }
     },
     {
@@ -172,7 +179,10 @@
       },
       "condition": {
         "property": "authenticationType",
-        "equals": "oauth-client-credentials-flow"
+        "oneOf": [
+          "oauth-client-credentials-flow",
+          "oauth-password-flow"
+        ]
       }
     },
     {
@@ -181,16 +191,17 @@
       "group": "authentication",
       "type": "String",
       "feel": "optional",
+      "optional": true,
       "binding": {
         "type": "zeebe:input",
         "name": "authentication.clientSecret"
       },
-      "constraints": {
-        "notEmpty": true
-      },
       "condition": {
         "property": "authenticationType",
-        "equals": "oauth-client-credentials-flow"
+        "oneOf": [
+          "oauth-client-credentials-flow",
+          "oauth-password-flow"
+        ]
       }
     },
     {
@@ -206,7 +217,10 @@
       },
       "condition": {
         "property": "authenticationType",
-        "equals": "oauth-client-credentials-flow"
+        "oneOf": [
+          "oauth-client-credentials-flow",
+          "oauth-password-flow"
+        ]
       }
     },
     {
@@ -222,7 +236,10 @@
       },
       "condition": {
         "property": "authenticationType",
-        "equals": "oauth-client-credentials-flow"
+        "oneOf": [
+          "oauth-client-credentials-flow",
+          "oauth-password-flow"
+        ]
       }
     },
     {
@@ -248,7 +265,10 @@
       },
       "condition": {
         "property": "authenticationType",
-        "equals": "oauth-client-credentials-flow"
+        "oneOf": [
+          "oauth-client-credentials-flow",
+          "oauth-password-flow"
+        ]
       }
     },
     {
@@ -265,7 +285,10 @@
       },
       "condition": {
         "property": "authenticationType",
-        "equals": "basic"
+        "oneOf": [
+          "basic",
+          "oauth-password-flow"
+        ]
       }
     },
     {
@@ -282,7 +305,10 @@
       },
       "condition": {
         "property": "authenticationType",
-        "equals": "basic"
+        "oneOf": [
+          "basic",
+          "oauth-password-flow"
+        ]
       }
     },
     {

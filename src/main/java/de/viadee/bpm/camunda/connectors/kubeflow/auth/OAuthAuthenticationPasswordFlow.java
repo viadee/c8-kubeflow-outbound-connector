@@ -27,10 +27,10 @@ import io.camunda.connector.generator.annotation.TemplateProperty.PropertyType;
 import io.camunda.connector.generator.annotation.TemplateSubType;
 import jakarta.validation.constraints.NotEmpty;
 
-@TemplateSubType(id = OAuthAuthentication.TYPE, label = "OAuth 2.0 (client credentials flow)")
-public final class OAuthAuthentication extends Authentication {
+@TemplateSubType(id = OAuthAuthenticationPasswordFlow.TYPE, label = "OAuth 2.0 (Password flow)")
+public final class OAuthAuthenticationPasswordFlow extends Authentication {
   @TemplateProperty(ignore = true)
-  private final String grantType = "client_credentials";
+  private final String grantType = "password";
 
   @FEEL
   @NotEmpty
@@ -45,7 +45,6 @@ public final class OAuthAuthentication extends Authentication {
   private String clientId;
 
   @FEEL
-  @NotEmpty
   @TemplateProperty(
       group = "authentication",
       description = "Your application's client secret from the OAuth client")
@@ -80,6 +79,16 @@ public final class OAuthAuthentication extends Authentication {
       description = "The scopes which you want to request authorization for (e.g.read:contacts)",
       optional = true)
   private String scopes;
+
+  @FEEL
+  @NotEmpty
+  @TemplateProperty(group = "authentication")
+  private String username;
+
+  @FEEL
+  @NotEmpty
+  @TemplateProperty(group = "authentication")
+  private String password;
 
   public Map<String, String> getDataForAuthRequestBody() {
     Map<String, String> data = new HashMap<>();
@@ -146,6 +155,22 @@ public final class OAuthAuthentication extends Authentication {
     this.clientAuthentication = clientAuthentication;
   }
 
+  public String getUsername() {
+    return username;
+  }
+
+  public void setUsername(final String username) {
+    this.username = username;
+  }
+
+  public String getPassword() {
+    return password;
+  }
+
+  public void setPassword(final String password) {
+    this.password = password;
+  }
+
   @Override
   public void setHeaders(final Map<String, String> headers) {}
 
@@ -160,14 +185,16 @@ public final class OAuthAuthentication extends Authentication {
     if (!super.equals(o)) {
       return false;
     }
-    OAuthAuthentication that = (OAuthAuthentication) o;
+    OAuthAuthenticationPasswordFlow that = (OAuthAuthenticationPasswordFlow) o;
     return oauthTokenEndpoint.equals(that.oauthTokenEndpoint)
         && clientId.equals(that.clientId)
         && clientSecret.equals(that.clientSecret)
         && audience.equals(that.audience)
         && Objects.equals(grantType, that.grantType)
         && clientAuthentication.equals(that.clientAuthentication)
-        && Objects.equals(scopes, that.scopes);
+        && Objects.equals(scopes, that.scopes)
+        && Objects.equals(username, that.username)
+        && Objects.equals(password, that.password);
   }
 
   @Override
@@ -185,7 +212,7 @@ public final class OAuthAuthentication extends Authentication {
 
   @Override
   public String toString() {
-    return "OAuthAuthentication{"
+    return "OAuthAuthenticationPasswordFlow{"
         + "grantType='"
         + grantType
         + '\''
@@ -206,5 +233,5 @@ public final class OAuthAuthentication extends Authentication {
   }
 
   @TemplateProperty(ignore = true)
-  public static final String TYPE = "oauth-client-credentials-flow";
+  public static final String TYPE = "oauth-password-flow";
 }

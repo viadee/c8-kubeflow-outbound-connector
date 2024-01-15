@@ -13,18 +13,27 @@ import java.net.http.HttpRequest.Builder;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.client.utils.URIBuilder;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import de.viadee.bpm.camunda.connectors.kubeflow.auth.BasicAuthentication;
 import de.viadee.bpm.camunda.connectors.kubeflow.auth.BearerAuthentication;
+import de.viadee.bpm.camunda.connectors.kubeflow.auth.Constants;
+import de.viadee.bpm.camunda.connectors.kubeflow.auth.OAuthAuthentication;
+import de.viadee.bpm.camunda.connectors.kubeflow.auth.OAuthAuthenticationPasswordFlow;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
 import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApiOperationsEnum;
 import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApisEnum;
+import de.viadee.bpm.camunda.connectors.kubeflow.utils.JsonHelper;
 
 public class KubeflowConnectorExecutor {
+
     private static final String KUBEFLOW_URL_ENV = "KF_CONNECTOR_URL";
     private static final String KUBEFLOW_COOKIE_ENV = "KF_CONNECTOR_COOKIE";
     private static final String KUBEFLOW_NAMESPACE_ENV = "KF_CONNECTOR_MULTIUSER_NS";
@@ -123,15 +132,25 @@ public class KubeflowConnectorExecutor {
     private void setAuthentication(Builder httpRequestBuilder) {
         if (connectorRequest.authentication() instanceof BasicAuthentication) {
             BasicAuthentication basicAuthentication = (BasicAuthentication) connectorRequest.authentication();
-            httpRequestBuilder.setHeader("Authorization", getBasicAuthenticationHeader(basicAuthentication.getUsername(), basicAuthentication.getPassword()));
+            httpRequestBuilder.setHeader("Authorization",
+                    getBasicAuthenticationHeader(basicAuthentication.getUsername(), basicAuthentication.getPassword()));
         } else if (connectorRequest.authentication() instanceof BearerAuthentication) {
             BearerAuthentication bearerAuthentication = (BearerAuthentication) connectorRequest.authentication();
             httpRequestBuilder.setHeader("Authorization", "Bearer " + bearerAuthentication.getToken());
+        } else if (connectorRequest.authentication() instanceof OAuthAuthentication) {
+            OAuthAuthentication oAuthAuthentication = (OAuthAuthentication) connectorRequest.authentication();
+            String accessToken = getAccessTokenFromClientCredentialsFlow(oAuthAuthentication);
+            httpRequestBuilder.setHeader("Authorization", "Bearer " + accessToken);
+        } else if (connectorRequest.authentication() instanceof OAuthAuthenticationPasswordFlow) {
+            OAuthAuthenticationPasswordFlow oAuthAuthenticationPasswordFlow = (OAuthAuthenticationPasswordFlow) connectorRequest
+                    .authentication();
+            String accessToken = getAccessTokenFromPasswordFlow(oAuthAuthenticationPasswordFlow);
+            httpRequestBuilder.setHeader("Authorization", "Bearer " + accessToken);
         } else {
             // no authentication
         }
     }
-
+    
     private String buildUrlForKubeflowEndpoint() {
         String url = "";
         try {
@@ -175,7 +194,7 @@ public class KubeflowConnectorExecutor {
     public static HttpRequest.BodyPublisher ofFormData(Map<String, Object> data) {
         var builder = new StringBuilder();
         for (Map.Entry<String, Object> entry : data.entrySet()) {
-            if(entry.getValue() == null) {
+            if (entry.getValue() == null) {
                 continue;
             }
             if (builder.length() > 0) {
@@ -191,5 +210,74 @@ public class KubeflowConnectorExecutor {
     private String getBasicAuthenticationHeader(String username, String password) {
         String valueToEncode = username + ":" + password;
         return "Basic " + Base64.getEncoder().encodeToString(valueToEncode.getBytes());
+    }
+
+    private String getAccessTokenFromClientCredentialsFlow(OAuthAuthentication authentication) {
+        HttpClient httpClient = HttpClient.newHttpClient();
+        String serviceUrl = authentication.getOauthTokenEndpoint();
+        Map<String, Object> data = new HashMap<>();
+        data.put("grant_type", "client_credentials");
+        data.put("client_id", authentication.getClientId());
+        data.put("client_secret", authentication.getClientSecret());
+        data.put("scope", authentication.getScopes());
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .method("POST", ofFormData(data))
+                .uri(URI.create(serviceUrl))
+                .setHeader("User-Agent", "Kubeflow Camunda Connector")
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .build();
+
+        try {
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() >= 300) {
+                throw new RuntimeException(response.body());
+            }
+
+            String accessToken = extractOAuthAccessToken(response);
+            return accessToken;
+        } catch (InterruptedException | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private String getAccessTokenFromPasswordFlow(OAuthAuthenticationPasswordFlow authentication) {
+        HttpClient httpClient = HttpClient.newHttpClient();
+        String serviceUrl = authentication.getOauthTokenEndpoint();
+        Map<String, Object> data = new HashMap<>();
+        data.put("username", authentication.getUsername());
+        data.put("password", authentication.getPassword());
+        data.put("grant_type", "password");
+        data.put("client_id", authentication.getClientId());
+        data.put("client_secret", authentication.getClientSecret());
+        data.put("scope", authentication.getScopes());
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .method("POST", ofFormData(data))
+                .uri(URI.create(serviceUrl))
+                .setHeader("User-Agent", "Kubeflow Camunda Connector")
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .build();
+
+        try {
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() >= 300) {
+                throw new RuntimeException(response.body());
+            }
+
+            String accessToken = extractOAuthAccessToken(response);
+            return accessToken;
+        } catch (InterruptedException | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private String extractOAuthAccessToken(HttpResponse<String> oauthResponse) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return Optional.ofNullable(JsonHelper.getAsJsonElement(oauthResponse.body(), objectMapper))
+                .map(jsonNode -> jsonNode.findValue(Constants.ACCESS_TOKEN).asText())
+                .orElse(null);
     }
 }
