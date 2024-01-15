@@ -2,8 +2,11 @@ package de.viadee.bpm.camunda.connectors.kubeflow.services;
 
 import java.io.IOException;
 import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -67,12 +70,17 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 	}
 
 	@Override
-	protected Map<String, Object> buildPayloadForKubeflowEndpoint() {
-		// use process instance key as name of run to be created
-		if (KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum)) {
-			return getPayloadForEndpointV1();
-		}
-		return getPayloadForEndpointV2();
+	protected BodyPublisher buildPayloadForKubeflowEndpoint() {
+		Map<String, Object> payload = new HashMap<>();
+        if (KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum)) {
+            payload = getPayloadForEndpointV1();
+        }
+        payload = getPayloadForEndpointV2();
+        try {
+            return HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(payload));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 	}
 
 	@Override

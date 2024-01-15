@@ -1,8 +1,11 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.services;
 
-import java.net.http.HttpRequest.Builder;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublisher;
+import java.util.HashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
@@ -36,17 +39,23 @@ public class KubeflowConnectorExecutorCreateExperiment extends KubeflowConnector
         super(connectorRequest, processInstanceKey, kubeflowApisEnum, kubeflowApiOperationsEnum);
     }
 
-    @Override
-    protected void setHeaders(Builder httpRequestBuilder) {
-        httpRequestBuilder.setHeader("Content-Type", "application/x-www-form-urlencoded");
-    }
+    // @Override
+    // protected void setHeaders(Builder httpRequestBuilder) {
+    //     httpRequestBuilder.header("Content-Type", "application/x-www-form-urlencoded");
+    // }
 
     @Override
-    protected Map<String, Object> buildPayloadForKubeflowEndpoint() {
+    protected BodyPublisher buildPayloadForKubeflowEndpoint() {
+        Map<String, Object> payload = new HashMap<>();
         if (KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum)) {
-            return getPayloadForEndpointV1();
+            payload = getPayloadForEndpointV1();
         }
-        return getPayloadForEndpointV2();
+        payload = getPayloadForEndpointV2();
+        try {
+            return HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(payload));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Map<String, Object> getPayloadForEndpointV1() {

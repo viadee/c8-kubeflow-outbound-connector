@@ -8,6 +8,7 @@ import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublisher;
+import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpRequest.Builder;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
@@ -72,9 +73,9 @@ public class KubeflowConnectorExecutor {
                 String.format(kubeflowApiOperationsEnum.getApiUrl(), kubeflowApisEnum.getUrlPathVersion()));
     }
 
-    protected Map<String, Object> buildPayloadForKubeflowEndpoint() {
+    protected BodyPublisher buildPayloadForKubeflowEndpoint() {
         // nop payload by default
-        return null;
+        return BodyPublishers.noBody();
     }
 
     protected String getFilterString() {
@@ -103,13 +104,11 @@ public class KubeflowConnectorExecutor {
     private void buildHttpRequest() {
         String url = buildUrlForKubeflowEndpoint();
 
-        Map<String, Object> payload = buildPayloadForKubeflowEndpoint();
-        BodyPublisher bodyPublisher = ofFormData(payload);
+        BodyPublisher bodyPublisher = buildPayloadForKubeflowEndpoint();
         Builder httpRequestBuilder = HttpRequest.newBuilder()
                 .method(kubeflowApiOperationsEnum.getHttpMethod(), bodyPublisher)
                 .uri(URI.create(url))
-                .setHeader("User-Agent", "Kubeflow Camunda Connector")
-                .header("Content-Type", "application/json");
+                .setHeader("User-Agent", "Kubeflow Camunda Connector");
 
         setAuthentication(httpRequestBuilder);
         setHeaders(httpRequestBuilder);
@@ -183,8 +182,7 @@ public class KubeflowConnectorExecutor {
             }
             builder.append(URLEncoder.encode(entry.getKey().toString(), StandardCharsets.UTF_8));
             builder.append("=");
-            var value = entry.getValue();
-            builder.append(URLEncoder.encode(value == null ? "" : value.toString(), StandardCharsets.UTF_8));
+            builder.append(URLEncoder.encode(entry.getValue().toString(), StandardCharsets.UTF_8));
         }
         return HttpRequest.BodyPublishers.ofString(builder.toString());
     }
