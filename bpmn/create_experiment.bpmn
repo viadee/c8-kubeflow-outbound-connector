@@ -13,16 +13,16 @@
       <bpmn:extensionElements>
         <zeebe:taskDefinition type="de.viadee.bpm.camunda:connector-kubeflow:1" />
         <zeebe:ioMapping>
+          <zeebe:input source="bearer" target="authentication.type" />
+          <zeebe:input source="eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJxTzZYbnVFNVVKWkdXdUZHdS1OUkZPN2tQOG1DLUVwZzcydk1EY3dzUVZvIn0.eyJleHAiOjE3MDU5MTgzMTQsImlhdCI6MTcwNTMxMzUxNCwianRpIjoiMmFmN2VmODgtOTFjZS00NmZjLWIxNGQtYTAzMzBiNzdiZGE2IiwiaXNzIjoiaHR0cHM6Ly9pZC5taWN1ZGFqLmRlL2F1dGgvcmVhbG1zL21pY3VkYWoiLCJhdWQiOiJhY2NvdW50Iiwic3ViIjoiNmQ2OTlmNGMtZjk5OS00MTViLTkzMDAtNjYzOTE4NzRmNDNkIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoia3ViZWZsb3ciLCJzZXNzaW9uX3N0YXRlIjoiZjJjYTdmYzgtMzE4YS00ZGI1LTkwNjAtZThlNzRhYTQyYTEwIiwiYWNyIjoiMSIsImFsbG93ZWQtb3JpZ2lucyI6WyJodHRwczovL2t1YmVmbG93LmwubWljdWRhai5kZSJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiZGVmYXVsdC1yb2xlcy1tYXR0ZXJtb3N0Iiwib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoib3BlbmlkIGVtYWlsIHByb2ZpbGUiLCJzaWQiOiJmMmNhN2ZjOC0zMThhLTRkYjUtOTA2MC1lOGU3NGFhNDJhMTAiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmFtZSI6InVzZXIgZXhhbXBsZSIsInByZWZlcnJlZF91c2VybmFtZSI6InVzZXJAZXhhbXBsZS5jb20iLCJnaXZlbl9uYW1lIjoidXNlciIsImZhbWlseV9uYW1lIjoiZXhhbXBsZSIsImVtYWlsIjoidXNlckBleGFtcGxlLmNvbSJ9.j0-g7v8UMCxqaIVyKKQbeNqkLk-B5uF_mMGcqVd0nl7LbBa0iRAmsKI3pQ7pjZ40JrK6plyZYDd1Mrx5uqi9f6tR9MrGYS0HR6nDPGGgoar1HrWIqsmxuOdoUUcz8abXvE0tbBAPru6qR0j0VazScNy4pgOg077EjGDdEBH9R7l4QaJhVBvtWeZxfKvoa9m-H1AKCF3ZdMFsCeM0VsN5wpEhAuZtNXE8_4VlRYctuoQCJaOlyzgz_lHSjWkgFk3b9egeT2vBogyD59GaYhLuYtRSmb-U-8ojs3hz7Ss7Ab76SPMILc-dIdT5WB3Z-JK4-uR1wnleqBxv2wHq0_Pkug" target="authentication.token" />
           <zeebe:input source="pipelinesV1" target="kubeflowapi.api" />
           <zeebe:input source="create_experiment" target="kubeflowapi.operation" />
           <zeebe:input source="bla" target="kubeflowapi.experimentName" />
           <zeebe:input source="sdads" target="kubeflowapi.experimentDescription" />
         </zeebe:ioMapping>
-        <zeebe:taskHeaders />
-        <zeebe:properties>
-          <zeebe:property name="authentication.type" value="bearer" />
-          <zeebe:property name="authentication.token" value="eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJxTzZYbnVFNVVKWkdXdUZHdS1OUkZPN2tQOG1DLUVwZzcydk1EY3dzUVZvIn0.eyJleHAiOjE3MDU5MDcyNTEsImlhdCI6MTcwNTMwMjQ1MSwianRpIjoiZTYzZDA3ZDktZTM5MC00ODM4LWExMWUtODkyMTg1YTc4NzliIiwiaXNzIjoiaHR0cHM6Ly9pZC5taWN1ZGFqLmRlL2F1dGgvcmVhbG1zL21pY3VkYWoiLCJhdWQiOiJhY2NvdW50Iiwic3ViIjoiNmQ2OTlmNGMtZjk5OS00MTViLTkzMDAtNjYzOTE4NzRmNDNkIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoia3ViZWZsb3ciLCJzZXNzaW9uX3N0YXRlIjoiMDgxMWY0NzUtNDAzNy00ZmY2LTk3MDQtNTA3NzU5OGNjMGUzIiwiYWNyIjoiMSIsImFsbG93ZWQtb3JpZ2lucyI6WyJodHRwczovL2t1YmVmbG93LmwubWljdWRhai5kZSJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiZGVmYXVsdC1yb2xlcy1tYXR0ZXJtb3N0Iiwib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoib3BlbmlkIGVtYWlsIHByb2ZpbGUiLCJzaWQiOiIwODExZjQ3NS00MDM3LTRmZjYtOTcwNC01MDc3NTk4Y2MwZTMiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmFtZSI6InVzZXIgZXhhbXBsZSIsInByZWZlcnJlZF91c2VybmFtZSI6InVzZXJAZXhhbXBsZS5jb20iLCJnaXZlbl9uYW1lIjoidXNlciIsImZhbWlseV9uYW1lIjoiZXhhbXBsZSIsImVtYWlsIjoidXNlckBleGFtcGxlLmNvbSJ9.onF14jeyyzGKekxtBbSo-c34HUuAHSKh8TAKtoRildbmCg1UDdb5W7w-HDjfSXH0qXZIoN5AdidGf4uUjuSKgenm0LxdikEespsiu-t2qmUq18gdDQj_p9tfHOyCYheBO2hxT7tNN28OR2Va36exsf0W4nBqgwlspwgb0R92EwbyU7eJF_UaguSyWpsUKZuQidGrHZr8rQ5NFNvBrH-WYO40A-UpmHrszuBOrJ4bppxGJ0fb48wzFdY5fWKcUN5jIjG0DHu_HBkvlEiefL9RK60kaTey2Y8sJQ9zp_NXzpK0C0iwri6KQWnSAWR_Eenqu3zTkXWbVUHFBpdz90Xt-g" />
-        </zeebe:properties>
+        <zeebe:taskHeaders>
+          <zeebe:header key="resultVariable" value="result" />
+        </zeebe:taskHeaders>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0ar4k28</bpmn:incoming>
       <bpmn:outgoing>Flow_16fjtwv</bpmn:outgoing>

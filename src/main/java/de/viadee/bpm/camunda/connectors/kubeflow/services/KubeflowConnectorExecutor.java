@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpRequest.Builder;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
@@ -103,16 +104,20 @@ public class KubeflowConnectorExecutor {
         String url = buildUrlForKubeflowEndpoint();
 
         Map<String, Object> payload = buildPayloadForKubeflowEndpoint();
-
+        BodyPublisher bodyPublisher = ofFormData(payload);
         Builder httpRequestBuilder = HttpRequest.newBuilder()
-                .method(kubeflowApiOperationsEnum.getHttpMethod(), ofFormData(payload))
+                .method(kubeflowApiOperationsEnum.getHttpMethod(), bodyPublisher)
                 .uri(URI.create(url))
                 .setHeader("User-Agent", "Kubeflow Camunda Connector")
                 .header("Content-Type", "application/json");
 
         setAuthentication(httpRequestBuilder);
-
+        setHeaders(httpRequestBuilder);
         httpRequest = httpRequestBuilder.build();
+    }
+
+    protected void setHeaders(Builder httpRequestBuilder) {
+        httpRequestBuilder.setHeader("Content-Type", "application/json");
     }
 
     private void setAuthentication(Builder httpRequestBuilder) {
@@ -121,7 +126,7 @@ public class KubeflowConnectorExecutor {
             httpRequestBuilder.setHeader("Authorization", getBasicAuthenticationHeader(basicAuthentication.getUsername(), basicAuthentication.getPassword()));
         } else if (connectorRequest.authentication() instanceof BearerAuthentication) {
             BearerAuthentication bearerAuthentication = (BearerAuthentication) connectorRequest.authentication();
-            httpRequestBuilder.setHeader("Authorization", bearerAuthentication.getToken());
+            httpRequestBuilder.setHeader("Authorization", "Bearer " + bearerAuthentication.getToken());
         } else {
             // no authentication
         }
@@ -170,6 +175,9 @@ public class KubeflowConnectorExecutor {
     public static HttpRequest.BodyPublisher ofFormData(Map<String, Object> data) {
         var builder = new StringBuilder();
         for (Map.Entry<String, Object> entry : data.entrySet()) {
+            if(entry.getValue() == null) {
+                continue;
+            }
             if (builder.length() > 0) {
                 builder.append("&");
             }

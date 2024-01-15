@@ -118,7 +118,7 @@
         }
       ],
       "binding": {
-        "type": "zeebe:property",
+        "type": "zeebe:input",
         "name": "authentication.type"
       }
     },
@@ -128,7 +128,7 @@
       "type": "String",
       "feel": "optional",
       "binding": {
-        "type": "zeebe:property",
+        "type": "zeebe:input",
         "name": "authentication.token"
       },
       "constraints": {
@@ -146,7 +146,7 @@
       "type": "String",
       "feel": "optional",
       "binding": {
-        "type": "zeebe:property",
+        "type": "zeebe:input",
         "name": "authentication.oauthTokenEndpoint"
       },
       "constraints": {
@@ -164,7 +164,7 @@
       "type": "String",
       "feel": "optional",
       "binding": {
-        "type": "zeebe:property",
+        "type": "zeebe:input",
         "name": "authentication.clientId"
       },
       "constraints": {
@@ -182,7 +182,7 @@
       "type": "String",
       "feel": "optional",
       "binding": {
-        "type": "zeebe:property",
+        "type": "zeebe:input",
         "name": "authentication.clientSecret"
       },
       "constraints": {
@@ -201,7 +201,7 @@
       "feel": "optional",
       "optional": true,
       "binding": {
-        "type": "zeebe:property",
+        "type": "zeebe:input",
         "name": "authentication.scopes"
       },
       "condition": {
@@ -217,7 +217,7 @@
       "feel": "optional",
       "optional": true,
       "binding": {
-        "type": "zeebe:property",
+        "type": "zeebe:input",
         "name": "authentication.audience"
       },
       "condition": {
@@ -243,7 +243,7 @@
         }
       ],
       "binding": {
-        "type": "zeebe:property",
+        "type": "zeebe:input",
         "name": "authentication.clientAuthentication"
       },
       "condition": {
@@ -257,7 +257,7 @@
       "type": "String",
       "feel": "optional",
       "binding": {
-        "type": "zeebe:property",
+        "type": "zeebe:input",
         "name": "authentication.username"
       },
       "constraints": {
@@ -274,7 +274,7 @@
       "type": "String",
       "feel": "optional",
       "binding": {
-        "type": "zeebe:property",
+        "type": "zeebe:input",
         "name": "authentication.password"
       },
       "constraints": {
