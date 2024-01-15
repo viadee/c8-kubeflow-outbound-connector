@@ -1,13 +1,8 @@
 package de.viadee.bpm.camunda.connectors.kubeflow;
 
 import java.io.IOException;
-import java.net.Proxy;
-import java.net.ProxySelector;
-import java.net.SocketAddress;
-import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
-import java.util.List;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
@@ -25,7 +20,7 @@ import io.camunda.connector.generator.annotation.ElementTemplate;
 
 @OutboundConnector(name = "Kubeflow Connector", inputVariables = { "authentication", "configuration",
     "kubeflowapi" }, type = "de.viadee.bpm.camunda:connector-kubeflow:1")
-@ElementTemplate(id = "de.viadee.bpm.camunda.connectors.kubeflow.v1", name = "Kubeflow connector", version = 1, description = "Connector for communicating with Kubeflow from Camunda", icon = "icon.svg", documentationRef = "https://docs.camunda.io/docs/components/connectors/out-of-the-box-connectors/available-connectors-overview/", propertyGroups = {
+@ElementTemplate(id = "de.viadee.bpm.camunda.connectors.kubeflow.v1", name = "Kubeflow connector", version = 2, description = "Connector for communicating with Kubeflow from Camunda", icon = "icon.svg", documentationRef = "https://docs.camunda.io/docs/components/connectors/out-of-the-box-connectors/available-connectors-overview/", propertyGroups = {
     @ElementTemplate.PropertyGroup(id = "authentication", label = "Authentication"),
     @ElementTemplate.PropertyGroup(id = "configuration", label = "Configuration"),
     @ElementTemplate.PropertyGroup(id = "kubeflowapi", label = "Kubeflow API")
@@ -46,19 +41,7 @@ public class KubeflowConnectorFunction implements OutboundConnectorFunction {
 
   public KubeflowConnectorFunction(
       final ObjectMapper objectMapper) {
-    this.httpClient = HttpClient.newBuilder().proxy(new ProxySelector() {
-
-      @Override
-      public void connectFailed(URI arg0, SocketAddress arg1, IOException arg2) {
-        throw new UnsupportedOperationException("Unimplemented method 'connectFailed'");
-      }
-
-      @Override
-      public List<Proxy> select(URI arg0) {
-        throw new UnsupportedOperationException("Unimplemented method 'select'");
-      }
-
-    }).build();
+    this.httpClient = HttpClient.newBuilder().build();
   }
 
   @Override

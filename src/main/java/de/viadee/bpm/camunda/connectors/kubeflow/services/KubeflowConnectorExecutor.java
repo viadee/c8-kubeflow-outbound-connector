@@ -175,7 +175,8 @@ public class KubeflowConnectorExecutor {
             }
             builder.append(URLEncoder.encode(entry.getKey().toString(), StandardCharsets.UTF_8));
             builder.append("=");
-            builder.append(URLEncoder.encode(entry.getValue().toString(), StandardCharsets.UTF_8));
+            var value = entry.getValue();
+            builder.append(URLEncoder.encode(value == null ? "" : value.toString(), StandardCharsets.UTF_8));
         }
         return HttpRequest.BodyPublishers.ofString(builder.toString());
     }
