@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
 import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApiOperationsEnum;
 import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApisEnum;
+import de.viadee.bpm.camunda.connectors.kubeflow.utils.JsonHelper;
 import io.swagger.client.model.V1ApiExperiment;
 import io.swagger.client.model.V1ApiResourceKey;
 import io.swagger.client.model.V1ApiResourceReference;
@@ -18,8 +19,6 @@ import io.swagger.client.model.V1ApiResourceType;
 import io.swagger.client.model.V2beta1Experiment;
 
 public class KubeflowConnectorExecutorCreateExperiment extends KubeflowConnectorExecutor {
-
-    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public KubeflowConnectorExecutorCreateExperiment(KubeflowConnectorRequest connectorRequest, long processInstanceKey, KubeflowApisEnum kubeflowApisEnum,
         KubeflowApiOperationsEnum kubeflowApiOperationsEnum) {
@@ -30,13 +29,13 @@ public class KubeflowConnectorExecutorCreateExperiment extends KubeflowConnector
     protected BodyPublisher buildPayloadForKubeflowEndpoint() {
         if (KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum)) {
             try {
-                return HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(getPayloadForEndpointV1()));
+                return HttpRequest.BodyPublishers.ofString(JsonHelper.objectMapper.writeValueAsString(getPayloadForEndpointV1()));
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
         } else {
             try {
-                return HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(getPayloadForEndpointV2()));
+                return HttpRequest.BodyPublishers.ofString(JsonHelper.objectMapper.writeValueAsString(getPayloadForEndpointV2()));
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
@@ -63,7 +62,7 @@ public class KubeflowConnectorExecutorCreateExperiment extends KubeflowConnector
             .displayName(getName())
             .description(getDescription())
             .namespace(super.kubeflowMultiNs);
-        return objectMapper.convertValue(v2Beta1Experiment,
+        return JsonHelper.objectMapper.convertValue(v2Beta1Experiment,
             new TypeReference<>() {});
     }
 

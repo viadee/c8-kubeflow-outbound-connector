@@ -262,8 +262,7 @@ public class KubeflowConnectorExecutor {
     }
 
     private String extractOAuthAccessToken(HttpResponse<String> oauthResponse) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        return Optional.ofNullable(JsonHelper.getAsJsonElement(oauthResponse.body(), objectMapper))
+        return Optional.ofNullable(JsonHelper.getAsJsonElement(oauthResponse.body(), JsonHelper.objectMapper))
                 .map(jsonNode -> jsonNode.findValue(Constants.ACCESS_TOKEN).asText())
                 .orElse(null);
     }

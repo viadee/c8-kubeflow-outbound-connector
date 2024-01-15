@@ -12,6 +12,7 @@ import de.viadee.bpm.camunda.connectors.kubeflow.entities.V1Filter;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.V1FilterPredicate;
 import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApiOperationsEnum;
 import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApisEnum;
+import de.viadee.bpm.camunda.connectors.kubeflow.utils.JsonHelper;
 import de.viadee.bpm.camunda.connectors.kubeflow.utils.RunUtil;
 import io.swagger.client.model.V1ApiRun;
 import io.swagger.client.model.V2beta1Filter;
@@ -21,7 +22,6 @@ import io.swagger.client.model.V2beta1Run;
 
 public class KubeflowConnectorExecutorGetRunByName extends KubeflowConnectorExecutor {
   private static final String FILTER_BY_KEY = "name";
-  private static final ObjectMapper objectMapper = new ObjectMapper();
   private RunUtil runUtil;
 
   public KubeflowConnectorExecutorGetRunByName(KubeflowConnectorRequest connectorRequest, long processInstanceKey,
@@ -35,7 +35,7 @@ public class KubeflowConnectorExecutorGetRunByName extends KubeflowConnectorExec
   protected String getFilterString() {
     var filter = KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum) ? getV1Filter() : getV2Filter();
     try {
-      return objectMapper.writeValueAsString(filter);
+      return JsonHelper.objectMapper.writeValueAsString(filter);
     } catch (Exception e) {
       throw new RuntimeException("Error occurred during serialization of filter object");
     }

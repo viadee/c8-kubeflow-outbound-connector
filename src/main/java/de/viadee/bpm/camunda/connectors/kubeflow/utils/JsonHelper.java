@@ -17,8 +17,17 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
+import io.camunda.connector.feel.jackson.JacksonModuleFeelFunction;
+
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,4 +50,11 @@ public class JsonHelper {
             })
         .orElse(null);
   }
+
+  public static final ObjectMapper objectMapper = JsonMapper.builder()
+      .addModules(new JacksonModuleFeelFunction(), new Jdk8Module(), new JavaTimeModule())
+      .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+      .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+      .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
+      .build();
 }
