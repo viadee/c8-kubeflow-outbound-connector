@@ -1,7 +1,6 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.services.async;
 
 import java.io.IOException;
-import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 import java.util.concurrent.Callable;
 

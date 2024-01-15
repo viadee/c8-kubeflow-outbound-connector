@@ -20,8 +20,6 @@ import java.util.Optional;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.client.utils.URIBuilder;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import de.viadee.bpm.camunda.connectors.kubeflow.auth.BasicAuthentication;
 import de.viadee.bpm.camunda.connectors.kubeflow.auth.BearerAuthentication;
 import de.viadee.bpm.camunda.connectors.kubeflow.auth.Constants;

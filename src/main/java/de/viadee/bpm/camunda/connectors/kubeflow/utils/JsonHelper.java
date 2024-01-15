@@ -16,6 +16,11 @@
  */
 package de.viadee.bpm.camunda.connectors.kubeflow.utils;
 
+import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -27,10 +32,6 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import io.camunda.connector.feel.jackson.JacksonModuleFeelFunction;
-
-import java.util.Optional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class JsonHelper {
 

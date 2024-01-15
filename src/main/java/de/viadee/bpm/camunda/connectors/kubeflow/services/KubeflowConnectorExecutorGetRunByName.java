@@ -5,7 +5,6 @@ import java.net.http.HttpResponse;
 import java.util.Optional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.V1Filter;
