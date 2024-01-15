@@ -3,7 +3,9 @@ package de.viadee.bpm.camunda.connectors.kubeflow;
 import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
+import java.util.HashMap;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -55,6 +57,17 @@ public class KubeflowConnectorFunction implements OutboundConnectorFunction {
     long processInstanceKey = context.getJobContext().getProcessInstanceKey();
 
     KubeflowConnectorExecutor connectorExecutor = ExecutionHandler.getExecutor(connectorRequest, processInstanceKey);
-    return connectorExecutor.execute(httpClient);
+
+    HttpResponse<String> response = connectorExecutor.execute(httpClient);
+
+    // raise error based on status code
+    if (response.statusCode() >= 300) {
+      throw new RuntimeException(response.body());
+    }
+
+    ObjectMapper mapper = new ObjectMapper();
+    TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
+    };
+    return mapper.readValue(response.body(), typeRef);
   }
 }

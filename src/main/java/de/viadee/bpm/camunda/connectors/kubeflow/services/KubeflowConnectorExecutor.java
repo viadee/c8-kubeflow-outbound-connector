@@ -62,17 +62,10 @@ public class KubeflowConnectorExecutor {
         buildHttpRequest();
     }
 
-    public HashMap<String,Object> execute(HttpClient httpClient) {
+    public HttpResponse<String> execute(HttpClient httpClient) {
         try {
             HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-
-            if(response.statusCode() >= 300) {
-                throw new RuntimeException(response.body());
-            }
-
-            ObjectMapper mapper = new ObjectMapper();
-            TypeReference<HashMap<String,Object>> typeRef = new TypeReference<HashMap<String,Object>>() {};
-            return mapper.readValue(response.body(), typeRef);
+            return response;
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (InterruptedException e) {
