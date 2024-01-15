@@ -25,7 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.viadee.bpm.camunda.connectors.kubeflow.auth.BasicAuthentication;
 import de.viadee.bpm.camunda.connectors.kubeflow.auth.BearerAuthentication;
 import de.viadee.bpm.camunda.connectors.kubeflow.auth.Constants;
-import de.viadee.bpm.camunda.connectors.kubeflow.auth.OAuthAuthentication;
+import de.viadee.bpm.camunda.connectors.kubeflow.auth.OAuthAuthenticationClientCredentialsFlow;
 import de.viadee.bpm.camunda.connectors.kubeflow.auth.OAuthAuthenticationPasswordFlow;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
 import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApiOperationsEnum;
@@ -61,13 +61,14 @@ public class KubeflowConnectorExecutor {
         this.processInstanceKey = processInstanceKey;
         this.kubeflowApisEnum = kubeflowApisEnum;
         this.kubeflowApiOperationsEnum = kubeflowApiOperationsEnum;
+        this.httpClient = HttpClient.newHttpClient();
 
         setConfigurationParameters();
 
         buildHttpRequest();
     }
 
-    public HttpResponse<String> execute(HttpClient httpClient) {
+    public HttpResponse<String> execute() {
         try {
             HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
             return response;
@@ -137,8 +138,9 @@ public class KubeflowConnectorExecutor {
         } else if (connectorRequest.authentication() instanceof BearerAuthentication) {
             BearerAuthentication bearerAuthentication = (BearerAuthentication) connectorRequest.authentication();
             httpRequestBuilder.setHeader("Authorization", "Bearer " + bearerAuthentication.getToken());
-        } else if (connectorRequest.authentication() instanceof OAuthAuthentication) {
-            OAuthAuthentication oAuthAuthentication = (OAuthAuthentication) connectorRequest.authentication();
+        } else if (connectorRequest.authentication() instanceof OAuthAuthenticationClientCredentialsFlow) {
+            OAuthAuthenticationClientCredentialsFlow oAuthAuthentication = (OAuthAuthenticationClientCredentialsFlow) connectorRequest
+                    .authentication();
             String accessToken = getAccessTokenFromClientCredentialsFlow(oAuthAuthentication);
             httpRequestBuilder.setHeader("Authorization", "Bearer " + accessToken);
         } else if (connectorRequest.authentication() instanceof OAuthAuthenticationPasswordFlow) {
@@ -150,7 +152,7 @@ public class KubeflowConnectorExecutor {
             // no authentication
         }
     }
-    
+
     private String buildUrlForKubeflowEndpoint() {
         String url = "";
         try {
@@ -212,47 +214,32 @@ public class KubeflowConnectorExecutor {
         return "Basic " + Base64.getEncoder().encodeToString(valueToEncode.getBytes());
     }
 
-    private String getAccessTokenFromClientCredentialsFlow(OAuthAuthentication authentication) {
-        HttpClient httpClient = HttpClient.newHttpClient();
+    private String getAccessTokenFromClientCredentialsFlow(OAuthAuthenticationClientCredentialsFlow authentication) {
         String serviceUrl = authentication.getOauthTokenEndpoint();
         Map<String, Object> data = new HashMap<>();
-        data.put("grant_type", "client_credentials");
+        data.put("grant_type", authentication.getGrantType());
         data.put("client_id", authentication.getClientId());
         data.put("client_secret", authentication.getClientSecret());
         data.put("scope", authentication.getScopes());
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .method("POST", ofFormData(data))
-                .uri(URI.create(serviceUrl))
-                .setHeader("User-Agent", "Kubeflow Camunda Connector")
-                .header("Content-Type", "application/x-www-form-urlencoded")
-                .build();
-
-        try {
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() >= 300) {
-                throw new RuntimeException(response.body());
-            }
-
-            String accessToken = extractOAuthAccessToken(response);
-            return accessToken;
-        } catch (InterruptedException | IOException e) {
-            throw new RuntimeException(e);
-        }
+        return requestAccessToken(serviceUrl, data);
     }
 
     private String getAccessTokenFromPasswordFlow(OAuthAuthenticationPasswordFlow authentication) {
-        HttpClient httpClient = HttpClient.newHttpClient();
+        
         String serviceUrl = authentication.getOauthTokenEndpoint();
         Map<String, Object> data = new HashMap<>();
         data.put("username", authentication.getUsername());
         data.put("password", authentication.getPassword());
-        data.put("grant_type", "password");
+        data.put("grant_type", authentication.getGrantType());
         data.put("client_id", authentication.getClientId());
         data.put("client_secret", authentication.getClientSecret());
         data.put("scope", authentication.getScopes());
 
+        return requestAccessToken(serviceUrl, data);
+    }
+
+    private String requestAccessToken(String serviceUrl, Map<String, Object> data) {
         HttpRequest request = HttpRequest.newBuilder()
                 .method("POST", ofFormData(data))
                 .uri(URI.create(serviceUrl))

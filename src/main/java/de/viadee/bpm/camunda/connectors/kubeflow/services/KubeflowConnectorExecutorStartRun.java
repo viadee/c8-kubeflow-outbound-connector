@@ -1,7 +1,6 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.services;
 
 import java.io.IOException;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpResponse;
@@ -12,7 +11,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.http.protocol.HttpService;
 import org.threeten.bp.OffsetDateTime;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -58,8 +56,6 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 					new OffsetDateTimeDeserializer()))
 			.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
 
-	private HttpService httpService;
-
 	private RunUtil runUtil;
 
 	public KubeflowConnectorExecutorStartRun(KubeflowConnectorRequest connectorRequest, long processInstanceKey,
@@ -84,17 +80,14 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 	}
 
 	@Override
-	public HttpResponse<String> execute(HttpClient httpClient) {
-		this.httpClient = httpClient;
-
+	public HttpResponse<String> execute() {
 		HttpResponse<String> result = null;
 		if (kubeflowApiOperationsEnum.equals(KubeflowApiOperationsEnum.START_RUN)) {
-			result = super.execute(httpClient);
+			result = super.execute();
 		} else if (kubeflowApiOperationsEnum.equals(KubeflowApiOperationsEnum.START_RUN_AND_MONITOR)) {
 			String idOfAlreadyStartedRun;
 			try {
-				idOfAlreadyStartedRun = getIdOfAlreadyStartedRunByName(httpService,
-						Long.toString(processInstanceKey));
+				idOfAlreadyStartedRun = getIdOfAlreadyStartedRunByName(Long.toString(processInstanceKey));
 			} catch (InstantiationException | IllegalAccessException | IOException e) {
 				throw new RuntimeException(e);
 			}
@@ -102,7 +95,7 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 					.parse(connectorRequest.kubeflowapi().pollingInterval());
 
 			if (idOfAlreadyStartedRun == null) { // run not yet started
-				result = super.execute(httpClient);
+				result = super.execute();
 				String newRunId;
 				try {
 					newRunId = KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum)
@@ -112,15 +105,13 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 					throw new RuntimeException(e);
 				}
 				KubeflowCallable kubeflowCallableRunNotStarted = new KubeflowCallable(connectorRequest,
-						processInstanceKey, httpClient, newRunId);
+						processInstanceKey, newRunId);
 				result = retrieveRunStatusWithDelay(kubeflowCallableRunNotStarted,
 						pollingInterval.getSeconds(),
 						false);
 
 			} else { // run already started
-				KubeflowCallable kubeflowCallableRunStarted = new KubeflowCallable(connectorRequest, processInstanceKey,
-						httpClient,
-						idOfAlreadyStartedRun);
+				KubeflowCallable kubeflowCallableRunStarted = new KubeflowCallable(connectorRequest, processInstanceKey, idOfAlreadyStartedRun);
 				result = retrieveRunStatusWithDelay(kubeflowCallableRunStarted,
 						pollingInterval.getSeconds(),
 						true);
@@ -167,7 +158,7 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 				});
 	}
 
-	private String getIdOfAlreadyStartedRunByName(HttpService httpService, String runName)
+	private String getIdOfAlreadyStartedRunByName(String runName)
 			throws InstantiationException, IllegalAccessException, IOException {
 		KubeflowApi kubeflowApi = new KubeflowApi(kubeflowApisEnum.getValue(),
 				KubeflowApiOperationsEnum.GET_RUN_BY_NAME.getValue(), null,
@@ -182,8 +173,8 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 						getRunByNameConnectorRequest,
 						processInstanceKey);
 		String id = KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum)
-				? getRunByNameExecutor.getRunByNameV1Typed(httpClient).map(V1ApiRun::getId).orElse(null)
-				: getRunByNameExecutor.getRunByNameV2Typed(httpClient).map(V2beta1Run::getRunId)
+				? getRunByNameExecutor.getRunByNameV1Typed().map(V1ApiRun::getId).orElse(null)
+				: getRunByNameExecutor.getRunByNameV2Typed().map(V2beta1Run::getRunId)
 						.orElse(null);
 
 		return id;

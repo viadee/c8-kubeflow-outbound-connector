@@ -1,7 +1,6 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.services;
 
 import java.io.IOException;
-import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 import java.util.Optional;
 
@@ -43,8 +42,8 @@ public class KubeflowConnectorExecutorGetRunByName extends KubeflowConnectorExec
   }
 
   @Override
-  public HttpResponse<String> execute(HttpClient httpClient) {
-    var runByNameHttpResult = super.execute(httpClient);
+  public HttpResponse<String> execute() {
+    var runByNameHttpResult = super.execute();
 
     Integer apiListRunsResponseSize = null;
     try {
@@ -63,17 +62,17 @@ public class KubeflowConnectorExecutorGetRunByName extends KubeflowConnectorExec
 
   }
 
-  public Optional<V1ApiRun> getRunByNameV1Typed(HttpClient httpClient)
+  public Optional<V1ApiRun> getRunByNameV1Typed()
       throws IOException, InstantiationException, IllegalAccessException {
-    var httpResponse = this.execute(httpClient);
+    var httpResponse = this.execute();
     var v1RunList = runUtil.readV1RunListAsTypedResponse(httpResponse).getRuns();
     var v1ApiRun = v1RunList == null || v1RunList.isEmpty() ? null : v1RunList.get(0);
     return Optional.ofNullable(v1ApiRun);
   }
 
-  public Optional<V2beta1Run> getRunByNameV2Typed(HttpClient httpClient)
+  public Optional<V2beta1Run> getRunByNameV2Typed()
       throws IOException, InstantiationException, IllegalAccessException {
-    var httpResponse = this.execute(httpClient);
+    var httpResponse = this.execute();
     var v2RunList = runUtil.readV2RunListAsTypedResponse(httpResponse).getRuns();
     var v2ApiRun = v2RunList == null || v2RunList.isEmpty() ? null : v2RunList.get(0);
     return Optional.ofNullable(v2ApiRun);

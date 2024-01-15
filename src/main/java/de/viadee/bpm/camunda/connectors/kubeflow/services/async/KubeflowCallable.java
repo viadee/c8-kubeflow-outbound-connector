@@ -12,27 +12,24 @@ import de.viadee.bpm.camunda.connectors.kubeflow.services.KubeflowConnectorExecu
 
 public class KubeflowCallable implements Callable<HttpResponse<String>> {
     private final String runId;
-    private final HttpClient httpClient;
     private final KubeflowConnectorRequest connectorRequest;
     private final long processInstanceKey;
 
-    public KubeflowCallable(KubeflowConnectorRequest connectorRequest, long processInstanceKey, HttpClient httpClient,
-            String runId) {
+    public KubeflowCallable(KubeflowConnectorRequest connectorRequest, long processInstanceKey, String runId) {
         this.connectorRequest = connectorRequest;
         this.processInstanceKey = processInstanceKey;
-        this.httpClient = httpClient;
         this.runId = runId;
     }
 
     public HttpResponse<String> call() {
         try {
-            return getStatusOfRunById(httpClient, runId);
+            return getStatusOfRunById(runId);
         } catch (InstantiationException | IllegalAccessException | IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private HttpResponse<String> getStatusOfRunById(HttpClient httpClient, String runId)
+    private HttpResponse<String> getStatusOfRunById(String runId)
             throws InstantiationException, IllegalAccessException, IOException {
         KubeflowApi kubeflowApi = new KubeflowApi(connectorRequest.kubeflowapi().api(), KubeflowApiOperationsEnum.GET_RUN_BY_ID.getValue(),
             runId, null, null, null, null, null, null);
@@ -42,7 +39,7 @@ public class KubeflowCallable implements Callable<HttpResponse<String>> {
                 getRunByIdConnectorRequest,
                 processInstanceKey);
 
-        var httpResponse = getRunByIdExecutor.execute(httpClient);
+        var httpResponse = getRunByIdExecutor.execute();
         
         return httpResponse;
     }

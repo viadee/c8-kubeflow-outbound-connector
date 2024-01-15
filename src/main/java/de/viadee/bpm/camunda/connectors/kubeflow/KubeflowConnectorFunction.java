@@ -1,18 +1,11 @@
 package de.viadee.bpm.camunda.connectors.kubeflow;
 
 import java.io.IOException;
-import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 import java.util.HashMap;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
 import de.viadee.bpm.camunda.connectors.kubeflow.services.KubeflowConnectorExecutor;
@@ -20,7 +13,6 @@ import de.viadee.bpm.camunda.connectors.kubeflow.services.async.ExecutionHandler
 import io.camunda.connector.api.annotation.OutboundConnector;
 import io.camunda.connector.api.outbound.OutboundConnectorContext;
 import io.camunda.connector.api.outbound.OutboundConnectorFunction;
-import io.camunda.connector.feel.jackson.JacksonModuleFeelFunction;
 import io.camunda.connector.generator.annotation.ElementTemplate;
 
 @OutboundConnector(name = "Kubeflow Connector", inputVariables = { "authentication", "configuration",
@@ -32,22 +24,7 @@ import io.camunda.connector.generator.annotation.ElementTemplate;
 }, inputDataClass = KubeflowConnectorRequest.class)
 public class KubeflowConnectorFunction implements OutboundConnectorFunction {
 
-  private final HttpClient httpClient;
-  private static final ObjectMapper objectMapper = JsonMapper.builder()
-      .addModules(new JacksonModuleFeelFunction(), new Jdk8Module(), new JavaTimeModule())
-      .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
-      .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-      .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
-      .build();
-
   public KubeflowConnectorFunction() {
-    this(
-        objectMapper.copy());
-  }
-
-  public KubeflowConnectorFunction(
-      final ObjectMapper objectMapper) {
-    this.httpClient = HttpClient.newBuilder().build();
   }
 
   @Override
@@ -58,7 +35,7 @@ public class KubeflowConnectorFunction implements OutboundConnectorFunction {
 
     KubeflowConnectorExecutor connectorExecutor = ExecutionHandler.getExecutor(connectorRequest, processInstanceKey);
 
-    HttpResponse<String> response = connectorExecutor.execute(httpClient);
+    HttpResponse<String> response = connectorExecutor.execute();
 
     // raise error based on status code
     if (response.statusCode() >= 300) {

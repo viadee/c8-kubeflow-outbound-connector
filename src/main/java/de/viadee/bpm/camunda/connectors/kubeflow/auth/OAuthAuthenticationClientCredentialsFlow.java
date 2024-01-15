@@ -27,8 +27,8 @@ import io.camunda.connector.generator.annotation.TemplateProperty.PropertyType;
 import io.camunda.connector.generator.annotation.TemplateSubType;
 import jakarta.validation.constraints.NotEmpty;
 
-@TemplateSubType(id = OAuthAuthentication.TYPE, label = "OAuth 2.0 (client credentials flow)")
-public final class OAuthAuthentication extends Authentication {
+@TemplateSubType(id = OAuthAuthenticationClientCredentialsFlow.TYPE, label = "OAuth 2.0 (client credentials flow)")
+public final class OAuthAuthenticationClientCredentialsFlow extends Authentication {
   @TemplateProperty(ignore = true)
   private final String grantType = "client_credentials";
 
@@ -160,7 +160,7 @@ public final class OAuthAuthentication extends Authentication {
     if (!super.equals(o)) {
       return false;
     }
-    OAuthAuthentication that = (OAuthAuthentication) o;
+    OAuthAuthenticationClientCredentialsFlow that = (OAuthAuthenticationClientCredentialsFlow) o;
     return oauthTokenEndpoint.equals(that.oauthTokenEndpoint)
         && clientId.equals(that.clientId)
         && clientSecret.equals(that.clientSecret)
