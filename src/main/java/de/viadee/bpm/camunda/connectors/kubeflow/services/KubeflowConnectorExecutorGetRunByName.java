@@ -5,6 +5,7 @@ import java.net.http.HttpResponse;
 import java.util.Optional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.V1Filter;
@@ -45,12 +46,16 @@ public class KubeflowConnectorExecutorGetRunByName extends KubeflowConnectorExec
     var runByNameHttpResult = super.execute();
 
     Integer apiListRunsResponseSize = null;
-    try {
-      apiListRunsResponseSize = KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum)
-          ? runUtil.readV1RunListAsTypedResponse(runByNameHttpResult).getTotalSize()
-          : runUtil.readV2RunListAsTypedResponse(runByNameHttpResult).getTotalSize();
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
+    if (JsonHelper.getAsJsonElement(runByNameHttpResult.body(), new ObjectMapper()).isEmpty()) {
+      apiListRunsResponseSize = 0;
+    } else {
+      try {
+        apiListRunsResponseSize = KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum)
+            ? runUtil.readV1RunListAsTypedResponse(runByNameHttpResult).getTotalSize()
+            : runUtil.readV2RunListAsTypedResponse(runByNameHttpResult).getTotalSize();
+      } catch (JsonProcessingException e) {
+        throw new RuntimeException(e);
+      }
     }
 
     if (apiListRunsResponseSize == null || apiListRunsResponseSize <= 1) {
@@ -64,6 +69,9 @@ public class KubeflowConnectorExecutorGetRunByName extends KubeflowConnectorExec
   public Optional<V1ApiRun> getRunByNameV1Typed()
       throws IOException, InstantiationException, IllegalAccessException {
     var httpResponse = this.execute();
+    if (JsonHelper.getAsJsonElement(httpResponse.body(), new ObjectMapper()).isEmpty()) {
+      return Optional.ofNullable(null);
+    }
     var v1RunList = runUtil.readV1RunListAsTypedResponse(httpResponse).getRuns();
     var v1ApiRun = v1RunList == null || v1RunList.isEmpty() ? null : v1RunList.get(0);
     return Optional.ofNullable(v1ApiRun);
@@ -72,6 +80,9 @@ public class KubeflowConnectorExecutorGetRunByName extends KubeflowConnectorExec
   public Optional<V2beta1Run> getRunByNameV2Typed()
       throws IOException, InstantiationException, IllegalAccessException {
     var httpResponse = this.execute();
+    if (JsonHelper.getAsJsonElement(httpResponse.body(), new ObjectMapper()).isEmpty()) {
+      return Optional.ofNullable(null);
+    }
     var v2RunList = runUtil.readV2RunListAsTypedResponse(httpResponse).getRuns();
     var v2ApiRun = v2RunList == null || v2RunList.isEmpty() ? null : v2RunList.get(0);
     return Optional.ofNullable(v2ApiRun);

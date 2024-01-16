@@ -5,16 +5,13 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.threeten.bp.OffsetDateTime;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -26,6 +23,7 @@ import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApisEnum;
 import de.viadee.bpm.camunda.connectors.kubeflow.enums.V1PipelineRunStatusEnum;
 import de.viadee.bpm.camunda.connectors.kubeflow.services.async.ExecutionHandler;
 import de.viadee.bpm.camunda.connectors.kubeflow.services.async.KubeflowCallable;
+import de.viadee.bpm.camunda.connectors.kubeflow.utils.JsonHelper;
 import de.viadee.bpm.camunda.connectors.kubeflow.utils.OffsetDateTimeDeserializer;
 import de.viadee.bpm.camunda.connectors.kubeflow.utils.RunUtil;
 import io.swagger.client.model.V1ApiPipelineSpec;
@@ -67,16 +65,17 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 
 	@Override
 	protected BodyPublisher buildPayloadForKubeflowEndpoint() {
-		Map<String, Object> payload = new HashMap<>();
-        if (KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum)) {
-            payload = getPayloadForEndpointV1();
-        }
-        payload = getPayloadForEndpointV2();
-        try {
-            return HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(payload));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+		try {
+			if (KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum)) {
+				return HttpRequest.BodyPublishers
+						.ofString(JsonHelper.objectMapper.writeValueAsString(getPayloadForEndpointV1()));
+			}
+			return HttpRequest.BodyPublishers
+					.ofString(JsonHelper.objectMapper.writeValueAsString(getPayloadForEndpointV2()));
+
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
@@ -111,7 +110,8 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 						false);
 
 			} else { // run already started
-				KubeflowCallable kubeflowCallableRunStarted = new KubeflowCallable(connectorRequest, processInstanceKey, idOfAlreadyStartedRun);
+				KubeflowCallable kubeflowCallableRunStarted = new KubeflowCallable(connectorRequest, processInstanceKey,
+						idOfAlreadyStartedRun);
 				result = retrieveRunStatusWithDelay(kubeflowCallableRunStarted,
 						pollingInterval.getSeconds(),
 						true);
@@ -125,7 +125,7 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 		return result;
 	}
 
-	private Map<String, Object> getPayloadForEndpointV1() {
+	private V1ApiRun getPayloadForEndpointV1() {
 		var v1ApiPipelineSpec = new V1ApiPipelineSpec()
 				.pipelineId(connectorRequest.kubeflowapi().pipelineId());
 
@@ -139,12 +139,10 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 				.pipelineSpec(v1ApiPipelineSpec)
 				.addResourceReferencesItem(v1ApiResourceReference);
 
-		return objectMapper.convertValue(v1ApiRun,
-				new TypeReference<>() {
-				});
+		return v1ApiRun;
 	}
 
-	private Map<String, Object> getPayloadForEndpointV2() {
+	private V2beta1Run getPayloadForEndpointV2() {
 		var v2beta1PipelineVersionReference = new V2beta1PipelineVersionReference()
 				.pipelineId(connectorRequest.kubeflowapi().pipelineId());
 
@@ -153,9 +151,7 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 				.pipelineVersionReference(v2beta1PipelineVersionReference)
 				.experimentId(connectorRequest.kubeflowapi().experimentId());
 
-		return objectMapper.convertValue(v2ApiRun,
-				new TypeReference<>() {
-				});
+		return v2ApiRun;
 	}
 
 	private String getIdOfAlreadyStartedRunByName(String runName)
@@ -198,8 +194,8 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 							TimeUnit.SECONDS);
 				}
 				status = KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum)
-				? runUtil.readV1RunAsTypedResponse(httpResponse).getStatus()
-				: runUtil.readV2RunAsTypedResponse(httpResponse).getState().getValue();
+						? runUtil.readV1RunAsTypedResponse(httpResponse).getStatus()
+						: runUtil.readV2RunAsTypedResponse(httpResponse).getState().getValue();
 			} catch (InterruptedException | ExecutionException e) {
 				throw new RuntimeException(e);
 			} catch (JsonProcessingException e) {

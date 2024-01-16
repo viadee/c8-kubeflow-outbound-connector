@@ -22,19 +22,23 @@ public class RunUtil {
           new OffsetDateTimeDeserializer()))
       .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
 
-  public RunUtil() {}
+  public RunUtil() {
+  }
 
   public V1ApiListRunsResponse readV1RunListAsTypedResponse(HttpResponse<String> runResponse)
       throws JsonProcessingException {
     var v1ApiListRunsResponse = runMapper
-        .readValue(runMapper.writeValueAsString(runResponse.body()), V1ApiListRunsResponse.class);
+        .readValue(runResponse.body(), V1ApiListRunsResponse.class);
     return v1ApiListRunsResponse;
   }
 
   public V1ApiRun readV1RunAsTypedResponse(HttpResponse<String> runResponse)
       throws JsonProcessingException {
-    var v1ApiRunResponse = runMapper
-        .readValue(runMapper.writeValueAsString(runResponse.body()), V1ApiRunDetail.class).getRun();
+    V1ApiRun v1ApiRunResponse = null;
+    if (!JsonHelper.getAsJsonElement(runResponse.body(), new ObjectMapper()).isEmpty()) {
+      v1ApiRunResponse = runMapper
+          .readValue(runResponse.body(), V1ApiRunDetail.class).getRun();
+    }
     return v1ApiRunResponse;
   }
 
@@ -46,14 +50,14 @@ public class RunUtil {
   public V2beta1ListRunsResponse readV2RunListAsTypedResponse(HttpResponse<String> runResponse)
       throws JsonProcessingException {
     var v2ApiListRunsResponse = runMapper
-        .readValue(runMapper.writeValueAsString(runResponse.body()), V2beta1ListRunsResponse.class);
+        .readValue(runResponse.body(), V2beta1ListRunsResponse.class);
     return v2ApiListRunsResponse;
   }
 
   public V2beta1Run readV2RunAsTypedResponse(HttpResponse<String> runResponse)
       throws JsonProcessingException {
     var v2ApiRunResponse = runMapper
-        .readValue(runMapper.writeValueAsString(runResponse.body()), V2beta1Run.class);
+        .readValue(runResponse.body(), V2beta1Run.class);
     return v2ApiRunResponse;
   }
 
