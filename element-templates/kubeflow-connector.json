@@ -80,19 +80,6 @@
       }
     },
     {
-      "id": "configuration.cookievalue",
-      "label": "Cookie Value",
-      "description": "Specify the cookie value of a valid Kubeflow session.",
-      "type": "String",
-      "group": "configuration",
-      "optional": true,
-      "tooltip": "If left empty, cookie is read from environment variable 'KF_CONNECTOR_COOKIE'.",
-      "binding": {
-        "type": "zeebe:input",
-        "name": "configuration.cookievalue"
-      }
-    },
-    {
       "label": "Type",
       "id": "authenticationType",
       "group": "authentication",

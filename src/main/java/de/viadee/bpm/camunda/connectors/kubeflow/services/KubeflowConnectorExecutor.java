@@ -33,7 +33,6 @@ import de.viadee.bpm.camunda.connectors.kubeflow.utils.JsonHelper;
 public class KubeflowConnectorExecutor {
 
     private static final String KUBEFLOW_URL_ENV = "KF_CONNECTOR_URL";
-    private static final String KUBEFLOW_COOKIE_ENV = "KF_CONNECTOR_COOKIE";
     private static final String KUBEFLOW_NAMESPACE_ENV = "KF_CONNECTOR_MULTIUSER_NS";
     private static final String URI_PARAMETER_FILTER = "filter";
     private static final Pair<String, String> URI_PARAMETER_PAIR_V1_TYPE_NS = Pair.of("resource_reference_key.type",
@@ -95,12 +94,10 @@ public class KubeflowConnectorExecutor {
         var authPropertyGroup = connectorRequest.configuration();
 
         kubeflowUrl = System.getenv(KUBEFLOW_URL_ENV);
-        kubeflowCookie = System.getenv(KUBEFLOW_COOKIE_ENV);
         kubeflowMultiNs = System.getenv(KUBEFLOW_NAMESPACE_ENV);
 
         if (authPropertyGroup != null) {
             kubeflowUrl = authPropertyGroup.kubeflowUrl() == null ? kubeflowUrl : authPropertyGroup.kubeflowUrl();
-            kubeflowCookie = authPropertyGroup.cookievalue() == null ? kubeflowCookie : authPropertyGroup.cookievalue();
             kubeflowMultiNs = authPropertyGroup.multiusernamespace() == null ? kubeflowMultiNs
                     : authPropertyGroup.multiusernamespace();
         }
