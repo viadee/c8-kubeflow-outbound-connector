@@ -109,8 +109,8 @@
         }
       ],
       "binding": {
-        "type": "zeebe:taskHeader",
-        "key": "authentication.type"
+        "type": "zeebe:input",
+        "name": "authentication.type"
       }
     },
     {
@@ -119,8 +119,8 @@
       "type": "String",
       "feel": "optional",
       "binding": {
-        "type": "zeebe:taskHeader",
-        "key": "authentication.token"
+        "type": "zeebe:input",
+        "name": "authentication.token"
       },
       "constraints": {
         "notEmpty": true
@@ -137,8 +137,8 @@
       "type": "String",
       "feel": "optional",
       "binding": {
-        "type": "zeebe:taskHeader",
-        "key": "authentication.oauthTokenEndpoint"
+        "type": "zeebe:input",
+        "name": "authentication.oauthTokenEndpoint"
       },
       "constraints": {
         "notEmpty": true
@@ -158,8 +158,8 @@
       "type": "String",
       "feel": "optional",
       "binding": {
-        "type": "zeebe:taskHeader",
-        "key": "authentication.clientId"
+        "type": "zeebe:input",
+        "name": "authentication.clientId"
       },
       "constraints": {
         "notEmpty": true
@@ -180,8 +180,8 @@
       "feel": "optional",
       "optional": true,
       "binding": {
-        "type": "zeebe:taskHeader",
-        "key": "authentication.clientSecret"
+        "type": "zeebe:input",
+        "name": "authentication.clientSecret"
       },
       "condition": {
         "property": "authenticationType",
@@ -199,8 +199,8 @@
       "feel": "optional",
       "optional": true,
       "binding": {
-        "type": "zeebe:taskHeader",
-        "key": "authentication.scopes"
+        "type": "zeebe:input",
+        "name": "authentication.scopes"
       },
       "condition": {
         "property": "authenticationType",
@@ -218,8 +218,8 @@
       "feel": "optional",
       "optional": true,
       "binding": {
-        "type": "zeebe:taskHeader",
-        "key": "authentication.audience"
+        "type": "zeebe:input",
+        "name": "authentication.audience"
       },
       "condition": {
         "property": "authenticationType",
@@ -247,8 +247,8 @@
         }
       ],
       "binding": {
-        "type": "zeebe:taskHeader",
-        "key": "authentication.clientAuthentication"
+        "type": "zeebe:input",
+        "name": "authentication.clientAuthentication"
       },
       "condition": {
         "property": "authenticationType",
@@ -264,8 +264,8 @@
       "type": "String",
       "feel": "optional",
       "binding": {
-        "type": "zeebe:taskHeader",
-        "key": "authentication.username"
+        "type": "zeebe:input",
+        "name": "authentication.username"
       },
       "constraints": {
         "notEmpty": true
@@ -284,8 +284,8 @@
       "type": "String",
       "feel": "optional",
       "binding": {
-        "type": "zeebe:taskHeader",
-        "key": "authentication.password"
+        "type": "zeebe:input",
+        "name": "authentication.password"
       },
       "constraints": {
         "notEmpty": true
