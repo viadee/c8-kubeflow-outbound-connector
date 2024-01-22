@@ -49,7 +49,6 @@ public class KubeflowConnectorExecutor {
     protected String kubeflowMultiNs;
 
     private String kubeflowUrl;
-    private String kubeflowCookie;
 
     public KubeflowConnectorExecutor(KubeflowConnectorRequest connectorRequest, long processInstanceKey,
             KubeflowApisEnum kubeflowApisEnum,
@@ -102,7 +101,7 @@ public class KubeflowConnectorExecutor {
                     : authPropertyGroup.multiusernamespace();
         }
 
-        if (kubeflowUrl == null || kubeflowCookie == null || kubeflowMultiNs == null) {
+        if (kubeflowUrl == null || kubeflowMultiNs == null) {
             throw new RuntimeException("Configuration parameters not found: url, cookie, and/or namespace null.");
         }
     }
