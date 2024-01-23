@@ -9,12 +9,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import org.threeten.bp.OffsetDateTime;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.KubeflowApi;
@@ -24,7 +19,6 @@ import de.viadee.bpm.camunda.connectors.kubeflow.enums.V1PipelineRunStatusEnum;
 import de.viadee.bpm.camunda.connectors.kubeflow.services.async.ExecutionHandler;
 import de.viadee.bpm.camunda.connectors.kubeflow.services.async.KubeflowCallable;
 import de.viadee.bpm.camunda.connectors.kubeflow.utils.JsonHelper;
-import de.viadee.bpm.camunda.connectors.kubeflow.utils.OffsetDateTimeDeserializer;
 import de.viadee.bpm.camunda.connectors.kubeflow.utils.RunUtil;
 import io.swagger.client.model.V1ApiPipelineSpec;
 import io.swagger.client.model.V1ApiResourceKey;
@@ -49,12 +43,8 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 			V2beta1RuntimeState.SKIPPED.getValue(),
 			V2beta1RuntimeState.CANCELED.getValue());
 
-	private static final ObjectMapper objectMapper = new ObjectMapper()
-			.registerModule(new SimpleModule().addDeserializer(OffsetDateTime.class,
-					new OffsetDateTimeDeserializer()))
-			.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
-
 	private RunUtil runUtil;
+	private String runName;
 
 	public KubeflowConnectorExecutorStartRun(KubeflowConnectorRequest connectorRequest, long processInstanceKey,
 			KubeflowApisEnum kubeflowApisEnum,
@@ -65,6 +55,9 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 
 	@Override
 	protected BodyPublisher buildPayloadForKubeflowEndpoint() {
+		//define runName
+		runName = Long.toString(processInstanceKey)+"_"+connectorRequest.kubeflowapi().runName();
+		
 		try {
 			if (KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum)) {
 				return HttpRequest.BodyPublishers
@@ -86,7 +79,7 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 		} else if (kubeflowApiOperationsEnum.equals(KubeflowApiOperationsEnum.START_RUN_AND_MONITOR)) {
 			String idOfAlreadyStartedRun;
 			try {
-				idOfAlreadyStartedRun = getIdOfAlreadyStartedRunByName(Long.toString(processInstanceKey));
+				idOfAlreadyStartedRun = getIdOfAlreadyStartedRunByName(this.runName);
 			} catch (InstantiationException | IllegalAccessException | IOException e) {
 				throw new RuntimeException(e);
 			}
@@ -135,7 +128,7 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 						.id(connectorRequest.kubeflowapi().experimentId()));
 
 		var v1ApiRun = new V1ApiRun()
-				.name(Long.toString(processInstanceKey))
+				.name(this.runName)
 				.pipelineSpec(v1ApiPipelineSpec)
 				.addResourceReferencesItem(v1ApiResourceReference);
 
@@ -147,7 +140,7 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 				.pipelineId(connectorRequest.kubeflowapi().pipelineId());
 
 		var v2ApiRun = new V2beta1Run()
-				.displayName(Long.toString(processInstanceKey))
+				.displayName(this.runName)
 				.pipelineVersionReference(v2beta1PipelineVersionReference)
 				.experimentId(connectorRequest.kubeflowapi().experimentId());
 
@@ -158,7 +151,7 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 			throws InstantiationException, IllegalAccessException, IOException {
 		KubeflowApi kubeflowApi = new KubeflowApi(kubeflowApisEnum.getValue(),
 				KubeflowApiOperationsEnum.GET_RUN_BY_NAME.getValue(), null,
-				null, null, runName, null, null, null);
+				null, null, null, runName, null, null, null);
 
 		KubeflowConnectorRequest getRunByNameConnectorRequest = new KubeflowConnectorRequest(
 				connectorRequest.authentication(),

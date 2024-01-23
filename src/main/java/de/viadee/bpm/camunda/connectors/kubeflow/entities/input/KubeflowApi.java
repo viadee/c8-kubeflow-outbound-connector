@@ -12,6 +12,8 @@ public record KubeflowApi(
     String operation,
     @TemplateProperty(group = "kubeflowapi", label = "Run ID", description = "The ID of the run to get")
     String runId,
+    @TemplateProperty(group = "kubeflowapi", label = "Run Name", description = "The name of the run")
+    String runName,
     @TemplateProperty(group = "kubeflowapi", label = "Pipeline ID", description = "The ID of the pipeline to start")
     String pipelineId,
     @TemplateProperty(group = "kubeflowapi", label = "Experiment ID", description = "The ID of the experiment in which to start the run")
