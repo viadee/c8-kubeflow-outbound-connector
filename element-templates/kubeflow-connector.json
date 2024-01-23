@@ -516,7 +516,7 @@
     {
       "id": "kubeflowapi.runName",
       "label": "Run Name",
-      "description": "Specify the name of the run.",
+      "description": "Specify the name of the run. When starting a run, the actual is being prepended, by 'processInstanceId_'.",
       "type": "String",
       "group": "kubeflowapi",
       "feel": "optional",
@@ -526,12 +526,14 @@
       },
       "binding": {
         "type": "zeebe:input",
-        "name": "kubeflowapi.filter"
+        "name": "kubeflowapi.runName"
       },
       "condition": {
         "property": "kubeflowapi.operation",
         "oneOf": [
-          "get_run_by_name"
+          "get_run_by_name",
+          "start_run",
+          "start_run_and_monitor"
         ]
       }
     },
