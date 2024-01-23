@@ -68,7 +68,7 @@ public class KubeflowConnectorExecutor {
         try {
             HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
             if(response.statusCode() != 200) {
-				throw new RuntimeException("Error while running request against kubeflow server: " + httpRequest.uri());
+				throw new RuntimeException("Error while running request against kubeflow server: " + httpRequest.uri() + " - " + response.body());
 			}
             return response;
         } catch (IOException e) {
