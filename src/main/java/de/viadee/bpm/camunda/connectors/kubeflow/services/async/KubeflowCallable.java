@@ -31,7 +31,7 @@ public class KubeflowCallable implements Callable<HttpResponse<String>> {
     private HttpResponse<String> getStatusOfRunById(String runId)
             throws InstantiationException, IllegalAccessException, IOException {
         KubeflowApi kubeflowApi = new KubeflowApi(connectorRequest.kubeflowapi().api(), KubeflowApiOperationsEnum.GET_RUN_BY_ID.getValue(),
-            runId, null, null, null, null, null, null, null);
+            runId, null, null, null, null, null, null, null, null);
         KubeflowConnectorRequest getRunByIdConnectorRequest = new KubeflowConnectorRequest(connectorRequest.authentication(),
                 connectorRequest.configuration(), kubeflowApi);
         KubeflowConnectorExecutorGetRunById getRunByIdExecutor = (KubeflowConnectorExecutorGetRunById) ExecutionHandler.getExecutor(

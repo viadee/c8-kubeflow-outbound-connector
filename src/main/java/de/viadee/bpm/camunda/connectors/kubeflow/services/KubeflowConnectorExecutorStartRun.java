@@ -6,6 +6,7 @@ import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -20,6 +21,7 @@ import de.viadee.bpm.camunda.connectors.kubeflow.services.async.ExecutionHandler
 import de.viadee.bpm.camunda.connectors.kubeflow.services.async.KubeflowCallable;
 import de.viadee.bpm.camunda.connectors.kubeflow.utils.JsonHelper;
 import de.viadee.bpm.camunda.connectors.kubeflow.utils.RunUtil;
+import io.swagger.client.model.V1ApiParameter;
 import io.swagger.client.model.V1ApiPipelineSpec;
 import io.swagger.client.model.V1ApiResourceKey;
 import io.swagger.client.model.V1ApiResourceReference;
@@ -27,6 +29,7 @@ import io.swagger.client.model.V1ApiResourceType;
 import io.swagger.client.model.V1ApiRun;
 import io.swagger.client.model.V2beta1PipelineVersionReference;
 import io.swagger.client.model.V2beta1Run;
+import io.swagger.client.model.V2beta1RuntimeConfig;
 import io.swagger.client.model.V2beta1RuntimeState;
 
 public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor {
@@ -119,8 +122,12 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 	}
 
 	private V1ApiRun getPayloadForEndpointV1() {
+		Map<String , Object> runParameters = connectorRequest.kubeflowapi().runParameters();
+		List<V1ApiParameter> v1ApiParameters = RunUtil.convertToV1ApiParameterList(runParameters);
+
 		var v1ApiPipelineSpec = new V1ApiPipelineSpec()
-				.pipelineId(connectorRequest.kubeflowapi().pipelineId());
+				.pipelineId(connectorRequest.kubeflowapi().pipelineId())
+				.parameters(v1ApiParameters);
 
 		var v1ApiResourceReference = new V1ApiResourceReference()
 				.key(new V1ApiResourceKey()
@@ -139,8 +146,12 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 		var v2beta1PipelineVersionReference = new V2beta1PipelineVersionReference()
 				.pipelineId(connectorRequest.kubeflowapi().pipelineId());
 
+		var v2beta1RuntimeConfig = new V2beta1RuntimeConfig()
+				.parameters(connectorRequest.kubeflowapi().runParameters());
+
 		var v2ApiRun = new V2beta1Run()
 				.displayName(this.runName)
+				.runtimeConfig(v2beta1RuntimeConfig)
 				.pipelineVersionReference(v2beta1PipelineVersionReference)
 				.experimentId(connectorRequest.kubeflowapi().experimentId());
 
@@ -151,7 +162,7 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 			throws InstantiationException, IllegalAccessException, IOException {
 		KubeflowApi kubeflowApi = new KubeflowApi(kubeflowApisEnum.getValue(),
 				KubeflowApiOperationsEnum.GET_RUN_BY_NAME.getValue(), null,
-				null, null, null, runName, null, null, null);
+				null, null, null, null, runName, null, null, null);
 
 		KubeflowConnectorRequest getRunByNameConnectorRequest = new KubeflowConnectorRequest(
 				connectorRequest.authentication(),

@@ -1,6 +1,9 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.utils;
 
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import org.threeten.bp.OffsetDateTime;
 
@@ -10,6 +13,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
 import io.swagger.client.model.V1ApiListRunsResponse;
+import io.swagger.client.model.V1ApiParameter;
 import io.swagger.client.model.V1ApiRun;
 import io.swagger.client.model.V1ApiRunDetail;
 import io.swagger.client.model.V2beta1ListRunsResponse;
@@ -64,6 +68,17 @@ public class RunUtil {
   public String extractIdFromV2RunResponse(HttpResponse<String> runResponse) throws JsonProcessingException {
     var v2beta1Run = readV2RunAsTypedResponse(runResponse);
     return v2beta1Run == null ? null : v2beta1Run.getRunId();
+  }
+
+  public static List<V1ApiParameter> convertToV1ApiParameterList(Map<String, Object> parameters) {
+    List<V1ApiParameter> pApiParameters = new ArrayList<>();
+    if(parameters == null) {
+      return pApiParameters;
+    }
+    for (String key : parameters.keySet()) {
+        pApiParameters.add(new V1ApiParameter().name(key).value(String.valueOf(parameters.get(key))));
+    }
+    return pApiParameters;
   }
 
 }

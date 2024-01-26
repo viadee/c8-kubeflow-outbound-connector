@@ -1,5 +1,7 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.entities.input;
 
+import java.util.Map;
+
 import io.camunda.connector.generator.annotation.TemplateProperty;
 import jakarta.validation.constraints.NotEmpty;
 
@@ -14,6 +16,8 @@ public record KubeflowApi(
     String runId,
     @TemplateProperty(group = "kubeflowapi", label = "Run Name", description = "The name of the run")
     String runName,
+    @TemplateProperty(group = "kubeflowapi", label = "Run Parameters", description = "The parameters of the run")
+    Map<String, Object> runParameters,
     @TemplateProperty(group = "kubeflowapi", label = "Pipeline ID", description = "The ID of the pipeline to start")
     String pipelineId,
     @TemplateProperty(group = "kubeflowapi", label = "Experiment ID", description = "The ID of the experiment in which to start the run")

@@ -542,6 +542,26 @@
       }
     },
     {
+      "id": "kubeflowapi.runParameters",
+      "label": "Run parameters",
+      "description": "Specify the parameters of the run if any needed.",
+      "type": "Text",
+      "group": "kubeflowapi",
+      "feel": "required",
+      "optional": true,
+      "binding": {
+        "type": "zeebe:input",
+        "name": "kubeflowapi.runParameters"
+      },
+      "condition": {
+        "property": "kubeflowapi.operation",
+        "oneOf": [
+          "start_run",
+          "start_run_and_monitor"
+        ]
+      }
+    },
+    {
       "id": "kubeflowapi.filter",
       "label": "Filter",
       "description": "Specify the filter to apply, if any.",
