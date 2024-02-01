@@ -89,6 +89,7 @@
     },
     {
       "label": "Type",
+      "id": "authenticationType",
       "group": "authentication",
       "description": "Choose the authentication type. Select 'None' if no authentication is necessary",
       "value": "noAuth",
@@ -238,6 +239,7 @@
     },
     {
       "label": "Client authentication",
+      "id": "clientAuthentication",
       "group": "authentication",
       "description": "Send client ID and client secret as Basic Auth request in the header, or as client credentials in the request body",
       "value": "basicAuthHeader",
@@ -305,6 +307,7 @@
       }
     },
     {
+      "id": "kubeflowapi.api",
       "label": "Kubeflow API",
       "description": "Specify the Kubeflow API to use.",
       "type": "Dropdown",
@@ -326,6 +329,7 @@
       }
     },
     {
+      "id": "kubeflowapi.operation",
       "label": "Pipelines API operation",
       "description": "Specify the pipeline operation to execute.",
       "type": "Dropdown",
