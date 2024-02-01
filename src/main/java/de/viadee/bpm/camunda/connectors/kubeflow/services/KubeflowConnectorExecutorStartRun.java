@@ -166,7 +166,8 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 
 		KubeflowConnectorRequest getRunByNameConnectorRequest = new KubeflowConnectorRequest(
 				connectorRequest.authentication(),
-				connectorRequest.configuration(), kubeflowApi);
+				connectorRequest.configuration(), kubeflowApi,
+				connectorRequest.connectionTimeoutInSeconds());
 
 		KubeflowConnectorExecutorGetRunByName getRunByNameExecutor = (KubeflowConnectorExecutorGetRunByName) ExecutionHandler
 				.getExecutor(

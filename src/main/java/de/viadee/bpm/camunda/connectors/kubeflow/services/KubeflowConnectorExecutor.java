@@ -12,6 +12,7 @@ import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpRequest.Builder;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -57,7 +58,7 @@ public class KubeflowConnectorExecutor {
         this.processInstanceKey = processInstanceKey;
         this.kubeflowApisEnum = kubeflowApisEnum;
         this.kubeflowApiOperationsEnum = kubeflowApiOperationsEnum;
-        this.httpClient = HttpClient.newHttpClient();
+        this.httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(connectorRequest.connectionTimeoutInSeconds())).build();
 
         setConfigurationParameters();
 
