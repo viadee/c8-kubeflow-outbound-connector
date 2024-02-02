@@ -48,7 +48,7 @@ public final class OAuthAuthenticationPasswordFlow extends Authentication {
   @TemplateProperty(
       group = "authentication",
       description = "Your application's client secret from the OAuth client")
-  private String clientSecret;
+  private String clientSecretPW;
 
   @FEEL
   @TemplateProperty(
@@ -98,7 +98,7 @@ public final class OAuthAuthenticationPasswordFlow extends Authentication {
 
     if (Constants.CREDENTIALS_BODY.equals(this.getClientAuthentication())) {
       data.put(Constants.CLIENT_ID, this.getClientId());
-      data.put(Constants.CLIENT_SECRET, this.getClientSecret());
+      data.put(Constants.CLIENT_SECRET, this.getClientSecretPW());
     }
     return data;
   }
@@ -111,12 +111,12 @@ public final class OAuthAuthenticationPasswordFlow extends Authentication {
     this.clientId = clientId;
   }
 
-  public String getClientSecret() {
-    return clientSecret;
+  public String getClientSecretPW() {
+    return clientSecretPW;
   }
 
-  public void setClientSecret(String clientSecret) {
-    this.clientSecret = clientSecret;
+  public void setClientSecretPW(String clientSecretPW) {
+    this.clientSecretPW = clientSecretPW;
   }
 
   public String getGrantType() {
@@ -188,7 +188,7 @@ public final class OAuthAuthenticationPasswordFlow extends Authentication {
     OAuthAuthenticationPasswordFlow that = (OAuthAuthenticationPasswordFlow) o;
     return oauthTokenEndpoint.equals(that.oauthTokenEndpoint)
         && clientId.equals(that.clientId)
-        && clientSecret.equals(that.clientSecret)
+        && clientSecretPW.equals(that.clientSecretPW)
         && audience.equals(that.audience)
         && Objects.equals(grantType, that.grantType)
         && clientAuthentication.equals(that.clientAuthentication)
@@ -203,7 +203,7 @@ public final class OAuthAuthenticationPasswordFlow extends Authentication {
         super.hashCode(),
         oauthTokenEndpoint,
         clientId,
-        clientSecret,
+        clientSecretPW,
         audience,
         grantType,
         clientAuthentication,
@@ -219,6 +219,12 @@ public final class OAuthAuthenticationPasswordFlow extends Authentication {
         + ", oauthTokenEndpoint='"
         + oauthTokenEndpoint
         + '\''
+        + ", clientId='"
+        + clientId
+        + '\''
+        + ", clientSecret='"
+        + clientSecretPW
+        + '\''
         + ", audience='"
         + audience
         + '\''
@@ -227,6 +233,12 @@ public final class OAuthAuthenticationPasswordFlow extends Authentication {
         + '\''
         + ", scopes='"
         + scopes
+        + '\''
+        + ", username='"
+        + username
+        + '\''
+        + ", password='"
+        + password
         + '\''
         + "} "
         + super.toString();

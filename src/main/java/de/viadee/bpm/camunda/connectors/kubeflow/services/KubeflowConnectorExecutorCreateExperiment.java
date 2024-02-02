@@ -66,7 +66,7 @@ public class KubeflowConnectorExecutorCreateExperiment extends KubeflowConnector
     }
 
     private String getDescription() {
-        var description = connectorRequest.kubeflowapi().experimentDescription();
+        var description = connectorRequest.getKubeflowapi().experimentDescription();
         if (description == null) {
             return "";
         }
@@ -74,7 +74,7 @@ public class KubeflowConnectorExecutorCreateExperiment extends KubeflowConnector
     }
 
     private String getName() {
-        var name = connectorRequest.kubeflowapi().experimentName();
+        var name = connectorRequest.getKubeflowapi().experimentName();
         if (name == null) {
             return "";
         }

@@ -91,10 +91,14 @@
       "label": "Type",
       "id": "authenticationType",
       "group": "authentication",
-      "description": "Choose the authentication type. Select 'None' if no authentication is necessary",
-      "value": "noAuth",
+      "description": "Choose the authentication type. Select 'None' if no authentication is necessary and 'Environment' to use settings defined in connector runtime.",
+      "value": "environment",
       "type": "Dropdown",
       "choices": [
+        {
+          "name": "Environment",
+          "value": "environment"
+        },
         {
           "name": "None",
           "value": "noAuth"
@@ -186,15 +190,34 @@
       "group": "authentication",
       "type": "String",
       "feel": "optional",
-      "optional": true,
       "binding": {
         "type": "zeebe:input",
-        "name": "authentication.clientSecret"
+        "name": "authentication.clientSecretCC"
+      },
+      "constraints": {
+        "notEmpty": true
       },
       "condition": {
         "property": "authenticationType",
         "oneOf": [
-          "oauth-client-credentials-flow",
+          "oauth-client-credentials-flow"
+        ]
+      }
+    },
+    {
+      "label": "Client secret",
+      "description": "Your application's client secret from the OAuth client",
+      "group": "authentication",
+      "type": "String",
+      "feel": "optional",
+      "optional": true,
+      "binding": {
+        "type": "zeebe:input",
+        "name": "authentication.clientSecretPW"
+      },
+      "condition": {
+        "property": "authenticationType",
+        "oneOf": [
           "oauth-password-flow"
         ]
       }
@@ -205,10 +228,13 @@
       "group": "authentication",
       "type": "String",
       "feel": "optional",
-      "optional": true,
+      "optional": false,
       "binding": {
         "type": "zeebe:input",
         "name": "authentication.scopes"
+      },
+      "constraints": {
+        "notEmpty": true
       },
       "condition": {
         "property": "authenticationType",

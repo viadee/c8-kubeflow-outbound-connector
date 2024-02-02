@@ -59,7 +59,7 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 	@Override
 	protected BodyPublisher buildPayloadForKubeflowEndpoint() {
 		//define runName
-		runName = Long.toString(processInstanceKey)+"_"+connectorRequest.kubeflowapi().runName();
+		runName = Long.toString(processInstanceKey)+"_"+connectorRequest.getKubeflowapi().runName();
 		
 		try {
 			if (KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum)) {
@@ -87,7 +87,7 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 				throw new RuntimeException(e);
 			}
 			final Duration pollingInterval = Duration
-					.parse(connectorRequest.kubeflowapi().pollingInterval());
+					.parse(connectorRequest.getKubeflowapi().pollingInterval());
 
 			if (idOfAlreadyStartedRun == null) { // run not yet started
 				result = super.execute();
@@ -115,24 +115,24 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 
 		} else {
 			throw new RuntimeException(
-					"Unknown kubeflow operation: " + connectorRequest.kubeflowapi().operation());
+					"Unknown kubeflow operation: " + connectorRequest.getKubeflowapi().operation());
 		}
 
 		return result;
 	}
 
 	private V1ApiRun getPayloadForEndpointV1() {
-		Map<String , Object> runParameters = connectorRequest.kubeflowapi().runParameters();
+		Map<String , Object> runParameters = connectorRequest.getKubeflowapi().runParameters();
 		List<V1ApiParameter> v1ApiParameters = RunUtil.convertToV1ApiParameterList(runParameters);
 
 		var v1ApiPipelineSpec = new V1ApiPipelineSpec()
-				.pipelineId(connectorRequest.kubeflowapi().pipelineId())
+				.pipelineId(connectorRequest.getKubeflowapi().pipelineId())
 				.parameters(v1ApiParameters);
 
 		var v1ApiResourceReference = new V1ApiResourceReference()
 				.key(new V1ApiResourceKey()
 						.type(V1ApiResourceType.EXPERIMENT)
-						.id(connectorRequest.kubeflowapi().experimentId()));
+						.id(connectorRequest.getKubeflowapi().experimentId()));
 
 		var v1ApiRun = new V1ApiRun()
 				.name(this.runName)
@@ -144,16 +144,16 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 
 	private V2beta1Run getPayloadForEndpointV2() {
 		var v2beta1PipelineVersionReference = new V2beta1PipelineVersionReference()
-				.pipelineId(connectorRequest.kubeflowapi().pipelineId());
+				.pipelineId(connectorRequest.getKubeflowapi().pipelineId());
 
 		var v2beta1RuntimeConfig = new V2beta1RuntimeConfig()
-				.parameters(connectorRequest.kubeflowapi().runParameters());
+				.parameters(connectorRequest.getKubeflowapi().runParameters());
 
 		var v2ApiRun = new V2beta1Run()
 				.displayName(this.runName)
 				.runtimeConfig(v2beta1RuntimeConfig)
 				.pipelineVersionReference(v2beta1PipelineVersionReference)
-				.experimentId(connectorRequest.kubeflowapi().experimentId());
+				.experimentId(connectorRequest.getKubeflowapi().experimentId());
 
 		return v2ApiRun;
 	}
@@ -165,9 +165,9 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 				null, null, null, null, runName, null, null, null);
 
 		KubeflowConnectorRequest getRunByNameConnectorRequest = new KubeflowConnectorRequest(
-				connectorRequest.authentication(),
-				connectorRequest.configuration(), kubeflowApi,
-				connectorRequest.connectionTimeoutInSeconds());
+				connectorRequest.getAuthentication(),
+				connectorRequest.getConfiguration(), kubeflowApi,
+				connectorRequest.getConnectionTimeoutInSeconds());
 
 		KubeflowConnectorExecutorGetRunByName getRunByNameExecutor = (KubeflowConnectorExecutorGetRunByName) ExecutionHandler
 				.getExecutor(

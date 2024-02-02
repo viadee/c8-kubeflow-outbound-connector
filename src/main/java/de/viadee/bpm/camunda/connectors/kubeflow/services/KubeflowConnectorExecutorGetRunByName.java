@@ -92,7 +92,7 @@ public class KubeflowConnectorExecutorGetRunByName extends KubeflowConnectorExec
     var predicate = new V1FilterPredicate()
         .op(V2beta1PredicateOperation.EQUALS)
         .key(FILTER_BY_KEY)
-        .stringValue(connectorRequest.kubeflowapi().filter());
+        .stringValue(connectorRequest.getKubeflowapi().filter());
 
     return new V1Filter()
         .addPredicatesItem(predicate);
@@ -102,7 +102,7 @@ public class KubeflowConnectorExecutorGetRunByName extends KubeflowConnectorExec
     var predicate = new V2beta1Predicate()
         .operation(V2beta1PredicateOperation.EQUALS)
         .key(FILTER_BY_KEY)
-        .stringValue(connectorRequest.kubeflowapi().filter());
+        .stringValue(connectorRequest.getKubeflowapi().filter());
 
     return new V2beta1Filter()
         .addPredicatesItem(predicate);

@@ -49,7 +49,7 @@ public final class OAuthAuthenticationClientCredentialsFlow extends Authenticati
   @TemplateProperty(
       group = "authentication",
       description = "Your application's client secret from the OAuth client")
-  private String clientSecret;
+  private String clientSecretCC;
 
   @FEEL
   @TemplateProperty(
@@ -89,7 +89,7 @@ public final class OAuthAuthenticationClientCredentialsFlow extends Authenticati
 
     if (Constants.CREDENTIALS_BODY.equals(this.getClientAuthentication())) {
       data.put(Constants.CLIENT_ID, this.getClientId());
-      data.put(Constants.CLIENT_SECRET, this.getClientSecret());
+      data.put(Constants.CLIENT_SECRET, this.getClientSecretCC());
     }
     return data;
   }
@@ -102,12 +102,12 @@ public final class OAuthAuthenticationClientCredentialsFlow extends Authenticati
     this.clientId = clientId;
   }
 
-  public String getClientSecret() {
-    return clientSecret;
+  public String getClientSecretCC() {
+    return clientSecretCC;
   }
 
-  public void setClientSecret(String clientSecret) {
-    this.clientSecret = clientSecret;
+  public void setClientSecretCC(String clientSecretCC) {
+    this.clientSecretCC = clientSecretCC;
   }
 
   public String getGrantType() {
@@ -163,7 +163,7 @@ public final class OAuthAuthenticationClientCredentialsFlow extends Authenticati
     OAuthAuthenticationClientCredentialsFlow that = (OAuthAuthenticationClientCredentialsFlow) o;
     return oauthTokenEndpoint.equals(that.oauthTokenEndpoint)
         && clientId.equals(that.clientId)
-        && clientSecret.equals(that.clientSecret)
+        && clientSecretCC.equals(that.clientSecretCC)
         && audience.equals(that.audience)
         && Objects.equals(grantType, that.grantType)
         && clientAuthentication.equals(that.clientAuthentication)
@@ -176,7 +176,7 @@ public final class OAuthAuthenticationClientCredentialsFlow extends Authenticati
         super.hashCode(),
         oauthTokenEndpoint,
         clientId,
-        clientSecret,
+        clientSecretCC,
         audience,
         grantType,
         clientAuthentication,
@@ -191,6 +191,12 @@ public final class OAuthAuthenticationClientCredentialsFlow extends Authenticati
         + '\''
         + ", oauthTokenEndpoint='"
         + oauthTokenEndpoint
+        + '\''
+        + ", clientId='"
+        + clientId
+        + '\''
+        + ", clientSecret='"
+        + clientSecretCC
         + '\''
         + ", audience='"
         + audience

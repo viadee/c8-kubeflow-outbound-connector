@@ -27,7 +27,7 @@
         <zeebe:taskDefinition type="de.viadee.bpm.camunda:connector-kubeflow:1" />
         <zeebe:ioMapping>
           <zeebe:input source="https://kubeflowd.l.micudaj.de" target="configuration.kubeflowUrl" />
-          <zeebe:input source="noAuth" target="authentication.type" />
+          <zeebe:input source="environment" target="authentication.type" />
           <zeebe:input source="pipelinesV1" target="kubeflowapi.api" />
           <zeebe:input source="start_run_and_monitor" target="kubeflowapi.operation" />
           <zeebe:input source="a58ca313-fe2a-47d8-b93c-169b6744d8c3" target="kubeflowapi.pipelineId" />
@@ -37,7 +37,6 @@
           <zeebe:input source="20" target="connectionTimeoutInSeconds" />
         </zeebe:ioMapping>
         <zeebe:taskHeaders>
-          <zeebe:header key="authentication.type" value="noAuth" />
           <zeebe:header key="resultVariable" value="completeResult" />
           <zeebe:header key="resultExpression" value="={result:run.status}" />
         </zeebe:taskHeaders>

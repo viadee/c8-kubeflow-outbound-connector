@@ -25,6 +25,7 @@ import io.camunda.connector.generator.annotation.TemplateDiscriminatorProperty;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({
+  @JsonSubTypes.Type(value = EnvironmentAuthentication.class, name = EnvironmentAuthentication.TYPE),
   @JsonSubTypes.Type(value = BasicAuthentication.class, name = BasicAuthentication.TYPE),
   @JsonSubTypes.Type(value = NoAuthentication.class, name = NoAuthentication.TYPE),
   @JsonSubTypes.Type(value = OAuthAuthenticationClientCredentialsFlow.class, name = OAuthAuthenticationClientCredentialsFlow.TYPE),
@@ -35,10 +36,11 @@ import io.camunda.connector.generator.annotation.TemplateDiscriminatorProperty;
     label = "Type",
     group = "authentication",
     name = "type",
-    defaultValue = NoAuthentication.TYPE,
-    description = "Choose the authentication type. Select 'None' if no authentication is necessary")
+    defaultValue = EnvironmentAuthentication.TYPE,
+    description = "Choose the authentication type. Select 'None' if no authentication is necessary and 'Environment' to use settings defined in connector runtime.")
 public abstract sealed class Authentication
-    permits BasicAuthentication,
+    permits EnvironmentAuthentication,
+        BasicAuthentication,
         BearerAuthentication,
         NoAuthentication,
         OAuthAuthenticationClientCredentialsFlow,

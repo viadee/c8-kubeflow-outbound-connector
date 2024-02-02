@@ -23,11 +23,11 @@ public class ExecutionHandler {
             long processInstanceKey) {
 
         var selectedApi = KubeflowApisEnum.fromValue(
-            connectorRequest.kubeflowapi().api()
+            connectorRequest.getKubeflowapi().api()
         );
 
         var selectedOperation = KubeflowApiOperationsEnum.fromValue(
-            connectorRequest.kubeflowapi().operation()
+            connectorRequest.getKubeflowapi().operation()
         );
 
         switch (selectedOperation) {

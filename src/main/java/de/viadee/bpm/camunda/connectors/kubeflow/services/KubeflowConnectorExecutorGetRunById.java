@@ -49,7 +49,7 @@ public class KubeflowConnectorExecutorGetRunById extends KubeflowConnectorExecut
     protected void addKubeflowUrlPath(URIBuilder uriBuilder) {
         var kubeflowUrlPath = String.format("%s/%s",
             String.format(kubeflowApiOperationsEnum.getApiUrl(), kubeflowApisEnum.getUrlPathVersion()),
-            connectorRequest.kubeflowapi().runId());
+            connectorRequest.getKubeflowapi().runId());
         uriBuilder.setPath(kubeflowUrlPath);
     }
 

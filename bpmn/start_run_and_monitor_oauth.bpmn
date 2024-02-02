@@ -27,13 +27,7 @@
         <zeebe:taskDefinition type="de.viadee.bpm.camunda:connector-kubeflow:1" />
         <zeebe:ioMapping modelerTemplate="de.viadee.bpm.camunda.connectors.kubeflow.v1" modelerTemplateVersion="2">
           <zeebe:input source="https://kubeflow.l.micudaj.de" target="configuration.kubeflowUrl" />
-          <zeebe:input source="oauth-client-credentials-flow" target="authentication.type" />
-          <zeebe:input source="https://id.micudaj.de/auth/realms/micudaj/protocol/openid-connect/token" target="authentication.oauthTokenEndpoint" />
-          <zeebe:input source="kubeflow" target="authentication.clientId" />
-          <zeebe:input source="ilL6NwEmMyRupqp0gWfXgPJjyEEvqgdk" target="authentication.clientSecret" />
-          <zeebe:input source="openid email profile" target="authentication.scopes" />
-          <zeebe:input source="kubeflow" target="authentication.audience" />
-          <zeebe:input source="basicAuthHeader" target="authentication.clientAuthentication" />
+          <zeebe:input source="environment" target="authentication.type" />
           <zeebe:input source="pipelinesV2" target="kubeflowapi.api" />
           <zeebe:input source="start_run_and_monitor" target="kubeflowapi.operation" />
           <zeebe:input source="a58ca313-fe2a-47d8-b93c-169b6744d8c3" target="kubeflowapi.pipelineId" />
