@@ -55,7 +55,7 @@ public class KubeflowConnectorExecutor {
     private static final String KUBEFLOW_AUTH_BASIC_PASSWORD = "KF_AUTH_BASIC_PASSWORD";
     private static final String KUBEFLOW_AUTH_BEARER_TOKEN = "KF_AUTH_BEARER_TOKEN";
     private static final String KUBEFLOW_AUTH_OAUTH_TOKEN_ENDPOINT = "KF_AUTH_OAUTH_TOKEN_ENDPOINT";
-    private static final String KUBEFLOW_AUTH_OAUTH_CLIENT_ID = "KF_AUTH_OAUTH_CCLIENT_ID";
+    private static final String KUBEFLOW_AUTH_OAUTH_CLIENT_ID = "KF_AUTH_OAUTH_CLIENT_ID";
     private static final String KUBEFLOW_AUTH_OAUTH_CLIENT_SECRET = "KF_AUTH_OAUTH_CLIENT_SECRET";
     private static final String KUBEFLOW_AUTH_OAUTH_SCOPES = "KF_AUTH_OAUTH_SCOPES";
     private static final String KUBEFLOW_AUTH_OAUTH_AUDIENCE = "KF_AUTH_OAUTH_AUDIENCE";
