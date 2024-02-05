@@ -60,8 +60,6 @@ public class KubeflowConnectorExecutor {
     private static final String KUBEFLOW_AUTH_OAUTH_SCOPES = "KF_AUTH_OAUTH_SCOPES";
     private static final String KUBEFLOW_AUTH_OAUTH_AUDIENCE = "KF_AUTH_OAUTH_AUDIENCE";
     private static final String KUBEFLOW_AUTH_OAUTH_CLIENT_AUTH = "KF_AUTH_OAUTH_CLIENT_AUTH";
-    private static final String KUBEFLOW_AUTH_OAUTH_CLIENT_AUTH_HEADER = "header";
-    private static final String KUBEFLOW_AUTH_OAUTH_CLIENT_AUTH_BODY = "body";
     private static final String KUBEFLOW_AUTH_OAUTH_USERNAME = "KF_AUTH_OAUTH_USERNAME";
     private static final String KUBEFLOW_AUTH_OAUTH_PASSWORD = "KF_AUTH_OAUTH_PASSWORD";
 
@@ -157,9 +155,9 @@ public class KubeflowConnectorExecutor {
                     || StringUtils.isBlank(oAuthAuthenticationClientCredentialsFlow.getClientId())
                     || StringUtils.isBlank(oAuthAuthenticationClientCredentialsFlow.getClientSecretCC())
                     || StringUtils.isBlank(oAuthAuthenticationClientCredentialsFlow.getScopes())
-                    || StringUtils.isBlank(oAuthAuthenticationClientCredentialsFlow.getClientId())
+                    || StringUtils.isBlank(oAuthAuthenticationClientCredentialsFlow.getClientAuthentication())
                     ) {
-                    throw new RuntimeException("Authentication parameters missing for basic authentication in environment! Required are username and password.");
+                    throw new RuntimeException("Authentication parameters missing for OAuth (client-credentials flow) authentication in environment! Required are token endpoint, clientId, clientSecret, scopes and client authentication.");
                 }
             } else if (authMode.equals(KUBEFLOW_AUTH_MODE_OAUTH_PASSWORD)) {
                 OAuthAuthenticationPasswordFlow oAuthAuthenticationPasswordFlow = (OAuthAuthenticationPasswordFlow) authPropertyGroup;
@@ -172,6 +170,15 @@ public class KubeflowConnectorExecutor {
                 oAuthAuthenticationPasswordFlow.setUsername(System.getenv(KUBEFLOW_AUTH_OAUTH_USERNAME));
                 oAuthAuthenticationPasswordFlow.setPassword(System.getenv(KUBEFLOW_AUTH_OAUTH_PASSWORD));
                 connectorRequest.setAuthentication(oAuthAuthenticationPasswordFlow);
+                if (StringUtils.isBlank(oAuthAuthenticationPasswordFlow.getOauthTokenEndpoint()) 
+                    || StringUtils.isBlank(oAuthAuthenticationPasswordFlow.getClientId())
+                    || StringUtils.isBlank(oAuthAuthenticationPasswordFlow.getScopes())
+                    || StringUtils.isBlank(oAuthAuthenticationPasswordFlow.getClientAuthentication())
+                    || StringUtils.isBlank(oAuthAuthenticationPasswordFlow.getUsername())
+                    || StringUtils.isBlank(oAuthAuthenticationPasswordFlow.getPassword())
+                    ) {
+                    throw new RuntimeException("Authentication parameters missing for OAuth (password flow) authentication in environment! Required are token endpoint, clientId, scopes, client authentication, username and password.");
+                }
             }
         }
     }
