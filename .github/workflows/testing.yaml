@@ -1,31 +1,24 @@
 name: CI
 
-# trigger manually
 on:
   push:
     branches:
       - main
+      - integration-tests
   pull_request:
     branches:
       - main
 
 jobs:
-  job1:
+  execute:
     runs-on: ubuntu-latest
-    name: build example and deploy to minikube
+    name: build and test
     steps:
       - uses: actions/checkout@v2
       - name: Start minikube
         uses: medyagh/setup-minikube@master
-      - name: Try the cluster !
+      - name: Test cluster connection
         run: kubectl get pods -A
-      - name: Build image
-        run: |
-          export SHELL=/bin/bash
-          eval $(minikube -p minikube docker-env)
-          docker build -f ./Dockerfile -t local/example .
-          echo -n "verifying images:"
-          docker images
       - name: Install Kustomize
         run: |
           curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
