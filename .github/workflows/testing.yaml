@@ -15,24 +15,39 @@ jobs:
     name: build and test
     steps:
       - uses: actions/checkout@v2
+
       - name: Start minikube
         uses: medyagh/setup-minikube@master
+      
       - name: Test cluster connection
         run: kubectl get pods -A
+      
       - name: Install Kustomize
         run: |
-          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
+          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/\
+          kustomize/master/hack/install_kustomize.sh" | bash
           sudo mv kustomize /usr/local/bin/
           kustomize version
+      
       - name: Setup Testing Environment
         run: |
-          set -e
-
-          timeout 15m bash -c \
-          'until kustomize build ./integration-tests/environment | kubectl apply -f -; do echo "Retrying to apply resources"; sleep 10; done'
-
-          echo "Waiting for all deployments to be ready"
-          kubectl wait --for=condition=available --timeout=600s deployment --all --all-namespaces
-      - name: Get all pods
+          timeout 5m bash -c \
+          'until kustomize build ./integration-tests/environment | kubectl apply -f -; \
+          do echo "Retrying to apply resources"; sleep 10; done'
+      
+      - name: Wait for deployments to be ready
         run: |
-          kubectl get po -A
+          kubectl wait --for=condition=available --timeout=300s \
+          deployment --all --all-namespaces
+      
+      - name: Print deployment descriptions on failure
+        if: failure()
+        run: |
+          kubectl get deployments -A
+          kubectl describe deployments -A
+
+      - name: Print pod descriptions on failure
+        if: failure()
+        run: |
+          kubectl get pods -A
+          kubectl describe pods -A
