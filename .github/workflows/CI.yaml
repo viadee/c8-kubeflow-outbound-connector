@@ -24,13 +24,15 @@ jobs:
         run: mvn --batch-mode clean verify
 
   integration:
-    # Run on our custom runner.
+    # Run on our custom runner, as the default runner doesn't offer enough resources.
     # Attention: paid runner, $0.064 per minute at the time of writing.
     # Not usable outside of this repo.
     runs-on: LinuxX64_16-cores_64GB
     # Set a max timeout of 20 minutes.
     # This way, we can control the cost of the runner.
     timeout-minutes: 20
+    # Only run on pull requests to main and on pushes to main.
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
     name: build and test
     # Run only if the unit-test job is successful
     needs: unit
@@ -52,6 +54,9 @@ jobs:
 
       - name: Start minikube
         uses: medyagh/setup-minikube@master
+        with: 
+          cpus: 12
+          memory: 48G
       
       - name: Test cluster connection
         run: kubectl get pods -A
@@ -74,12 +79,6 @@ jobs:
         run: |
           kubectl get deployments -A
           kubectl describe deployments -A
-
-      - name: Print pod descriptions on failure
-        if: failure()
-        run: |
-          kubectl get pods -A
-          kubectl describe pods -A
           
       - name: Run Spring Boot Integration Tests
         run: |
