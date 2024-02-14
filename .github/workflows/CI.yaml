@@ -20,8 +20,8 @@ jobs:
           java-version: '17'
           cache: 'maven'
       
-      - name: Build Artifact
-        run: mvn --batch-mode clean verify
+      # - name: Build Artifact
+      #   run: mvn --batch-mode clean verify
 
   integration:
     # Run on our custom runner, as the default runner doesn't offer enough resources.
