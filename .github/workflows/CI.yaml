@@ -73,12 +73,15 @@ jobs:
           kubectl wait --for=condition=available --timeout=300s \
           deployment --all --all-namespaces
 
+          # Sleep for 30 seconds to ensure all pods are ready
+          sleep 30
+
+      - name: Run mvn clean integration-test
+        run: |
+          mvn --batch-mode clean verify -DskipUnitTests
+
       - name: Print deployment descriptions on failure
         if: failure()
         run: |
           kubectl get deployments -A
           kubectl describe deployments -A
-
-      - name: Run mvn clean integration-test
-        run: |
-          mvn --batch-mode clean verify -DskipUnitTests
