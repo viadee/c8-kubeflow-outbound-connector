@@ -16,6 +16,9 @@ import io.camunda.connector.http.base.services.HttpService;
 
 public class BaseIntegrationTest {
 
+  private static final String KUBEFLOW_HOST = "KUBEFLOW_HOST";
+  private static final String DEFAULT_KUBEFLOW_HOST = "localhost";
+
   private static final String KUBEFLOW_NAMESPACE_ENV_KEY = "KUBEFLOW_NAMESPACE";
   private static final String DEFAULT_KUBEFLOW_NAMESPACE = "kubeflow-user-example-com";
 
@@ -62,7 +65,8 @@ public class BaseIntegrationTest {
       throw new IOException("Failed to get kubeflow url");
     }
 
-    return "http://localhost:" + output.toString().trim();
+    String host = getEnvOrDefault(KUBEFLOW_HOST, DEFAULT_KUBEFLOW_HOST);
+    return "http://" + host + ":" + output.toString().trim();
   }
 
   private Configuration createConfiguration() throws Exception {

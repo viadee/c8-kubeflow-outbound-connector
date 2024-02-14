@@ -73,11 +73,20 @@ jobs:
           kubectl wait --for=condition=available --timeout=300s \
           deployment --all --all-namespaces
 
-          # Sleep for 30 seconds to ensure all pods are ready
-          sleep 30
+          # Wait for namespace to appear
+          timeout 5m bash -c \
+          'until kubectl get namespace kubeflow; \
+          do echo "Retrying to get namespace"; sleep 10; done'
+
+          # Wait for all deployments again, now that the namespace is there
+          kubectl wait --for=condition=available --timeout=300s \
+          deployment --all --all-namespaces
 
       - name: Run mvn clean integration-test
         run: |
+          # Export minikube IP to KUBEFLOW_HOST
+          export KUBEFLOW_HOST=$(minikube ip)
+          echo "KUBEFLOW_HOST=$KUBEFLOW_HOST"
           mvn --batch-mode clean verify -DskipUnitTests
 
       - name: Print deployment descriptions on failure
