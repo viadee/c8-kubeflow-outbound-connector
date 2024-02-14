@@ -29,9 +29,10 @@
           <zeebe:input source="http://localhost:30132" target="configuration.kubeflowUrl" />
           <zeebe:input source="kubeflow-user-example-com" target="configuration.multiusernamespace" />
           <zeebe:input source="noAuth" target="authentication.type" />
-          <zeebe:input source="pipelinesV2" target="kubeflowapi.api" />
-          <zeebe:input source="get_run_by_id" target="kubeflowapi.operation" />
-          <zeebe:input source="16ec53a0-1d30-4e30-b335-73a71b180ce9" target="kubeflowapi.runId" />
+          <zeebe:input source="pipelinesV1" target="kubeflowapi.api" />
+          <zeebe:input source="create_experiment" target="kubeflowapi.operation" />
+          <zeebe:input target="kubeflowapi.experimentName" />
+          <zeebe:input source="={&#34;Cookie&#34;: &#34;authservice_session=MTcwNzg0NTM0N3xOd3dBTkRWRE1qWTJRbFpUV1ZaU1NrVkRXVlJMU0V0Q1RrOUtVREpaTkVwQ1RFRlFTRFpVU1ZsV1RWUlNWbGxVVjBORFUwUkVORkU9fE7ebtr2VuuwPSrq8DG0kZXbFpWKIQyvP5RBbOX43lEr&#34;}" target="kubeflowapi.httpHeaders" />
           <zeebe:input source="20" target="connectionTimeoutInSeconds" />
         </zeebe:ioMapping>
         <zeebe:taskHeaders>

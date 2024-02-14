@@ -1,10 +1,11 @@
-package de.viadee.bpm.camunda.connectors.kubeflow.utils;
+package de.viadee.bpm.camunda.connectors.kubeflow.unit.utils;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.viadee.bpm.camunda.connectors.kubeflow.utils.JsonHelper;
 import java.net.http.HttpResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

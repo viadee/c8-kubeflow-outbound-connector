@@ -1,4 +1,4 @@
-package de.viadee.bpm.camunda.connectors.kubeflow.services.async;
+package de.viadee.bpm.camunda.connectors.kubeflow.unit.async;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -6,6 +6,7 @@ import de.viadee.bpm.camunda.connectors.kubeflow.auth.NoAuthentication;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.Configuration;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.KubeflowApi;
+import de.viadee.bpm.camunda.connectors.kubeflow.services.async.ExecutionHandler;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
