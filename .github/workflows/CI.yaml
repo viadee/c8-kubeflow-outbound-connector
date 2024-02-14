@@ -10,18 +10,18 @@ on:
 
 jobs:
   unit:
-    runs-on: ubuntu-latest 
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'
-          java-version: '17'
-          cache: 'maven'
-      
-      # - name: Build Artifact
-      #   run: mvn --batch-mode clean verify
+          distribution: "temurin"
+          java-version: "17"
+          cache: "maven"
+
+      - name: Run mvn clean verify
+        run: mvn --batch-mode clean verify -DskipIntegrationTests
 
   integration:
     # Run on our custom runner, as the default runner doesn't offer enough resources.
@@ -40,9 +40,9 @@ jobs:
 
       - uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'
-          java-version: '17'
-          cache: 'maven'
+          distribution: "temurin"
+          java-version: "17"
+          cache: "maven"
 
       - name: Install Kustomize
         run: |
@@ -53,13 +53,13 @@ jobs:
 
       - name: Start minikube
         uses: medyagh/setup-minikube@master
-        with: 
+        with:
           cpus: 12
           memory: 48G
-      
+
       - name: Test cluster connection
         run: kubectl get pods -A
-      
+
       - name: Setup Testing Environment
         run: |
           timeout 5m bash -c \
@@ -67,19 +67,18 @@ jobs:
           kustomize build ./src/test/resources/kubeflow-environment \
           | kubectl apply -f -; \
           do echo "Retrying to apply resources"; sleep 10; done'
-      
+
       - name: Wait for deployments to be ready
         run: |
           kubectl wait --for=condition=available --timeout=300s \
           deployment --all --all-namespaces
-      
+
       - name: Print deployment descriptions on failure
         if: failure()
         run: |
           kubectl get deployments -A
           kubectl describe deployments -A
-          
-      - name: Run Spring Boot Integration Tests
+
+      - name: Run mvn clean integration-test
         run: |
-          mvn --batch-mode clean verify \
-          -Dspring.profiles.active=integration
+          mvn --batch-mode clean verify -DskipUnitTests

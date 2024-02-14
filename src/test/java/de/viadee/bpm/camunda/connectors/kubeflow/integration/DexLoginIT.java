@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.Configuration;
 
-public class DexLoginIntegrationTest extends BaseIntegrationTest {
+public class DexLoginIT extends BaseIntegrationTest {
 
   @Test
   public void testLogin() throws Exception {

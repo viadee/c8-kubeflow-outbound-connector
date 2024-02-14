@@ -30,7 +30,12 @@ public class KubeflowLogin {
                 .build();
 
         // Send the GET request and handle the response
-        HttpResponse<String> getResponse = client.send(getRequest, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> getResponse;
+        try {
+            getResponse = client.send(getRequest, HttpResponse.BodyHandlers.ofString());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to send GET request to: " + url, e);
+        }
         if (getResponse.statusCode() != 200) {
             throw new RuntimeException("HTTP status code '" + getResponse.statusCode() + "' for GET against: " + url);
         }

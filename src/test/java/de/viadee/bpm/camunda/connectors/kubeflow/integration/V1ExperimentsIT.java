@@ -16,7 +16,7 @@ import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApisEnum;
 import de.viadee.bpm.camunda.connectors.kubeflow.services.KubeflowConnectorExecutorCreateExperiment;
 import io.camunda.connector.http.base.model.HttpCommonResult;
 
-public class V1ExperimentsIntegrationTest extends BaseIntegrationTest {
+public class V1ExperimentsIT extends BaseIntegrationTest {
 
   private void createExperiment(String experimentName) throws Exception {
     KubeflowApi kubeflowApi = new KubeflowApi(null, null, null, null, null, null, null, experimentName, null);
