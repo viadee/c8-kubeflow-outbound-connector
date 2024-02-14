@@ -60,3 +60,15 @@ resources:
   - https://github.com/kubeflow/manifests//apps/profiles/upstream/overlays/kubeflow/?timeout=120&ref=v1.8-branch
   # User namespace
   - https://github.com/kubeflow/manifests//common/user-namespace/base/?timeout=120&ref=v1.8-branch
+
+patches:
+  # Make the istio-ingressgateway a NodePort service.
+  # This way, we can access it locally.
+  - patch: |
+      - op: replace
+        path: /spec/type
+        value: NodePort
+    target:
+      kind: Service
+      name: istio-ingressgateway
+      namespace: istio-system
