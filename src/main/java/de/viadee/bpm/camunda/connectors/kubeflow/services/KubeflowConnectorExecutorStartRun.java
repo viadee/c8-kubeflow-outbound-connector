@@ -59,7 +59,7 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 	@Override
 	protected BodyPublisher buildPayloadForKubeflowEndpoint() {
 		//define runName
-		runName = Long.toString(processInstanceKey)+"_"+connectorRequest.getKubeflowapi().runName();
+		runName = processInstanceKey+"_"+connectorRequest.getKubeflowapi().runName();
 		
 		try {
 			if (KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum)) {
