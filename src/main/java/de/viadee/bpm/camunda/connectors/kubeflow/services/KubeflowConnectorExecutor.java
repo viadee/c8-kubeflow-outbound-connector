@@ -19,7 +19,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.http.HttpHeaders;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.ContentType;
 
 import de.viadee.bpm.camunda.connectors.kubeflow.auth.BasicAuthentication;
 import de.viadee.bpm.camunda.connectors.kubeflow.auth.BearerAuthentication;
@@ -120,7 +122,7 @@ public class KubeflowConnectorExecutor {
         Builder httpRequestBuilder = HttpRequest.newBuilder()
                 .method(kubeflowApiOperationsEnum.getHttpMethod(), bodyPublisher)
                 .uri(URI.create(url))
-                .setHeader("User-Agent", "Kubeflow Camunda Connector");
+                .setHeader(HttpHeaders.USER_AGENT, "Kubeflow Camunda Connector");
 
         setAuthentication(httpRequestBuilder);
         setHeaders(httpRequestBuilder);
@@ -129,31 +131,31 @@ public class KubeflowConnectorExecutor {
 
     protected void setHeaders(Builder httpRequestBuilder) {
         Map<String, String> httpHeadersFromPropertiesPanel = this.connectorRequest.getKubeflowapi().httpHeaders();
-        if(httpHeadersFromPropertiesPanel.keySet().size() > 0) {
+        if(httpHeadersFromPropertiesPanel != null && httpHeadersFromPropertiesPanel.keySet().size() > 0) {
             httpHeadersFromPropertiesPanel.keySet().forEach(key -> httpRequestBuilder
                 .setHeader(key, httpHeadersFromPropertiesPanel.get(key)));
         }
-        httpRequestBuilder.setHeader("Content-Type", "application/json");
+        httpRequestBuilder.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.toString());
     }
 
     private void setAuthentication(Builder httpRequestBuilder) {
         if (connectorRequest.getAuthentication() instanceof BasicAuthentication) {
             BasicAuthentication basicAuthentication = (BasicAuthentication) connectorRequest.getAuthentication();
-            httpRequestBuilder.setHeader("Authorization",
+            httpRequestBuilder.setHeader(HttpHeaders.AUTHORIZATION,
                     getBasicAuthenticationHeader(basicAuthentication.getUsername(), basicAuthentication.getPassword()));
         } else if (connectorRequest.getAuthentication() instanceof BearerAuthentication) {
             BearerAuthentication bearerAuthentication = (BearerAuthentication) connectorRequest.getAuthentication();
-            httpRequestBuilder.setHeader("Authorization", "Bearer " + bearerAuthentication.getToken());
+            httpRequestBuilder.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + bearerAuthentication.getToken());
         } else if (connectorRequest.getAuthentication() instanceof OAuthAuthenticationClientCredentialsFlow) {
             OAuthAuthenticationClientCredentialsFlow oAuthAuthentication = (OAuthAuthenticationClientCredentialsFlow) connectorRequest
                     .getAuthentication();
             String accessToken = getAccessTokenFromClientCredentialsFlow(oAuthAuthentication);
-            httpRequestBuilder.setHeader("Authorization", "Bearer " + accessToken);
+            httpRequestBuilder.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
         } else if (connectorRequest.getAuthentication() instanceof OAuthAuthenticationPasswordFlow) {
             OAuthAuthenticationPasswordFlow oAuthAuthenticationPasswordFlow = (OAuthAuthenticationPasswordFlow) connectorRequest
                     .getAuthentication();
             String accessToken = getAccessTokenFromPasswordFlow(oAuthAuthenticationPasswordFlow);
-            httpRequestBuilder.setHeader("Authorization", "Bearer " + accessToken);
+            httpRequestBuilder.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
         } else {
             // no authentication
         }
@@ -182,7 +184,7 @@ public class KubeflowConnectorExecutor {
         if (filter != null) {
             // this regex removes all new lines and escaping of " before url encoding is
             filter = filter.replaceAll("[\\\\r]?\\\\n", "").replace("\\\"", "\"");
-            uriBuilder.addParameter(URI_PARAMETER_FILTER, URLEncoder.encode(filter, "UTF-8"));
+            uriBuilder.addParameter(URI_PARAMETER_FILTER, URLEncoder.encode(filter, StandardCharsets.UTF_8.toString()));
         }
     }
 
@@ -249,8 +251,8 @@ public class KubeflowConnectorExecutor {
         HttpRequest request = HttpRequest.newBuilder()
                 .method("POST", ofFormData(data))
                 .uri(URI.create(serviceUrl))
-                .setHeader("User-Agent", "Kubeflow Camunda Connector")
-                .header("Content-Type", Constants.APPLICATION_X_WWW_FORM_URLENCODED)
+                .setHeader(HttpHeaders.USER_AGENT, "Kubeflow Camunda Connector")
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED.toString())
                 .build();
 
         try {
