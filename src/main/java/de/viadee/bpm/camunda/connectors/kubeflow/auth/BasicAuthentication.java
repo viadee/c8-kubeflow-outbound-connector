@@ -20,27 +20,20 @@ import java.util.Map;
 import java.util.function.Function;
 
 import io.camunda.connector.feel.annotation.FEEL;
-import io.camunda.connector.generator.java.annotation.TemplateProperty;
-import io.camunda.connector.generator.java.annotation.TemplateSubType;
 import jakarta.validation.constraints.NotEmpty;
 
-@TemplateSubType(id = BasicAuthentication.TYPE, label = "Basic")
 public final class BasicAuthentication extends Authentication {
-  @TemplateProperty(ignore = true)
   private static final String SPEC_PASSWORD_EMPTY_PATTERN = "SPEC_PASSWORD_EMPTY_PATTERN";
 
-  @TemplateProperty(ignore = true)
   private static final Function<String, String> SPEC_PASSWORD =
       (psw) -> psw.equals(SPEC_PASSWORD_EMPTY_PATTERN) ? "" : psw;
 
   @FEEL
   @NotEmpty
-  @TemplateProperty(group = "authentication")
   private String username;
 
   @FEEL
   @NotEmpty
-  @TemplateProperty(group = "authentication")
   private String password;
 
   @Override
@@ -73,6 +66,5 @@ public final class BasicAuthentication extends Authentication {
         + super.toString();
   }
 
-  @TemplateProperty(ignore = true)
   public static final String TYPE = "basic";
 }

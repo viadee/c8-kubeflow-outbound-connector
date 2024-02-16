@@ -19,16 +19,12 @@ package de.viadee.bpm.camunda.connectors.kubeflow.auth;
 import java.util.Map;
 
 import io.camunda.connector.feel.annotation.FEEL;
-import io.camunda.connector.generator.java.annotation.TemplateProperty;
-import io.camunda.connector.generator.java.annotation.TemplateSubType;
 import jakarta.validation.constraints.NotEmpty;
 
-@TemplateSubType(id = "bearer", label = "Bearer token")
 public final class BearerAuthentication extends Authentication {
 
   @FEEL
   @NotEmpty
-  @TemplateProperty(group = "authentication", label = "Bearer token")
   private String token;
 
   @Override
@@ -49,6 +45,5 @@ public final class BearerAuthentication extends Authentication {
     return "BearerAuthentication{" + "token='[REDACTED]'" + "}; Super: " + super.toString();
   }
 
-  @TemplateProperty(ignore = true)
   public static final String TYPE = "bearer";
 }

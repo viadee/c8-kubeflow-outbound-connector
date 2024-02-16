@@ -6,7 +6,6 @@ import de.viadee.bpm.camunda.connectors.kubeflow.auth.Authentication;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.Configuration;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.KubeflowApi;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.Timeout;
-import io.camunda.connector.generator.java.annotation.TemplateProperty;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
@@ -88,11 +87,13 @@ public class KubeflowConnectorRequest {
         return "KubeflowConnectorRequest{"
                 + ", authentication="
                 + authentication
+                + '\''
                 + ", timeout='"
                 + timeout
                 + '\''
                 + ", configuration="
                 + configuration
+                + '\''
                 + ", kubeflowapi="
                 + kubeflowapi
                 + '}';
