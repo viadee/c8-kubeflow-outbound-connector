@@ -301,15 +301,6 @@
                 <artifactId>maven-shade-plugin</artifactId>
             </plugin>
             <plugin>
-                <groupId>io.camunda.connector</groupId>
-                <artifactId>element-template-generator-maven-plugin</artifactId>
-                <configuration>
-                    <connectorClasses>
-                        <connectorClass>de.viadee.bpm.camunda.connectors.kubeflow.KubeflowConnectorFunction</connectorClass>
-                    </connectorClasses>
-                </configuration>
-            </plugin>
-            <plugin>
                 <!-- a hint for IDE's to add the java sources to the classpath -->
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
