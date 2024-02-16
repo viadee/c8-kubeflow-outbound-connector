@@ -26,15 +26,16 @@
       <bpmn:extensionElements>
         <zeebe:taskDefinition type="de.viadee.bpm.camunda:connector-kubeflow:1" />
         <zeebe:ioMapping>
-          <zeebe:input source="https://kubeflow.l.micudaj.de" target="configuration.kubeflowUrl" />
-          <zeebe:input source="environment" target="authentication.type" />
+          <zeebe:input source="http://localhost:32357" target="configuration.kubeflowUrl" />
+          <zeebe:input source="kubeflow-user-example-com" target="configuration.multiusernamespace" />
+          <zeebe:input source="noAuth" target="authentication.type" />
           <zeebe:input source="pipelinesV2" target="kubeflowapi.api" />
           <zeebe:input source="start_run_and_monitor" target="kubeflowapi.operation" />
-          <zeebe:input source="a58ca313-fe2a-47d8-b93c-169b6744d8c3" target="kubeflowapi.pipelineId" />
-          <zeebe:input source="9a50a51d-873a-4dfa-be7f-b033be2a5f3d" target="kubeflowapi.experimentId" />
+          <zeebe:input source="6b0feed7-738f-4435-9414-862e0e4455c6" target="kubeflowapi.pipelineId" />
+          <zeebe:input source="f0ecdaa3-8726-4aeb-94fb-d268dd7ce41c" target="kubeflowapi.experimentId" />
           <zeebe:input source="PT10S" target="kubeflowapi.pollingInterval" />
           <zeebe:input source="from_camunda_v2" target="kubeflowapi.runName" />
-          <zeebe:input source="={&#34;test&#34;:&#34;Hallo von Mario&#34;}" target="kubeflowapi.runParameters" />
+          <zeebe:input source="={&#34;Cookie&#34;: &#34;authservice_session=MTcwNzc1MzcxMnxOd3dBTkRkRFRqTk9Vek5CVFVzMFREWXpNbFEwVmswM1RVeEdSRlZTVEZkWE16ZFNTa3hEUTBaVFQweFBVMEpCUmxWTlJrZFFNMEU9fPPT2hwktXE4xoZY4whPwUYKVsTMq1fmzbCHs6DBtX2e&#34;}" target="kubeflowapi.httpHeaders" />
           <zeebe:input source="20" target="connectionTimeoutInSeconds" />
         </zeebe:ioMapping>
         <zeebe:taskHeaders>

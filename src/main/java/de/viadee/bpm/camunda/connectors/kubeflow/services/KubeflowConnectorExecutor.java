@@ -129,6 +129,11 @@ public class KubeflowConnectorExecutor {
     }
 
     protected void setHeaders(Builder httpRequestBuilder) {
+        Map<String, String> httpHeadersFromPropertiesPanel = this.connectorRequest.getKubeflowapi().httpHeaders();
+        if(httpHeadersFromPropertiesPanel.keySet().size() > 0) {
+            httpHeadersFromPropertiesPanel.keySet().forEach(key -> httpRequestBuilder
+                .setHeader(key, httpHeadersFromPropertiesPanel.get(key)));
+        }
         httpRequestBuilder.setHeader("Content-Type", "application/json");
     }
 

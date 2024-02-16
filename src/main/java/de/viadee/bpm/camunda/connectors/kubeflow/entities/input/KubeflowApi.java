@@ -29,5 +29,7 @@ public record KubeflowApi(
     @TemplateProperty(group = "kubeflowapi", label = "Experiment Name", description = "The name of the experiment")
     String experimentName,
     @TemplateProperty(group = "kubeflowapi", label = "Experiment Description", description = "The description of the experiment")
-    String experimentDescription
+    String experimentDescription,
+    @TemplateProperty(group = "kubeflowapi", label = "HTTP Headers", description = "Headers to be sent with the request")
+    Map<String, String> httpHeaders
 ) { }
