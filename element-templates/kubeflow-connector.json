@@ -656,7 +656,7 @@
       "value": "20",
       "binding": {
         "type": "zeebe:input",
-        "name": "connectionTimeoutInSeconds"
+        "name": "timeout.connectionTimeoutInSeconds"
       },
       "optional": true,
       "feel": "optional",

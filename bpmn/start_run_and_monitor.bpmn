@@ -33,7 +33,7 @@
           <zeebe:input source="bdbbd11c-b571-4582-b703-c57faca4cf13" target="kubeflowapi.experimentId" />
           <zeebe:input source="PT10S" target="kubeflowapi.pollingInterval" />
           <zeebe:input source="camunda8" target="kubeflowapi.runName" />
-          <zeebe:input source="25" target="connectionTimeoutInSeconds" />
+          <zeebe:input source="20" target="timeout.connectionTimeoutInSeconds" />
         </zeebe:ioMapping>
         <zeebe:taskHeaders>
           <zeebe:header key="resultVariable" value="allresult" />

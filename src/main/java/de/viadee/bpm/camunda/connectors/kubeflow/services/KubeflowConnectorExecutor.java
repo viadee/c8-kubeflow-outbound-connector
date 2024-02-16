@@ -61,7 +61,7 @@ public class KubeflowConnectorExecutor {
         this.kubeflowApisEnum = kubeflowApisEnum;
         this.kubeflowApiOperationsEnum = kubeflowApiOperationsEnum;
         this.httpClient = HttpClient.newBuilder()
-                .connectTimeout(Duration.ofSeconds(connectorRequest.getConnectionTimeoutInSeconds())).build();
+                .connectTimeout(Duration.ofSeconds(connectorRequest.getTimeout().connectionTimeoutInSeconds())).build();
 
         AuthUtil.setAuthenticationParameters(connectorRequest);
         setConfigurationParameters();

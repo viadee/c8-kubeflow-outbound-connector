@@ -34,7 +34,7 @@ public class KubeflowCallable implements Callable<HttpResponse<String>> {
             runId, null, null, null, null, null, null, null, null, connectorRequest.getKubeflowapi()
             .httpHeaders());
         KubeflowConnectorRequest getRunByIdConnectorRequest = new KubeflowConnectorRequest(connectorRequest.getAuthentication(),
-                connectorRequest.getConfiguration(), kubeflowApi, connectorRequest.getConnectionTimeoutInSeconds());
+                connectorRequest.getConfiguration(), kubeflowApi, connectorRequest.getTimeout());
         KubeflowConnectorExecutorGetRunById getRunByIdExecutor = (KubeflowConnectorExecutorGetRunById) ExecutionHandler.getExecutor(
                 getRunByIdConnectorRequest,
                 processInstanceKey);
