@@ -12,7 +12,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <!-- connector SDK version -->
-        <version.connectors>8.3.0</version.connectors>
+        <version.connectors>8.3.7</version.connectors>
         <!-- external libraries -->
         <version.assertj>3.24.2</version.assertj>
         <version.junit-jupiter>5.10.0</version.junit-jupiter>
@@ -49,7 +49,7 @@
         <!-- Element template generator annotations (compile-time only) -->
         <dependency>
             <groupId>io.camunda.connector</groupId>
-            <artifactId>element-template-generator</artifactId>
+            <artifactId>element-template-generator-core</artifactId>
             <version>${version.connectors}</version>
             <optional>true</optional>
         </dependency>
@@ -144,6 +144,7 @@
             <artifactId>jackson-datatype-feel</artifactId>
             <version>${version.connectors}</version>
         </dependency>
+
     </dependencies>
     <build>
         <pluginManagement>

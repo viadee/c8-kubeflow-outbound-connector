@@ -29,7 +29,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import io.camunda.connector.feel.jackson.JacksonModuleFeelFunction;
 
@@ -53,7 +52,7 @@ public class JsonHelper {
   }
 
   public static final ObjectMapper objectMapper = JsonMapper.builder()
-      .addModules(new JacksonModuleFeelFunction(), new Jdk8Module(), new JavaTimeModule())
+      .addModules(new JacksonModuleFeelFunction(), new Jdk8Module())
       .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
       .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
       .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)

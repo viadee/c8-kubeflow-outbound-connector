@@ -18,8 +18,8 @@ package de.viadee.bpm.camunda.connectors.kubeflow.auth;
 
 import java.util.Map;
 
-import io.camunda.connector.generator.annotation.TemplateProperty;
-import io.camunda.connector.generator.annotation.TemplateSubType;
+import io.camunda.connector.generator.java.annotation.TemplateProperty;
+import io.camunda.connector.generator.java.annotation.TemplateSubType;
 
 @TemplateSubType(id = NoAuthentication.TYPE, label = "None")
 public final class NoAuthentication extends Authentication {

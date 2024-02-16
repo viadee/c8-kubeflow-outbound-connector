@@ -18,9 +18,9 @@ package de.viadee.bpm.camunda.connectors.kubeflow.auth;
 
 import java.util.Map;
 
-import io.camunda.connector.api.annotation.FEEL;
-import io.camunda.connector.generator.annotation.TemplateProperty;
-import io.camunda.connector.generator.annotation.TemplateSubType;
+import io.camunda.connector.feel.annotation.FEEL;
+import io.camunda.connector.generator.java.annotation.TemplateProperty;
+import io.camunda.connector.generator.java.annotation.TemplateSubType;
 import jakarta.validation.constraints.NotEmpty;
 
 @TemplateSubType(id = "bearer", label = "Bearer token")

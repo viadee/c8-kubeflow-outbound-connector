@@ -2,7 +2,7 @@ package de.viadee.bpm.camunda.connectors.kubeflow.entities.input;
 
 import java.util.Map;
 
-import io.camunda.connector.generator.annotation.TemplateProperty;
+import io.camunda.connector.generator.java.annotation.TemplateProperty;
 import jakarta.validation.constraints.NotEmpty;
 
 public record KubeflowApi(

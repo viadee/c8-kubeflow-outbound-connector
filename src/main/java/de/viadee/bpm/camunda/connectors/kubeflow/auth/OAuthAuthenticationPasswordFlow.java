@@ -20,11 +20,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import io.camunda.connector.api.annotation.FEEL;
-import io.camunda.connector.generator.annotation.TemplateProperty;
-import io.camunda.connector.generator.annotation.TemplateProperty.DropdownPropertyChoice;
-import io.camunda.connector.generator.annotation.TemplateProperty.PropertyType;
-import io.camunda.connector.generator.annotation.TemplateSubType;
+import io.camunda.connector.feel.annotation.FEEL;
+import io.camunda.connector.generator.java.annotation.TemplateProperty;
+import io.camunda.connector.generator.java.annotation.TemplateProperty.DropdownPropertyChoice;
+import io.camunda.connector.generator.java.annotation.TemplateProperty.PropertyType;
+import io.camunda.connector.generator.java.annotation.TemplateSubType;
 import jakarta.validation.constraints.NotEmpty;
 
 @TemplateSubType(id = OAuthAuthenticationPasswordFlow.TYPE, label = "OAuth 2.0 (Password flow)")

@@ -18,16 +18,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.client.utils.URIBuilder;
 
-import de.viadee.bpm.camunda.connectors.kubeflow.auth.Authentication;
 import de.viadee.bpm.camunda.connectors.kubeflow.auth.BasicAuthentication;
 import de.viadee.bpm.camunda.connectors.kubeflow.auth.BearerAuthentication;
 import de.viadee.bpm.camunda.connectors.kubeflow.auth.Constants;
-import de.viadee.bpm.camunda.connectors.kubeflow.auth.EnvironmentAuthentication;
-import de.viadee.bpm.camunda.connectors.kubeflow.auth.NoAuthentication;
 import de.viadee.bpm.camunda.connectors.kubeflow.auth.OAuthAuthenticationClientCredentialsFlow;
 import de.viadee.bpm.camunda.connectors.kubeflow.auth.OAuthAuthenticationPasswordFlow;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
@@ -250,7 +246,7 @@ public class KubeflowConnectorExecutor {
                 .method("POST", ofFormData(data))
                 .uri(URI.create(serviceUrl))
                 .setHeader("User-Agent", "Kubeflow Camunda Connector")
-                .header("Content-Type", "application/x-www-form-urlencoded")
+                .header("Content-Type", Constants.APPLICATION_X_WWW_FORM_URLENCODED)
                 .build();
 
         try {

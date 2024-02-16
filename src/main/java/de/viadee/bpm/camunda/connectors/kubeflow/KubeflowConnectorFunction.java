@@ -13,7 +13,7 @@ import de.viadee.bpm.camunda.connectors.kubeflow.services.async.ExecutionHandler
 import io.camunda.connector.api.annotation.OutboundConnector;
 import io.camunda.connector.api.outbound.OutboundConnectorContext;
 import io.camunda.connector.api.outbound.OutboundConnectorFunction;
-import io.camunda.connector.generator.annotation.ElementTemplate;
+import io.camunda.connector.generator.java.annotation.ElementTemplate;
 
 @OutboundConnector(name = "Kubeflow Connector", inputVariables = { "authentication", "configuration",
     "kubeflowapi", "connectionTimeoutInSeconds" }, type = "de.viadee.bpm.camunda:connector-kubeflow:1")
