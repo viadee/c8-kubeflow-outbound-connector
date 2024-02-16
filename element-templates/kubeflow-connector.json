@@ -9,9 +9,11 @@
     "id": "connectors",
     "name": "Connectors"
   },
-  "appliesTo" : [ "bpmn:Task" ],
-  "elementType" : {
-    "value" : "bpmn:ServiceTask"
+  "appliesTo": [
+    "bpmn:Task"
+  ],
+  "elementType": {
+    "value": "bpmn:ServiceTask"
   },
   "groups": [
     {
@@ -50,43 +52,42 @@
         "type": "zeebe:taskDefinition:type"
       }
     },
-    "type" : "Hidden"
-  }, {
-    "id" : "configuration.cookievalue",
-    "label" : "Cookie Value",
-    "description" : "Authentication via Cookie Value",
-    "optional" : false,
-    "feel" : "optional",
-    "group" : "configuration",
-    "binding" : {
-      "name" : "configuration.cookievalue",
-      "type" : "zeebe:input"
-    },
-    "type" : "String"
-  }, {
-    "id" : "configuration.kubeflowUrl",
-    "label" : "Kubeflow URL",
-    "description" : "URL of Kubeflow",
-    "optional" : false,
-    "feel" : "optional",
-    "group" : "configuration",
-    "binding" : {
-      "name" : "configuration.kubeflowUrl",
-      "type" : "zeebe:input"
-    },
-    "type" : "String"
-  }, {
-    "id" : "configuration.multiusernamespace",
-    "label" : "Kubeflow Namespace",
-    "description" : "Kubeflow Namespace for Multi-User Isolation",
-    "optional" : false,
-    "feel" : "optional",
-    "group" : "configuration",
-    "binding" : {
-      "name" : "configuration.multiusernamespace",
-      "type" : "zeebe:input"
+    {
+      "id": "configuration.kubeflowUrl",
+      "label": "Kubeflow URL",
+      "description": "Specify the url of the Kubeflow server to talk to.",
+      "type": "String",
+      "group": "configuration",
+      "feel": "optional",
+      "optional": true,
+      "tooltip": "If left empty, URL is read from environment variable 'KF_CONNECTOR_URL'.",
+      "constraints": {
+        "notEmpty": false,
+        "pattern": {
+          "value": "(^$|^(https?)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|])",
+          "message": "must be valid."
+        }
+      },
+      "binding": {
+        "type": "zeebe:input",
+        "name": "configuration.kubeflowUrl"
       }
-    }, {
+    },
+    {
+      "id": "configuration.multiusernamespace",
+      "label": "Kubeflow Namespace",
+      "description": "If Kubeflow is running in a multiuser mode, define namespace to use.",
+      "type": "String",
+      "group": "configuration",
+      "feel": "optional",
+      "optional": true,
+      "tooltip": "If left empty, namespace is read from environment variable 'KF_CONNECTOR_MULTIUSER_NS'.",
+      "binding": {
+        "type": "zeebe:input",
+        "name": "configuration.multiusernamespace"
+      }
+    },
+    {
       "label": "Type",
       "id": "authenticationType",
       "group": "authentication",
@@ -331,15 +332,27 @@
         ]
       }
     },
-    "type" : "String"
-  }, {
-    "id" : "resultVariable",
-    "label" : "Result variable",
-    "description" : "Name of variable to store the response in",
-    "group" : "output",
-    "binding" : {
-      "key" : "resultVariable",
-      "type" : "zeebe:taskHeader"
+    {
+      "id": "kubeflowapi.api",
+      "label": "Kubeflow API",
+      "description": "Specify the Kubeflow API to use.",
+      "type": "Dropdown",
+      "group": "kubeflowapi",
+      "value": "pipelinesV1",
+      "choices": [
+        {
+          "name": "Pipelines v1",
+          "value": "pipelinesV1"
+        },
+        {
+          "name": "Pipelines v2",
+          "value": "pipelinesV2"
+        }
+      ],
+      "binding": {
+        "type": "zeebe:input",
+        "name": "kubeflowapi.api"
+      }
     },
     {
       "id": "kubeflowapi.operation",
