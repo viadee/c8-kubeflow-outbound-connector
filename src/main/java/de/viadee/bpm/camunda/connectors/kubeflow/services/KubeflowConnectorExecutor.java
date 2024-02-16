@@ -37,8 +37,7 @@ public class KubeflowConnectorExecutor {
     private static final String KUBEFLOW_URL_ENV = "KF_CONNECTOR_URL";
     private static final String KUBEFLOW_NAMESPACE_ENV = "KF_CONNECTOR_MULTIUSER_NS";
     private static final String URI_PARAMETER_FILTER = "filter";
-    private static final Pair<String, String> URI_PARAMETER_PAIR_V1_TYPE_NS = Pair.of("resource_reference_key.type",
-            "NAMESPACE");
+    private static final Pair<String, String> URI_PARAMETER_PAIR_V1_TYPE_NS = Pair.of("resource_reference_key.type", "NAMESPACE");
     private static final String URI_PARAMETER_V1_ID = "resource_reference_key.id";
     private static final String URI_PARAMETER_V2_NS = "namespace";
 
@@ -224,10 +223,10 @@ public class KubeflowConnectorExecutor {
     private String getAccessTokenFromClientCredentialsFlow(OAuthAuthenticationClientCredentialsFlow authentication) {
         String serviceUrl = authentication.getOauthTokenEndpoint();
         Map<String, Object> data = new HashMap<>();
-        data.put("grant_type", authentication.getGrantType());
-        data.put("client_id", authentication.getClientId());
-        data.put("client_secret", authentication.getClientSecretCC());
-        data.put("scope", authentication.getScopes());
+        data.put(Constants.GRANT_TYPE, authentication.getGrantType());
+        data.put(Constants.CLIENT_ID, authentication.getClientId());
+        data.put(Constants.CLIENT_SECRET, authentication.getClientSecretCC());
+        data.put(Constants.SCOPE, authentication.getScopes());
 
         return requestAccessToken(serviceUrl, data);
     }
@@ -236,12 +235,12 @@ public class KubeflowConnectorExecutor {
 
         String serviceUrl = authentication.getOauthTokenEndpoint();
         Map<String, Object> data = new HashMap<>();
-        data.put("username", authentication.getUsername());
-        data.put("password", authentication.getPassword());
-        data.put("grant_type", authentication.getGrantType());
-        data.put("client_id", authentication.getClientId());
-        data.put("client_secret", authentication.getClientSecretPW());
-        data.put("scope", authentication.getScopes());
+        data.put(Constants.USERNAME, authentication.getUsername());
+        data.put(Constants.PASSWORD, authentication.getPassword());
+        data.put(Constants.GRANT_TYPE, authentication.getGrantType());
+        data.put(Constants.CLIENT_ID, authentication.getClientId());
+        data.put(Constants.CLIENT_SECRET, authentication.getClientSecretPW());
+        data.put(Constants.SCOPE, authentication.getScopes());
 
         return requestAccessToken(serviceUrl, data);
     }
