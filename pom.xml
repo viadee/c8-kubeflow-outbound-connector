@@ -12,7 +12,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <!-- connector SDK version -->
-        <version.connectors>8.3.0</version.connectors>
+        <version.connectors>8.3.7</version.connectors>
         <!-- external libraries -->
         <version.assertj>3.24.2</version.assertj>
         <version.junit-jupiter>5.10.0</version.junit-jupiter>
@@ -49,13 +49,6 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>${version.slf4j}</version>
-        </dependency>
-        <!-- Element template generator annotations (compile-time only) -->
-        <dependency>
-            <groupId>io.camunda.connector</groupId>
-            <artifactId>element-template-generator</artifactId>
-            <version>${version.connectors}</version>
-            <optional>true</optional>
         </dependency>
         <!-- test dependencies -->
         <dependency>
@@ -102,19 +95,14 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>io.camunda.connector</groupId>
-            <artifactId>connector-http-base</artifactId>
-            <version>8.3.0</version>
-        </dependency>
-        <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.10.1</version>
         </dependency>
         <dependency>
-            <groupId>io.camunda.connector</groupId>
-            <artifactId>jackson-datatype-feel</artifactId>
-            <version>8.3.0</version>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.17.1</version>
         </dependency>
         <!-- for generating models from swagger specifications -->
         <dependency>
@@ -133,6 +121,31 @@
             <groupId>org.threeten</groupId>
             <artifactId>threetenbp</artifactId>
             <version>1.6.8</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.9</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jdk8 -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jdk8</artifactId>
+            <version>2.16.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.camunda.connector</groupId>
+            <artifactId>jackson-datatype-feel</artifactId>
+            <version>${version.connectors}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.9</version>
         </dependency>
     </dependencies>
     <build>
@@ -290,15 +303,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>io.camunda.connector</groupId>
-                <artifactId>element-template-generator-maven-plugin</artifactId>
-                <configuration>
-                    <connectorClasses>
-                        <connectorClass>de.viadee.bpm.camunda.connectors.kubeflow.KubeflowConnectorFunction</connectorClass>
-                    </connectorClasses>
-                </configuration>
             </plugin>
             <plugin>
                 <!-- a hint for IDE's to add the java sources to the classpath -->

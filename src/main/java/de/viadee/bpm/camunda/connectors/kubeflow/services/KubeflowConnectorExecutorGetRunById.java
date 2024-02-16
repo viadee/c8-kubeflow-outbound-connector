@@ -1,15 +1,19 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.services;
 
+import java.io.IOException;
+import java.net.http.HttpClient;
+import java.net.http.HttpResponse;
+
+import org.apache.http.client.utils.URIBuilder;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
 import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApiOperationsEnum;
 import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApisEnum;
-import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
 import de.viadee.bpm.camunda.connectors.kubeflow.utils.RunUtil;
-import io.camunda.connector.http.base.model.HttpCommonResult;
-import io.camunda.connector.http.base.services.HttpService;
 import io.swagger.client.model.V1ApiRun;
 import io.swagger.client.model.V2beta1Run;
-import java.io.IOException;
-import org.apache.http.client.utils.URIBuilder;
 
 public class KubeflowConnectorExecutorGetRunById extends KubeflowConnectorExecutor {
 
@@ -22,13 +26,17 @@ public class KubeflowConnectorExecutorGetRunById extends KubeflowConnectorExecut
     }
 
     @Override
-    public HttpCommonResult execute(HttpService httpService)
-        throws InstantiationException, IllegalAccessException, IOException {
-        HttpCommonResult runByIdHttpResult = super.execute(httpService);
+    public HttpResponse<String> execute() {
+        HttpResponse<String> runByIdHttpResult = super.execute();
 
-        var apiRunResponse = KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum) ?
-            runUtil.readV1RunAsTypedResponse(runByIdHttpResult) :
-            runUtil.readV2RunAsTypedResponse(runByIdHttpResult);
+        Object apiRunResponse = null;
+        try {
+            apiRunResponse = KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum) ?
+                runUtil.readV1RunAsTypedResponse(runByIdHttpResult) :
+                runUtil.readV2RunAsTypedResponse(runByIdHttpResult);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
         if (apiRunResponse == null) {
             throw new RuntimeException("Could not identify run by id");
@@ -41,19 +49,19 @@ public class KubeflowConnectorExecutorGetRunById extends KubeflowConnectorExecut
     protected void addKubeflowUrlPath(URIBuilder uriBuilder) {
         var kubeflowUrlPath = String.format("%s/%s",
             String.format(kubeflowApiOperationsEnum.getApiUrl(), kubeflowApisEnum.getUrlPathVersion()),
-            connectorRequest.kubeflowapi().runId());
+            connectorRequest.getKubeflowapi().runId());
         uriBuilder.setPath(kubeflowUrlPath);
     }
 
-    public V1ApiRun getRunByIdV1Typed(HttpService httpService)
+    public V1ApiRun getRunByIdV1Typed(HttpClient httpClient)
         throws IOException, InstantiationException, IllegalAccessException {
-        var httpCommonResult = this.execute(httpService);
-        return runUtil.readV1RunAsTypedResponse(httpCommonResult);
+        var httpResponse = this.execute();
+        return runUtil.readV1RunAsTypedResponse(httpResponse);
     }
 
-    public V2beta1Run getRunByIdV2Typed(HttpService httpService)
+    public V2beta1Run getRunByIdV2Typed(HttpClient httpClient)
         throws IOException, InstantiationException, IllegalAccessException {
-        var httpCommonResult = this.execute(httpService);
-        return runUtil.readV2RunAsTypedResponse(httpCommonResult);
+        var httpResponse = this.execute();
+        return runUtil.readV2RunAsTypedResponse(httpResponse);
     }
 }
