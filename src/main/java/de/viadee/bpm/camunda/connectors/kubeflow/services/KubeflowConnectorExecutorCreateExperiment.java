@@ -1,21 +1,23 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.services;
 
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublisher;
+import java.util.Map;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
+import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
+import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApiOperationsEnum;
 import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApisEnum;
+import de.viadee.bpm.camunda.connectors.kubeflow.utils.JsonHelper;
 import io.swagger.client.model.V1ApiExperiment;
 import io.swagger.client.model.V1ApiResourceKey;
 import io.swagger.client.model.V1ApiResourceReference;
 import io.swagger.client.model.V1ApiResourceType;
 import io.swagger.client.model.V2beta1Experiment;
 
-import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApiOperationsEnum;
-import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
-import java.util.Map;
-
 public class KubeflowConnectorExecutorCreateExperiment extends KubeflowConnectorExecutor {
-
-    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public KubeflowConnectorExecutorCreateExperiment(KubeflowConnectorRequest connectorRequest, long processInstanceKey, KubeflowApisEnum kubeflowApisEnum,
         KubeflowApiOperationsEnum kubeflowApiOperationsEnum) {
@@ -23,14 +25,24 @@ public class KubeflowConnectorExecutorCreateExperiment extends KubeflowConnector
     }
 
     @Override
-    protected Object buildPayloadForKubeflowEndpoint() {
+    protected BodyPublisher buildPayloadForKubeflowEndpoint() {
         if (KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum)) {
-            return getPayloadForEndpointV1();
+            try {
+                return HttpRequest.BodyPublishers.ofString(JsonHelper.objectMapper.writeValueAsString(getPayloadForEndpointV1()));
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            try {
+                return HttpRequest.BodyPublishers.ofString(JsonHelper.objectMapper.writeValueAsString(getPayloadForEndpointV2()));
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
         }
-        return getPayloadForEndpointV2();
+        
     }
 
-    private Map<String, Object> getPayloadForEndpointV1() {
+    private V1ApiExperiment getPayloadForEndpointV1() {
         var v1ApiResourceReference = new V1ApiResourceReference()
             .key(new V1ApiResourceKey()
                 .type(V1ApiResourceType.NAMESPACE)
@@ -41,8 +53,7 @@ public class KubeflowConnectorExecutorCreateExperiment extends KubeflowConnector
             .description(getDescription())
             .addResourceReferencesItem(v1ApiResourceReference);
 
-        return objectMapper.convertValue(v1ApiExperiment,
-            new TypeReference<>() {});
+        return v1ApiExperiment;
     }
 
     private Map<String, Object> getPayloadForEndpointV2() {
@@ -50,12 +61,12 @@ public class KubeflowConnectorExecutorCreateExperiment extends KubeflowConnector
             .displayName(getName())
             .description(getDescription())
             .namespace(super.kubeflowMultiNs);
-        return objectMapper.convertValue(v2Beta1Experiment,
+        return JsonHelper.objectMapper.convertValue(v2Beta1Experiment,
             new TypeReference<>() {});
     }
 
     private String getDescription() {
-        var description = connectorRequest.kubeflowapi().experimentDescription();
+        var description = connectorRequest.getKubeflowapi().experimentDescription();
         if (description == null) {
             return "";
         }
@@ -63,7 +74,7 @@ public class KubeflowConnectorExecutorCreateExperiment extends KubeflowConnector
     }
 
     private String getName() {
-        var name = connectorRequest.kubeflowapi().experimentName();
+        var name = connectorRequest.getKubeflowapi().experimentName();
         if (name == null) {
             return "";
         }

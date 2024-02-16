@@ -1,28 +1,31 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.services;
 
+import java.io.IOException;
+import java.net.http.HttpResponse;
+import java.util.Optional;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApiOperationsEnum;
-import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApisEnum;
+
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.V1Filter;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.V1FilterPredicate;
+import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApiOperationsEnum;
+import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApisEnum;
+import de.viadee.bpm.camunda.connectors.kubeflow.utils.JsonHelper;
 import de.viadee.bpm.camunda.connectors.kubeflow.utils.RunUtil;
-import io.camunda.connector.http.base.model.HttpCommonResult;
-import io.camunda.connector.http.base.services.HttpService;
 import io.swagger.client.model.V1ApiRun;
 import io.swagger.client.model.V2beta1Filter;
 import io.swagger.client.model.V2beta1Predicate;
 import io.swagger.client.model.V2beta1PredicateOperation;
 import io.swagger.client.model.V2beta1Run;
-import java.io.IOException;
-import java.util.Optional;
 
 public class KubeflowConnectorExecutorGetRunByName extends KubeflowConnectorExecutor {
   private static final String FILTER_BY_KEY = "name";
-  private static final ObjectMapper objectMapper = new ObjectMapper();
   private RunUtil runUtil;
 
-  public KubeflowConnectorExecutorGetRunByName(KubeflowConnectorRequest connectorRequest, long processInstanceKey, KubeflowApisEnum kubeflowApisEnum,
+  public KubeflowConnectorExecutorGetRunByName(KubeflowConnectorRequest connectorRequest, long processInstanceKey,
+      KubeflowApisEnum kubeflowApisEnum,
       KubeflowApiOperationsEnum kubeflowApiOperationsEnum) {
     super(connectorRequest, processInstanceKey, kubeflowApisEnum, kubeflowApiOperationsEnum);
     this.runUtil = new RunUtil();
@@ -30,23 +33,30 @@ public class KubeflowConnectorExecutorGetRunByName extends KubeflowConnectorExec
 
   @Override
   protected String getFilterString() {
-    var filter = KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum) ?
-        getV1Filter() : getV2Filter();
+    var filter = KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum) ? getV1Filter() : getV2Filter();
     try {
-      return objectMapper.writeValueAsString(filter);
+      return JsonHelper.objectMapper.writeValueAsString(filter);
     } catch (Exception e) {
       throw new RuntimeException("Error occurred during serialization of filter object");
     }
   }
 
   @Override
-  public HttpCommonResult execute(HttpService httpService)
-      throws InstantiationException, IllegalAccessException, IOException {
-    var runByNameHttpResult = super.execute(httpService);
+  public HttpResponse<String> execute() {
+    var runByNameHttpResult = super.execute();
 
-    var apiListRunsResponseSize = KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum) ?
-        runUtil.readV1RunListAsTypedResponse(runByNameHttpResult).getTotalSize() :
-        runUtil.readV2RunListAsTypedResponse(runByNameHttpResult).getTotalSize();
+    Integer apiListRunsResponseSize = null;
+    if (JsonHelper.getAsJsonElement(runByNameHttpResult.body(), new ObjectMapper()).isEmpty()) {
+      apiListRunsResponseSize = 0;
+    } else {
+      try {
+        apiListRunsResponseSize = KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum)
+            ? runUtil.readV1RunListAsTypedResponse(runByNameHttpResult).getTotalSize()
+            : runUtil.readV2RunListAsTypedResponse(runByNameHttpResult).getTotalSize();
+      } catch (JsonProcessingException e) {
+        throw new RuntimeException(e);
+      }
+    }
 
     if (apiListRunsResponseSize == null || apiListRunsResponseSize <= 1) {
       return runByNameHttpResult;
@@ -56,18 +66,24 @@ public class KubeflowConnectorExecutorGetRunByName extends KubeflowConnectorExec
 
   }
 
-  public Optional<V1ApiRun> getRunByNameV1Typed(HttpService httpService)
+  public Optional<V1ApiRun> getRunByNameV1Typed()
       throws IOException, InstantiationException, IllegalAccessException {
-    var httpCommonResult = this.execute(httpService);
-    var v1RunList = runUtil.readV1RunListAsTypedResponse(httpCommonResult).getRuns();
+    var httpResponse = this.execute();
+    if (JsonHelper.getAsJsonElement(httpResponse.body(), new ObjectMapper()).isEmpty()) {
+      return Optional.ofNullable(null);
+    }
+    var v1RunList = runUtil.readV1RunListAsTypedResponse(httpResponse).getRuns();
     var v1ApiRun = v1RunList == null || v1RunList.isEmpty() ? null : v1RunList.get(0);
     return Optional.ofNullable(v1ApiRun);
   }
 
-  public Optional<V2beta1Run> getRunByNameV2Typed(HttpService httpService)
+  public Optional<V2beta1Run> getRunByNameV2Typed()
       throws IOException, InstantiationException, IllegalAccessException {
-    var httpCommonResult = this.execute(httpService);
-    var v2RunList = runUtil.readV2RunListAsTypedResponse(httpCommonResult).getRuns();
+    var httpResponse = this.execute();
+    if (JsonHelper.getAsJsonElement(httpResponse.body(), new ObjectMapper()).isEmpty()) {
+      return Optional.ofNullable(null);
+    }
+    var v2RunList = runUtil.readV2RunListAsTypedResponse(httpResponse).getRuns();
     var v2ApiRun = v2RunList == null || v2RunList.isEmpty() ? null : v2RunList.get(0);
     return Optional.ofNullable(v2ApiRun);
   }
@@ -76,7 +92,7 @@ public class KubeflowConnectorExecutorGetRunByName extends KubeflowConnectorExec
     var predicate = new V1FilterPredicate()
         .op(V2beta1PredicateOperation.EQUALS)
         .key(FILTER_BY_KEY)
-        .stringValue(connectorRequest.kubeflowapi().filter());
+        .stringValue(connectorRequest.getKubeflowapi().filter());
 
     return new V1Filter()
         .addPredicatesItem(predicate);
@@ -86,7 +102,7 @@ public class KubeflowConnectorExecutorGetRunByName extends KubeflowConnectorExec
     var predicate = new V2beta1Predicate()
         .operation(V2beta1PredicateOperation.EQUALS)
         .key(FILTER_BY_KEY)
-        .stringValue(connectorRequest.kubeflowapi().filter());
+        .stringValue(connectorRequest.getKubeflowapi().filter());
 
     return new V2beta1Filter()
         .addPredicatesItem(predicate);

@@ -1,10 +1,10 @@
 {
   "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
-  "name" : "Kubeflow connector",
-  "id" : "de.viadee.bpm.camunda.connectors.kubeflow.v1",
-  "description" : "Connector for communicating with Kubeflow from Camunda",
-  "documentationRef" : "https://docs.camunda.io/docs/components/connectors/out-of-the-box-connectors/available-connectors-overview/",
-  "version": 2,
+  "name": "Kubeflow connector",
+  "id": "de.viadee.bpm.camunda.connectors.kubeflow.v1",
+  "description": "Connector for communicating with Kubeflow from Camunda",
+  "documentationRef": "https://docs.camunda.io/docs/components/connectors/out-of-the-box-connectors/available-connectors-overview/",
+  "version": 1,
   "category": {
     "id": "connectors",
     "name": "Connectors"
@@ -15,18 +15,35 @@
   "elementType": {
     "value": "bpmn:ServiceTask"
   },
-  "groups" : [ {
-    "id" : "configuration",
-    "label" : "Configuration",
-    "openByDefault": false,
-    "tooltip": "Can also be configured via environment variables."
-  },{
-    "id" : "kubeflowapi",
-    "label" : "Kubeflow API"
-  },{
-    "id" : "output",
-    "label" : "Output"
-  }],
+  "groups": [
+    {
+      "id": "configuration",
+      "label": "Configuration",
+      "openByDefault": false,
+      "tooltip": "Can also be configured via environment variables."
+    },
+    {
+      "id": "authentication",
+      "label": "Authentication",
+      "tooltip": "Can also be configured via environment variables."
+    },
+    {
+      "id": "kubeflowapi",
+      "label": "Kubeflow API"
+    },
+    {
+      "id": "timeout",
+      "label": "Connection timeout"
+    },
+    {
+      "id": "output",
+      "label": "Output mapping"
+    },
+    {
+      "id": "errors",
+      "label": "Error handling"
+    }
+  ],
   "properties": [
     {
       "type": "Hidden",
@@ -71,16 +88,248 @@
       }
     },
     {
-      "id": "configuration.cookievalue",
-      "label": "Cookie Value",
-      "description": "Specify the cookie value of a valid Kubeflow session.",
-      "type": "String",
-      "group": "configuration",
-      "optional": true,
-      "tooltip": "If left empty, cookie is read from environment variable 'KF_CONNECTOR_COOKIE'.",
+      "label": "Type",
+      "id": "authenticationType",
+      "group": "authentication",
+      "description": "Choose the authentication type. Select 'None' if no authentication is necessary and 'Environment' to use settings defined in connector runtime.",
+      "value": "environment",
+      "type": "Dropdown",
+      "choices": [
+        {
+          "name": "Environment",
+          "value": "environment"
+        },
+        {
+          "name": "None",
+          "value": "noAuth"
+        },
+        {
+          "name": "Basic",
+          "value": "basic"
+        },
+        {
+          "name": "Bearer token",
+          "value": "bearer"
+        },
+        {
+          "name": "OAuth 2.0 (client credentials flow)",
+          "value": "oauth-client-credentials-flow"
+        },
+        {
+          "name": "OAuth 2.0 (password flow)",
+          "value": "oauth-password-flow"
+        }
+      ],
       "binding": {
         "type": "zeebe:input",
-        "name": "configuration.cookievalue"
+        "name": "authentication.type"
+      }
+    },
+    {
+      "label": "Bearer token",
+      "group": "authentication",
+      "type": "String",
+      "feel": "optional",
+      "binding": {
+        "type": "zeebe:input",
+        "name": "authentication.token"
+      },
+      "constraints": {
+        "notEmpty": true
+      },
+      "condition": {
+        "property": "authenticationType",
+        "equals": "bearer"
+      }
+    },
+    {
+      "label": "OAuth token endpoint",
+      "description": "The OAuth token endpoint",
+      "group": "authentication",
+      "type": "String",
+      "feel": "optional",
+      "binding": {
+        "type": "zeebe:input",
+        "name": "authentication.oauthTokenEndpoint"
+      },
+      "constraints": {
+        "notEmpty": true
+      },
+      "condition": {
+        "property": "authenticationType",
+        "oneOf": [
+          "oauth-client-credentials-flow",
+          "oauth-password-flow"
+        ]
+      }
+    },
+    {
+      "label": "Client ID",
+      "description": "Your application's client ID from the OAuth client",
+      "group": "authentication",
+      "type": "String",
+      "feel": "optional",
+      "binding": {
+        "type": "zeebe:input",
+        "name": "authentication.clientId"
+      },
+      "constraints": {
+        "notEmpty": true
+      },
+      "condition": {
+        "property": "authenticationType",
+        "oneOf": [
+          "oauth-client-credentials-flow",
+          "oauth-password-flow"
+        ]
+      }
+    },
+    {
+      "label": "Client secret",
+      "description": "Your application's client secret from the OAuth client",
+      "group": "authentication",
+      "type": "String",
+      "feel": "optional",
+      "binding": {
+        "type": "zeebe:input",
+        "name": "authentication.clientSecretCC"
+      },
+      "constraints": {
+        "notEmpty": true
+      },
+      "condition": {
+        "property": "authenticationType",
+        "oneOf": [
+          "oauth-client-credentials-flow"
+        ]
+      }
+    },
+    {
+      "label": "Client secret",
+      "description": "Your application's client secret from the OAuth client",
+      "group": "authentication",
+      "type": "String",
+      "feel": "optional",
+      "optional": true,
+      "binding": {
+        "type": "zeebe:input",
+        "name": "authentication.clientSecretPW"
+      },
+      "condition": {
+        "property": "authenticationType",
+        "oneOf": [
+          "oauth-password-flow"
+        ]
+      }
+    },
+    {
+      "label": "Scopes",
+      "description": "The scopes which you want to request authorization for (e.g.read:contacts)",
+      "group": "authentication",
+      "type": "String",
+      "feel": "optional",
+      "optional": false,
+      "binding": {
+        "type": "zeebe:input",
+        "name": "authentication.scopes"
+      },
+      "constraints": {
+        "notEmpty": true
+      },
+      "condition": {
+        "property": "authenticationType",
+        "oneOf": [
+          "oauth-client-credentials-flow",
+          "oauth-password-flow"
+        ]
+      }
+    },
+    {
+      "label": "Audience",
+      "description": "The unique identifier of the target API you want to access",
+      "group": "authentication",
+      "type": "String",
+      "feel": "optional",
+      "optional": true,
+      "binding": {
+        "type": "zeebe:input",
+        "name": "authentication.audience"
+      },
+      "condition": {
+        "property": "authenticationType",
+        "oneOf": [
+          "oauth-client-credentials-flow",
+          "oauth-password-flow"
+        ]
+      }
+    },
+    {
+      "label": "Client authentication",
+      "id": "clientAuthentication",
+      "group": "authentication",
+      "description": "Send client ID and client secret as Basic Auth request in the header, or as client credentials in the request body",
+      "value": "basicAuthHeader",
+      "type": "Dropdown",
+      "choices": [
+        {
+          "name": "Send client credentials in body",
+          "value": "credentialsBody"
+        },
+        {
+          "name": "Send as Basic Auth header",
+          "value": "basicAuthHeader"
+        }
+      ],
+      "binding": {
+        "type": "zeebe:input",
+        "name": "authentication.clientAuthentication"
+      },
+      "condition": {
+        "property": "authenticationType",
+        "oneOf": [
+          "oauth-client-credentials-flow",
+          "oauth-password-flow"
+        ]
+      }
+    },
+    {
+      "label": "Username",
+      "group": "authentication",
+      "type": "String",
+      "feel": "optional",
+      "binding": {
+        "type": "zeebe:input",
+        "name": "authentication.username"
+      },
+      "constraints": {
+        "notEmpty": true
+      },
+      "condition": {
+        "property": "authenticationType",
+        "oneOf": [
+          "basic",
+          "oauth-password-flow"
+        ]
+      }
+    },
+    {
+      "label": "Password",
+      "group": "authentication",
+      "type": "String",
+      "feel": "optional",
+      "binding": {
+        "type": "zeebe:input",
+        "name": "authentication.password"
+      },
+      "constraints": {
+        "notEmpty": true
+      },
+      "condition": {
+        "property": "authenticationType",
+        "oneOf": [
+          "basic",
+          "oauth-password-flow"
+        ]
       }
     },
     {
@@ -156,7 +405,10 @@
       },
       "condition": {
         "property": "kubeflowapi.api",
-        "oneOf": ["pipelinesV1", "pipelinesV2"]
+        "oneOf": [
+          "pipelinesV1",
+          "pipelinesV2"
+        ]
       }
     },
     {
@@ -176,7 +428,10 @@
       },
       "condition": {
         "property": "kubeflowapi.operation",
-        "oneOf": ["start_run", "start_run_and_monitor"]
+        "oneOf": [
+          "start_run",
+          "start_run_and_monitor"
+        ]
       }
     },
     {
@@ -196,7 +451,10 @@
       },
       "condition": {
         "property": "kubeflowapi.operation",
-        "oneOf": ["start_run", "start_run_and_monitor"]
+        "oneOf": [
+          "start_run",
+          "start_run_and_monitor"
+        ]
       }
     },
     {
@@ -216,7 +474,9 @@
       },
       "condition": {
         "property": "kubeflowapi.operation",
-        "oneOf": ["create_experiment"]
+        "oneOf": [
+          "create_experiment"
+        ]
       }
     },
     {
@@ -233,7 +493,9 @@
       },
       "condition": {
         "property": "kubeflowapi.operation",
-        "oneOf": ["create_experiment"]
+        "oneOf": [
+          "create_experiment"
+        ]
       }
     },
     {
@@ -258,7 +520,9 @@
       },
       "condition": {
         "property": "kubeflowapi.operation",
-        "oneOf": ["start_run_and_monitor"]
+        "oneOf": [
+          "start_run_and_monitor"
+        ]
       }
     },
     {
@@ -278,13 +542,15 @@
       },
       "condition": {
         "property": "kubeflowapi.operation",
-        "oneOf": ["get_run_by_id"]
+        "oneOf": [
+          "get_run_by_id"
+        ]
       }
     },
     {
       "id": "kubeflowapi.runName",
       "label": "Run Name",
-      "description": "Specify the name of the run.",
+      "description": "Specify the name of the run. When starting a run, the actual is being prepended, by 'processInstanceId_'.",
       "type": "String",
       "group": "kubeflowapi",
       "feel": "optional",
@@ -294,11 +560,35 @@
       },
       "binding": {
         "type": "zeebe:input",
-        "name": "kubeflowapi.filter"
+        "name": "kubeflowapi.runName"
       },
       "condition": {
         "property": "kubeflowapi.operation",
-        "oneOf": ["get_run_by_name"]
+        "oneOf": [
+          "get_run_by_name",
+          "start_run",
+          "start_run_and_monitor"
+        ]
+      }
+    },
+    {
+      "id": "kubeflowapi.runParameters",
+      "label": "Run parameters",
+      "description": "Specify the parameters of the run if any needed.",
+      "type": "Text",
+      "group": "kubeflowapi",
+      "feel": "required",
+      "optional": true,
+      "binding": {
+        "type": "zeebe:input",
+        "name": "kubeflowapi.runParameters"
+      },
+      "condition": {
+        "property": "kubeflowapi.operation",
+        "oneOf": [
+          "start_run",
+          "start_run_and_monitor"
+        ]
       }
     },
     {
@@ -315,12 +605,29 @@
       },
       "condition": {
         "property": "kubeflowapi.operation",
-        "oneOf": ["get_pipelines", "get_experiments", "get_runs"]
+        "oneOf": [
+          "get_pipelines",
+          "get_experiments",
+          "get_runs"
+        ]
+      }
+    },
+    {
+      "id": "kubeflowapi.httpHeaders",
+      "label": "HTTP Headers",
+      "description": "Specify headers to be sent with the request, if any.",
+      "type": "String",
+      "feel": "required",
+      "group": "kubeflowapi",
+      "optional": true,
+      "binding": {
+        "type": "zeebe:input",
+        "name": "kubeflowapi.httpHeaders"
       }
     },
     {
       "label": "Result Variable",
-      "description": "Name of variable to store the response in.",
+      "description": "Name of variable to store the response in. Details in the <a href=\"https://docs.camunda.io/docs/components/connectors/use-connectors/#result-variable\" target=\"_blank\">documentation</a>",
       "type": "String",
       "group": "output",
       "binding": {
@@ -330,13 +637,46 @@
     },
     {
       "label": "Result Expression",
-      "description": "Expression to map the response into process variables.",
-      "type": "Text",
+      "description": "Expression to map the response into process variables. Details in the <a href=\"https://docs.camunda.io/docs/components/connectors/use-connectors/#result-expression\" target=\"_blank\">documentation</a>",
+      "type": "String",
       "group": "output",
       "feel": "required",
+      "value": "={result: state}",
       "binding": {
         "type": "zeebe:taskHeader",
         "key": "resultExpression"
+      }
+    },
+    {
+      "id": "timeout.connectionTimeoutInSeconds",
+      "label": "Connection timeout",
+      "description": "Sets the timeout in seconds to establish a connection or 0 for an infinite timeout",
+      "group": "timeout",
+      "type": "String",
+      "value": "20",
+      "binding": {
+        "type": "zeebe:input",
+        "name": "timeout.connectionTimeoutInSeconds"
+      },
+      "optional": true,
+      "feel": "optional",
+      "constraints": {
+        "notEmpty": false,
+        "pattern": {
+          "value": "^(=.+|[0-9]+|\\{\\{secrets\\..+\\}\\})$",
+          "message": "Must be a timeout in seconds (default value is 20 seconds) or a FEEL expression"
+        }
+      }
+    },
+    {
+      "label": "Error expression",
+      "description": "Expression to handle errors. Details in the <a href=\"https://docs.camunda.io/docs/components/connectors/use-connectors/#bpmn-errors\" target=\"_blank\">documentation</a>",
+      "group": "errors",
+      "type": "Text",
+      "feel": "required",
+      "binding": {
+        "type": "zeebe:taskHeader",
+        "key": "errorExpression"
       }
     }
   ],
