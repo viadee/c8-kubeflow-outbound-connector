@@ -15,7 +15,7 @@ public class DexLoginIT extends BaseIntegrationTest {
     // Run a plain request against the url to check the response code
     java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
         .uri(new URL(configuration.kubeflowUrl()).toURI())
-        .header("Cookie", configuration.cookievalue())
+        .header("Cookie", this.getCookie())
         .GET()
         .build();
 
