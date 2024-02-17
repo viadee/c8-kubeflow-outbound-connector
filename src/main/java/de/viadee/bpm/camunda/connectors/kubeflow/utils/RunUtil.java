@@ -15,7 +15,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import io.swagger.client.model.V1ApiListRunsResponse;
 import io.swagger.client.model.V1ApiParameter;
 import io.swagger.client.model.V1ApiRun;
-import io.swagger.client.model.V1ApiRunDetail;
 import io.swagger.client.model.V2beta1ListRunsResponse;
 import io.swagger.client.model.V2beta1Run;
 

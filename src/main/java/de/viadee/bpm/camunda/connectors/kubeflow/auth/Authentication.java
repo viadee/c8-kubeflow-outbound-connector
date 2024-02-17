@@ -21,8 +21,6 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-import io.camunda.connector.generator.annotation.TemplateDiscriminatorProperty;
-
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({
   @JsonSubTypes.Type(value = EnvironmentAuthentication.class, name = EnvironmentAuthentication.TYPE),
@@ -32,12 +30,6 @@ import io.camunda.connector.generator.annotation.TemplateDiscriminatorProperty;
   @JsonSubTypes.Type(value = OAuthAuthenticationPasswordFlow.class, name = OAuthAuthenticationPasswordFlow.TYPE),
   @JsonSubTypes.Type(value = BearerAuthentication.class, name = BearerAuthentication.TYPE)
 })
-@TemplateDiscriminatorProperty(
-    label = "Type",
-    group = "authentication",
-    name = "type",
-    defaultValue = EnvironmentAuthentication.TYPE,
-    description = "Choose the authentication type. Select 'None' if no authentication is necessary and 'Environment' to use settings defined in connector runtime.")
 public abstract sealed class Authentication
     permits EnvironmentAuthentication,
         BasicAuthentication,

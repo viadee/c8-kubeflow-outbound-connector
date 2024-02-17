@@ -5,7 +5,7 @@ import java.util.Objects;
 import de.viadee.bpm.camunda.connectors.kubeflow.auth.Authentication;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.Configuration;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.KubeflowApi;
-import io.camunda.connector.generator.annotation.TemplateProperty;
+import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.Timeout;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
@@ -17,17 +17,18 @@ public class KubeflowConnectorRequest {
     @Valid
     @NotNull
     private KubeflowApi kubeflowapi;
-    @TemplateProperty(group = "timeout", defaultValue = "20", optional = false, description = "Sets the timeout in seconds to establish a connection or 0 for an infinite timeout")
-    private Integer connectionTimeoutInSeconds;
+    @Valid
+    @NotNull
+    private Timeout timeout;
 
     public KubeflowConnectorRequest(){};
 
     public KubeflowConnectorRequest(Authentication authentication, Configuration configuration,
-            KubeflowApi kubeflowapi, Integer connectionTimeoutInSeconds) {
+            KubeflowApi kubeflowapi, Timeout timeout) {
         this.authentication = authentication;
         this.configuration = configuration;
         this.kubeflowapi = kubeflowapi;
-        this.connectionTimeoutInSeconds = connectionTimeoutInSeconds;
+        this.timeout = timeout;
     }
 
     public Authentication getAuthentication() {
@@ -54,12 +55,12 @@ public class KubeflowConnectorRequest {
         this.kubeflowapi = kubeflowapi;
     }
 
-    public Integer getConnectionTimeoutInSeconds() {
-        return this.connectionTimeoutInSeconds;
+    public Timeout getTimeout() {
+        return this.timeout;
     }
 
-    public void setConnectionTimeoutInSeconds(Integer connectionTimeoutInSeconds) {
-        this.connectionTimeoutInSeconds = connectionTimeoutInSeconds;
+    public void setTimeout(Timeout timeout) {
+        this.timeout = timeout;
     }
 
     @Override
@@ -70,7 +71,7 @@ public class KubeflowConnectorRequest {
             return false;
             KubeflowConnectorRequest that = (KubeflowConnectorRequest) o;
         return Objects.equals(authentication, that.authentication)
-                && Objects.equals(connectionTimeoutInSeconds, that.connectionTimeoutInSeconds)
+                && Objects.equals(timeout, that.timeout)
                 && Objects.equals(configuration, that.configuration)
                 && Objects.equals(kubeflowapi, that.kubeflowapi);
     }
@@ -78,7 +79,7 @@ public class KubeflowConnectorRequest {
     @Override
     public int hashCode() {
         return Objects.hash(
-                authentication, connectionTimeoutInSeconds, configuration, kubeflowapi);
+                authentication, timeout, configuration, kubeflowapi);
     }
 
     @Override
@@ -86,11 +87,13 @@ public class KubeflowConnectorRequest {
         return "KubeflowConnectorRequest{"
                 + ", authentication="
                 + authentication
-                + ", connectionTimeoutInSeconds='"
-                + connectionTimeoutInSeconds
+                + '\''
+                + ", timeout='"
+                + timeout
                 + '\''
                 + ", configuration="
                 + configuration
+                + '\''
                 + ", kubeflowapi="
                 + kubeflowapi
                 + '}';

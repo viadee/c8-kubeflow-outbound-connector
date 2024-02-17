@@ -20,19 +20,19 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.http.HttpHeaders;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.ContentType;
 
-import de.viadee.bpm.camunda.connectors.kubeflow.auth.Authentication;
 import de.viadee.bpm.camunda.connectors.kubeflow.auth.BasicAuthentication;
 import de.viadee.bpm.camunda.connectors.kubeflow.auth.BearerAuthentication;
-import de.viadee.bpm.camunda.connectors.kubeflow.auth.Constants;
-import de.viadee.bpm.camunda.connectors.kubeflow.auth.EnvironmentAuthentication;
-import de.viadee.bpm.camunda.connectors.kubeflow.auth.NoAuthentication;
 import de.viadee.bpm.camunda.connectors.kubeflow.auth.OAuthAuthenticationClientCredentialsFlow;
 import de.viadee.bpm.camunda.connectors.kubeflow.auth.OAuthAuthenticationPasswordFlow;
+import de.viadee.bpm.camunda.connectors.kubeflow.auth.OAuthParamsEnum;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
 import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApiOperationsEnum;
 import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApisEnum;
+import de.viadee.bpm.camunda.connectors.kubeflow.utils.AuthUtil;
 import de.viadee.bpm.camunda.connectors.kubeflow.utils.JsonHelper;
 
 public class KubeflowConnectorExecutor {
@@ -44,24 +44,6 @@ public class KubeflowConnectorExecutor {
             "NAMESPACE");
     private static final String URI_PARAMETER_V1_ID = "resource_reference_key.id";
     private static final String URI_PARAMETER_V2_NS = "namespace";
-
-    private static final String KUBEFLOW_AUTH_MODE = "KF_AUTH_MODE";
-    private static final String KUBEFLOW_AUTH_MODE_NONE = "none";
-    private static final String KUBEFLOW_AUTH_MODE_BASIC = "basic";
-    private static final String KUBEFLOW_AUTH_MODE_BEARER = "bearer";
-    private static final String KUBEFLOW_AUTH_MODE_OAUTH_CC = "oauth_cc";
-    private static final String KUBEFLOW_AUTH_MODE_OAUTH_PASSWORD = "oauth_password";
-    private static final String KUBEFLOW_AUTH_BASIC_USERNAME = "KF_AUTH_BASIC_USERNAME";
-    private static final String KUBEFLOW_AUTH_BASIC_PASSWORD = "KF_AUTH_BASIC_PASSWORD";
-    private static final String KUBEFLOW_AUTH_BEARER_TOKEN = "KF_AUTH_BEARER_TOKEN";
-    private static final String KUBEFLOW_AUTH_OAUTH_TOKEN_ENDPOINT = "KF_AUTH_OAUTH_TOKEN_ENDPOINT";
-    private static final String KUBEFLOW_AUTH_OAUTH_CLIENT_ID = "KF_AUTH_OAUTH_CLIENT_ID";
-    private static final String KUBEFLOW_AUTH_OAUTH_CLIENT_SECRET = "KF_AUTH_OAUTH_CLIENT_SECRET";
-    private static final String KUBEFLOW_AUTH_OAUTH_SCOPES = "KF_AUTH_OAUTH_SCOPES";
-    private static final String KUBEFLOW_AUTH_OAUTH_AUDIENCE = "KF_AUTH_OAUTH_AUDIENCE";
-    private static final String KUBEFLOW_AUTH_OAUTH_CLIENT_AUTH = "KF_AUTH_OAUTH_CLIENT_AUTH";
-    private static final String KUBEFLOW_AUTH_OAUTH_USERNAME = "KF_AUTH_OAUTH_USERNAME";
-    private static final String KUBEFLOW_AUTH_OAUTH_PASSWORD = "KF_AUTH_OAUTH_PASSWORD";
 
     protected long processInstanceKey;
     protected KubeflowConnectorRequest connectorRequest;
@@ -80,9 +62,9 @@ public class KubeflowConnectorExecutor {
         this.kubeflowApisEnum = kubeflowApisEnum;
         this.kubeflowApiOperationsEnum = kubeflowApiOperationsEnum;
         this.httpClient = HttpClient.newBuilder()
-                .connectTimeout(Duration.ofSeconds(connectorRequest.getConnectionTimeoutInSeconds())).build();
+                .connectTimeout(Duration.ofSeconds(connectorRequest.getTimeout().connectionTimeoutInSeconds())).build();
 
-        setAuthenticationParameters();
+        AuthUtil.setAuthenticationParameters(connectorRequest);
         setConfigurationParameters();
 
         buildHttpRequest();
@@ -91,7 +73,7 @@ public class KubeflowConnectorExecutor {
     public HttpResponse<String> execute() {
         try {
             HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() != 200) {
+            if (response.statusCode() >= 300) {
                 throw new RuntimeException("Error while running request against kubeflow server: " + httpRequest.uri()
                         + " - " + response.body());
             }
@@ -115,71 +97,6 @@ public class KubeflowConnectorExecutor {
 
     protected String getFilterString() {
         return connectorRequest.getKubeflowapi().filter();
-    }
-
-    private void setAuthenticationParameters() {
-        Authentication authPropertyGroup = connectorRequest.getAuthentication();
-
-        if (authPropertyGroup instanceof EnvironmentAuthentication) {
-            String authMode = System.getenv(KUBEFLOW_AUTH_MODE);
-            if (authMode.equals(KUBEFLOW_AUTH_MODE_NONE)) {
-                NoAuthentication noAuthentication = new NoAuthentication();
-                connectorRequest.setAuthentication(noAuthentication);
-            } else if (authMode.equals(KUBEFLOW_AUTH_MODE_BASIC)) {
-                BasicAuthentication basicAuthentication = (BasicAuthentication) authPropertyGroup;
-                basicAuthentication.setUsername(System.getenv(KUBEFLOW_AUTH_BASIC_USERNAME));
-                basicAuthentication.setPassword(System.getenv(KUBEFLOW_AUTH_BASIC_PASSWORD));
-                connectorRequest.setAuthentication(basicAuthentication);
-
-                if (StringUtils.isBlank(basicAuthentication.getUsername()) || StringUtils.isBlank(basicAuthentication.getPassword())) {
-                    throw new RuntimeException("Authentication parameters missing for basic authentication in environment! Required are username and password.");
-                }
-            } else if (authMode.equals(KUBEFLOW_AUTH_MODE_BEARER)) {
-                BearerAuthentication bearerAuthentication = (BearerAuthentication) authPropertyGroup;
-                bearerAuthentication.setToken(System.getenv(KUBEFLOW_AUTH_BEARER_TOKEN));
-                connectorRequest.setAuthentication(bearerAuthentication);
-                if (StringUtils.isBlank(bearerAuthentication.getToken())) {
-                    throw new RuntimeException("Authentication parameters missing for bearer authentication in environment! Required is token.");
-                }
-            } else if (authMode.equals(KUBEFLOW_AUTH_MODE_OAUTH_CC)) {
-                OAuthAuthenticationClientCredentialsFlow oAuthAuthenticationClientCredentialsFlow = new OAuthAuthenticationClientCredentialsFlow();
-                oAuthAuthenticationClientCredentialsFlow.setOauthTokenEndpoint(System.getenv(KUBEFLOW_AUTH_OAUTH_TOKEN_ENDPOINT));
-                oAuthAuthenticationClientCredentialsFlow.setClientId(System.getenv(KUBEFLOW_AUTH_OAUTH_CLIENT_ID));
-                oAuthAuthenticationClientCredentialsFlow.setClientSecretCC(System.getenv(KUBEFLOW_AUTH_OAUTH_CLIENT_SECRET));
-                oAuthAuthenticationClientCredentialsFlow.setScopes(System.getenv(KUBEFLOW_AUTH_OAUTH_SCOPES));
-                oAuthAuthenticationClientCredentialsFlow.setAudience(System.getenv(KUBEFLOW_AUTH_OAUTH_AUDIENCE));
-                oAuthAuthenticationClientCredentialsFlow.setClientAuthentication(System.getenv(KUBEFLOW_AUTH_OAUTH_CLIENT_AUTH));
-                connectorRequest.setAuthentication(oAuthAuthenticationClientCredentialsFlow);
-                if (StringUtils.isBlank(oAuthAuthenticationClientCredentialsFlow.getOauthTokenEndpoint()) 
-                    || StringUtils.isBlank(oAuthAuthenticationClientCredentialsFlow.getClientId())
-                    || StringUtils.isBlank(oAuthAuthenticationClientCredentialsFlow.getClientSecretCC())
-                    || StringUtils.isBlank(oAuthAuthenticationClientCredentialsFlow.getScopes())
-                    || StringUtils.isBlank(oAuthAuthenticationClientCredentialsFlow.getClientAuthentication())
-                    ) {
-                    throw new RuntimeException("Authentication parameters missing for OAuth (client-credentials flow) authentication in environment! Required are token endpoint, clientId, clientSecret, scopes and client authentication.");
-                }
-            } else if (authMode.equals(KUBEFLOW_AUTH_MODE_OAUTH_PASSWORD)) {
-                OAuthAuthenticationPasswordFlow oAuthAuthenticationPasswordFlow = (OAuthAuthenticationPasswordFlow) authPropertyGroup;
-                oAuthAuthenticationPasswordFlow.setOauthTokenEndpoint(System.getenv(KUBEFLOW_AUTH_OAUTH_TOKEN_ENDPOINT));
-                oAuthAuthenticationPasswordFlow.setClientId(System.getenv(KUBEFLOW_AUTH_OAUTH_CLIENT_ID));
-                oAuthAuthenticationPasswordFlow.setClientSecretPW(System.getenv(KUBEFLOW_AUTH_OAUTH_CLIENT_SECRET));
-                oAuthAuthenticationPasswordFlow.setScopes(System.getenv(KUBEFLOW_AUTH_OAUTH_SCOPES));
-                oAuthAuthenticationPasswordFlow.setAudience(System.getenv(KUBEFLOW_AUTH_OAUTH_AUDIENCE));
-                oAuthAuthenticationPasswordFlow.setClientAuthentication(System.getenv(KUBEFLOW_AUTH_OAUTH_CLIENT_AUTH));
-                oAuthAuthenticationPasswordFlow.setUsername(System.getenv(KUBEFLOW_AUTH_OAUTH_USERNAME));
-                oAuthAuthenticationPasswordFlow.setPassword(System.getenv(KUBEFLOW_AUTH_OAUTH_PASSWORD));
-                connectorRequest.setAuthentication(oAuthAuthenticationPasswordFlow);
-                if (StringUtils.isBlank(oAuthAuthenticationPasswordFlow.getOauthTokenEndpoint()) 
-                    || StringUtils.isBlank(oAuthAuthenticationPasswordFlow.getClientId())
-                    || StringUtils.isBlank(oAuthAuthenticationPasswordFlow.getScopes())
-                    || StringUtils.isBlank(oAuthAuthenticationPasswordFlow.getClientAuthentication())
-                    || StringUtils.isBlank(oAuthAuthenticationPasswordFlow.getUsername())
-                    || StringUtils.isBlank(oAuthAuthenticationPasswordFlow.getPassword())
-                    ) {
-                    throw new RuntimeException("Authentication parameters missing for OAuth (password flow) authentication in environment! Required are token endpoint, clientId, scopes, client authentication, username and password.");
-                }
-            }
-        }
     }
 
     private void setConfigurationParameters() {
@@ -206,7 +123,7 @@ public class KubeflowConnectorExecutor {
         Builder httpRequestBuilder = HttpRequest.newBuilder()
                 .method(kubeflowApiOperationsEnum.getHttpMethod(), bodyPublisher)
                 .uri(URI.create(url))
-                .setHeader("User-Agent", "Kubeflow Camunda Connector");
+                .setHeader(HttpHeaders.USER_AGENT, "Kubeflow Camunda Connector");
 
         setAuthentication(httpRequestBuilder);
         setHeaders(httpRequestBuilder);
@@ -219,27 +136,27 @@ public class KubeflowConnectorExecutor {
             httpHeadersFromPropertiesPanel.keySet().forEach(key -> httpRequestBuilder
                 .setHeader(key, httpHeadersFromPropertiesPanel.get(key)));
         }
-        httpRequestBuilder.setHeader("Content-Type", "application/json");
+        httpRequestBuilder.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.toString());
     }
 
     private void setAuthentication(Builder httpRequestBuilder) {
         if (connectorRequest.getAuthentication() instanceof BasicAuthentication) {
             BasicAuthentication basicAuthentication = (BasicAuthentication) connectorRequest.getAuthentication();
-            httpRequestBuilder.setHeader("Authorization",
+            httpRequestBuilder.setHeader(HttpHeaders.AUTHORIZATION,
                     getBasicAuthenticationHeader(basicAuthentication.getUsername(), basicAuthentication.getPassword()));
         } else if (connectorRequest.getAuthentication() instanceof BearerAuthentication) {
             BearerAuthentication bearerAuthentication = (BearerAuthentication) connectorRequest.getAuthentication();
-            httpRequestBuilder.setHeader("Authorization", "Bearer " + bearerAuthentication.getToken());
+            httpRequestBuilder.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + bearerAuthentication.getToken());
         } else if (connectorRequest.getAuthentication() instanceof OAuthAuthenticationClientCredentialsFlow) {
             OAuthAuthenticationClientCredentialsFlow oAuthAuthentication = (OAuthAuthenticationClientCredentialsFlow) connectorRequest
                     .getAuthentication();
             String accessToken = getAccessTokenFromClientCredentialsFlow(oAuthAuthentication);
-            httpRequestBuilder.setHeader("Authorization", "Bearer " + accessToken);
+            httpRequestBuilder.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
         } else if (connectorRequest.getAuthentication() instanceof OAuthAuthenticationPasswordFlow) {
             OAuthAuthenticationPasswordFlow oAuthAuthenticationPasswordFlow = (OAuthAuthenticationPasswordFlow) connectorRequest
                     .getAuthentication();
             String accessToken = getAccessTokenFromPasswordFlow(oAuthAuthenticationPasswordFlow);
-            httpRequestBuilder.setHeader("Authorization", "Bearer " + accessToken);
+            httpRequestBuilder.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
         } else {
             // no authentication
         }
@@ -268,7 +185,7 @@ public class KubeflowConnectorExecutor {
         if (filter != null) {
             // this regex removes all new lines and escaping of " before url encoding is
             filter = filter.replaceAll("[\\\\r]?\\\\n", "").replace("\\\"", "\"");
-            uriBuilder.addParameter(URI_PARAMETER_FILTER, URLEncoder.encode(filter, "UTF-8"));
+            uriBuilder.addParameter(URI_PARAMETER_FILTER, URLEncoder.encode(filter, StandardCharsets.UTF_8.toString()));
         }
     }
 
@@ -309,10 +226,10 @@ public class KubeflowConnectorExecutor {
     private String getAccessTokenFromClientCredentialsFlow(OAuthAuthenticationClientCredentialsFlow authentication) {
         String serviceUrl = authentication.getOauthTokenEndpoint();
         Map<String, Object> data = new HashMap<>();
-        data.put("grant_type", authentication.getGrantType());
-        data.put("client_id", authentication.getClientId());
-        data.put("client_secret", authentication.getClientSecretCC());
-        data.put("scope", authentication.getScopes());
+        data.put(OAuthParamsEnum.GRANT_TYPE.toString(), authentication.getGrantType());
+        data.put(OAuthParamsEnum.CLIENT_ID.toString(), authentication.getClientId());
+        data.put(OAuthParamsEnum.CLIENT_SECRET.toString(), authentication.getClientSecretCC());
+        data.put(OAuthParamsEnum.SCOPE.toString(), authentication.getScopes());
 
         return requestAccessToken(serviceUrl, data);
     }
@@ -321,12 +238,12 @@ public class KubeflowConnectorExecutor {
 
         String serviceUrl = authentication.getOauthTokenEndpoint();
         Map<String, Object> data = new HashMap<>();
-        data.put("username", authentication.getUsername());
-        data.put("password", authentication.getPassword());
-        data.put("grant_type", authentication.getGrantType());
-        data.put("client_id", authentication.getClientId());
-        data.put("client_secret", authentication.getClientSecretPW());
-        data.put("scope", authentication.getScopes());
+        data.put(OAuthParamsEnum.USERNAME.toString(), authentication.getUsername());
+        data.put(OAuthParamsEnum.PASSWORD.toString(), authentication.getPassword());
+        data.put(OAuthParamsEnum.GRANT_TYPE.toString(), authentication.getGrantType());
+        data.put(OAuthParamsEnum.CLIENT_ID.toString(), authentication.getClientId());
+        data.put(OAuthParamsEnum.CLIENT_SECRET.toString(), authentication.getClientSecretPW());
+        data.put(OAuthParamsEnum.SCOPE.toString(), authentication.getScopes());
 
         return requestAccessToken(serviceUrl, data);
     }
@@ -335,8 +252,8 @@ public class KubeflowConnectorExecutor {
         HttpRequest request = HttpRequest.newBuilder()
                 .method("POST", ofFormData(data))
                 .uri(URI.create(serviceUrl))
-                .setHeader("User-Agent", "Kubeflow Camunda Connector")
-                .header("Content-Type", "application/x-www-form-urlencoded")
+                .setHeader(HttpHeaders.USER_AGENT, "Kubeflow Camunda Connector")
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED.toString())
                 .build();
 
         try {
@@ -355,7 +272,7 @@ public class KubeflowConnectorExecutor {
 
     private String extractOAuthAccessToken(HttpResponse<String> oauthResponse) throws IOException {
         return Optional.ofNullable(JsonHelper.getAsJsonElement(oauthResponse.body(), JsonHelper.objectMapper))
-                .map(jsonNode -> jsonNode.findValue(Constants.ACCESS_TOKEN).asText())
+                .map(jsonNode -> jsonNode.findValue(OAuthParamsEnum.ACCESS_TOKEN.toString()).asText())
                 .orElse(null);
     }
 }

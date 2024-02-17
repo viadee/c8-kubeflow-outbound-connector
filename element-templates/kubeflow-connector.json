@@ -4,7 +4,7 @@
   "id": "de.viadee.bpm.camunda.connectors.kubeflow.v1",
   "description": "Connector for communicating with Kubeflow from Camunda",
   "documentationRef": "https://docs.camunda.io/docs/components/connectors/out-of-the-box-connectors/available-connectors-overview/",
-  "version": 2,
+  "version": 1,
   "category": {
     "id": "connectors",
     "name": "Connectors"
@@ -648,7 +648,7 @@
       }
     },
     {
-      "id": "connectionTimeoutInSeconds",
+      "id": "timeout.connectionTimeoutInSeconds",
       "label": "Connection timeout",
       "description": "Sets the timeout in seconds to establish a connection or 0 for an infinite timeout",
       "group": "timeout",
@@ -656,7 +656,7 @@
       "value": "20",
       "binding": {
         "type": "zeebe:input",
-        "name": "connectionTimeoutInSeconds"
+        "name": "timeout.connectionTimeoutInSeconds"
       },
       "optional": true,
       "feel": "optional",

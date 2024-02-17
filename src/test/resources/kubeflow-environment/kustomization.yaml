@@ -1,0 +1,74 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+sortOptions:
+  order: legacy
+  legacySortOptions:
+    orderFirst:
+      - Namespace
+      - ResourceQuota
+      - StorageClass
+      - CustomResourceDefinition
+      - MutatingWebhookConfiguration
+      - ServiceAccount
+      - PodSecurityPolicy
+      - Role
+      - ClusterRole
+      - RoleBinding
+      - ClusterRoleBinding
+      - ConfigMap
+      - Secret
+      - Endpoints
+      - Service
+      - LimitRange
+      - PriorityClass
+      - PersistentVolume
+      - PersistentVolumeClaim
+      - Deployment
+      - StatefulSet
+      - CronJob
+      - PodDisruptionBudget
+    orderLast:
+      - ValidatingWebhookConfiguration
+
+resources:
+  # Cert-Manager
+  - https://github.com/kubeflow/manifests//common/cert-manager/cert-manager/base/?timeout=120&ref=v1.8-branch
+  - https://github.com/kubeflow/manifests//common/cert-manager/kubeflow-issuer/base/?timeout=120&ref=v1.8-branch
+  # Istio
+  - https://github.com/kubeflow/manifests//common/istio-1-17/istio-crds/base/?timeout=120&ref=v1.8-branch
+  - https://github.com/kubeflow/manifests//common/istio-1-17/istio-namespace/base/?timeout=120&ref=v1.8-branch
+  - https://github.com/kubeflow/manifests//common/istio-1-17/istio-install/base/?timeout=120&ref=v1.8-branch
+  # OIDC Authservice
+  - https://github.com/kubeflow/manifests//common/oidc-client/oidc-authservice/base/?timeout=120&ref=v1.8-branch
+  # Dex
+  - https://github.com/kubeflow/manifests//common/dex/overlays/istio/?timeout=120&ref=v1.8-branch
+  # Kubeflow namespace
+  - https://github.com/kubeflow/manifests//common/kubeflow-namespace/base/?timeout=120&ref=v1.8-branch
+  # Kubeflow Roles
+  - https://github.com/kubeflow/manifests//common/kubeflow-roles/base/?timeout=120&ref=v1.8-branch
+  # Kubeflow Istio Resources
+  - https://github.com/kubeflow/manifests//common/istio-1-17/kubeflow-istio-resources/base/?timeout=120&ref=v1.8-branch
+
+  # Kubeflow Pipelines
+  - https://github.com/kubeflow/manifests//apps/pipeline/upstream/env/cert-manager/platform-agnostic-multi-user/?timeout=120&ref=v1.8-branch
+  # Central Dashboard
+  - https://github.com/kubeflow/manifests//apps/centraldashboard/upstream/overlays/kserve/?timeout=120&ref=v1.8-branch
+  # Admission Webhook
+  - https://github.com/kubeflow/manifests//apps/admission-webhook/upstream/overlays/cert-manager/?timeout=120&ref=v1.8-branch
+  # Profiles + KFAM
+  - https://github.com/kubeflow/manifests//apps/profiles/upstream/overlays/kubeflow/?timeout=120&ref=v1.8-branch
+  # User namespace
+  - https://github.com/kubeflow/manifests//common/user-namespace/base/?timeout=120&ref=v1.8-branch
+
+patches:
+  # Make the istio-ingressgateway a NodePort service.
+  # This way, we can access it locally.
+  - patch: |
+      - op: replace
+        path: /spec/type
+        value: NodePort
+    target:
+      kind: Service
+      name: istio-ingressgateway
+      namespace: istio-system

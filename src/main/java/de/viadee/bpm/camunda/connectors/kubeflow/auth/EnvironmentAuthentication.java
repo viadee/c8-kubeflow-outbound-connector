@@ -18,10 +18,6 @@ package de.viadee.bpm.camunda.connectors.kubeflow.auth;
 
 import java.util.Map;
 
-import io.camunda.connector.generator.annotation.TemplateProperty;
-import io.camunda.connector.generator.annotation.TemplateSubType;
-
-@TemplateSubType(id = EnvironmentAuthentication.TYPE, label = "Environment")
 public final class EnvironmentAuthentication extends Authentication {
 
   @Override
@@ -31,7 +27,6 @@ public final class EnvironmentAuthentication extends Authentication {
         + super.toString();
   }
 
-  @TemplateProperty(ignore = true)
   public static final String TYPE = "environment";
 
   @Override

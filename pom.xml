@@ -12,7 +12,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <!-- connector SDK version -->
-        <version.connectors>8.3.0</version.connectors>
+        <version.connectors>8.3.7</version.connectors>
         <!-- external libraries -->
         <version.assertj>3.24.2</version.assertj>
         <version.junit-jupiter>5.10.0</version.junit-jupiter>
@@ -27,6 +27,10 @@
         <plugin.version.maven-resources-plugin>3.3.1</plugin.version.maven-resources-plugin>
         <plugin.version.maven-shade-plugin>3.5.1</plugin.version.maven-shade-plugin>
         <plugin.version.maven-surefire-plugin>3.1.2</plugin.version.maven-surefire-plugin>
+        <plugin.version.maven-failsafe-plugin>3.2.5</plugin.version.maven-failsafe-plugin>
+        <skipTests>false</skipTests>
+        <skipUnitTests>${skipTests}</skipUnitTests>
+        <skipIntegrationTests>${skipTests}</skipIntegrationTests>
     </properties>
     <dependencies>
         <dependency>
@@ -45,13 +49,6 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>${version.slf4j}</version>
-        </dependency>
-        <!-- Element template generator annotations (compile-time only) -->
-        <dependency>
-            <groupId>io.camunda.connector</groupId>
-            <artifactId>element-template-generator</artifactId>
-            <version>${version.connectors}</version>
-            <optional>true</optional>
         </dependency>
         <!-- test dependencies -->
         <dependency>
@@ -129,7 +126,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.5.9</version>
+            <version>4.5.13</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jdk8 -->
@@ -143,6 +140,12 @@
             <groupId>io.camunda.connector</groupId>
             <artifactId>jackson-datatype-feel</artifactId>
             <version>${version.connectors}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.9</version>
         </dependency>
     </dependencies>
     <build>
@@ -309,15 +312,6 @@
                 <artifactId>maven-shade-plugin</artifactId>
             </plugin>
             <plugin>
-                <groupId>io.camunda.connector</groupId>
-                <artifactId>element-template-generator-maven-plugin</artifactId>
-                <configuration>
-                    <connectorClasses>
-                        <connectorClass>de.viadee.bpm.camunda.connectors.kubeflow.KubeflowConnectorFunction</connectorClass>
-                    </connectorClasses>
-                </configuration>
-            </plugin>
-            <plugin>
                 <!-- a hint for IDE's to add the java sources to the classpath -->
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
@@ -335,6 +329,33 @@
                                 <source>${project.build.directory}/generated-sources/v2beta1/src/main/java</source>
                             </sources>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${plugin.version.maven-surefire-plugin}</version>
+                <configuration>
+                    <skipTests>${skipUnitTests}</skipTests>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>${plugin.version.maven-failsafe-plugin}</version>
+                <configuration>
+                    <skipTests>${skipIntegrationTests}</skipTests>
+                    <includes>
+                        <include>**/*IT.java</include>
+                    </includes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
