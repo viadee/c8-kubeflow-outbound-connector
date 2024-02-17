@@ -1,20 +1,21 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.integration;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import de.viadee.bpm.camunda.connectors.kubeflow.utils.OffsetDateTimeDeserializer;
+import de.viadee.bpm.camunda.connectors.kubeflow.auth.NoAuthentication;
+import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
+import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.KubeflowApi;
+import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.Timeout;
+import de.viadee.bpm.camunda.connectors.kubeflow.services.KubeflowConnectorExecutor;
+import de.viadee.bpm.camunda.connectors.kubeflow.services.async.ExecutionHandler;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
 import java.net.URISyntaxException;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.Configuration;
 import de.viadee.bpm.camunda.connectors.kubeflow.integration.util.KubeflowLogin;
-import org.threeten.bp.OffsetDateTime;
 
 public class BaseIntegrationTest {
 
@@ -69,7 +70,7 @@ public class BaseIntegrationTest {
 
   private String getEnvOrDefault(String env, String defaultValue) {
     String value = System.getenv(env);
-    return value != null ? value : defaultValue;
+    return value == null ? defaultValue : value;
   }
 
   protected Configuration getConfiguration() {
@@ -82,5 +83,18 @@ public class BaseIntegrationTest {
     String cookie = KubeflowLogin.getIstioAuthSession(this.getConfiguration().kubeflowUrl(), username, password);
 
     return cookie;
+  }
+
+  protected KubeflowConnectorExecutor getExecutor(String pipelineVersion, String operation, String experimentName)
+      throws IOException, URISyntaxException, InterruptedException {
+    var httpHeaders = Map.of("Cookie", this.getCookie());
+    KubeflowApi kubeflowApi = new KubeflowApi(pipelineVersion, operation, null, null,
+        null, null, null, null, null, experimentName, null, httpHeaders);
+    KubeflowConnectorRequest kubeflowConnectorRequest = new KubeflowConnectorRequest(
+        new NoAuthentication(), // Authentication via Headers
+        this.getConfiguration(),
+        kubeflowApi,
+        new Timeout(20));
+    return ExecutionHandler.getExecutor(kubeflowConnectorRequest, 0);
   }
 }
