@@ -7,6 +7,7 @@ import de.viadee.bpm.camunda.connectors.kubeflow.auth.NoAuthentication;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.Configuration;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.KubeflowApi;
+import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.Timeout;
 import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApiOperationsEnum;
 import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApisEnum;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,7 +31,7 @@ class KubeflowConnectorExecutorTest {
         new NoAuthentication(),
         new Configuration(kubeflowUrl, multiusernamespace),
         kubeflowApiMock,
-        20
+        new Timeout(20)
     );
     // when
     KubeflowConnectorExecutor kubeflowConnectorExecutor = new KubeflowConnectorExecutor(kubeflowConnectorRequest, 123456789,
