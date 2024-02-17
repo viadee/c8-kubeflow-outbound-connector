@@ -74,4 +74,25 @@ class KubeflowConnectorFunctionTest {
     assertThat(result)
         .isInstanceOf(IllegalArgumentException.class);
   }
+
+  @ParameterizedTest
+  @CsvSource(value = {"localhost:8080", "www.localhost:0", "http:/kubeflow:2020"})
+  void failOnExecuteWhenConfigurationHasInvalidURL(String url) throws Exception {
+    // given
+    var kubeflowConnectorRequest = new KubeflowConnectorRequest(
+        new NoAuthentication(),
+        new Configuration(url, "testNamespace"),
+        new KubeflowApi("pipelinesV1", "get_pipelines", null, null,
+            null, null, null, null, null, null, null, null),
+        20
+    );
+    var context = OutboundConnectorContextBuilder.create()
+        .variables(objectMapper.writeValueAsString(kubeflowConnectorRequest))
+        .build();
+    // when
+    var result = catchThrowable(() -> kubeflowConnectorFunction.execute(context));
+    // then
+    assertThat(result)
+        .isInstanceOf(IllegalArgumentException.class);
+  }
 }

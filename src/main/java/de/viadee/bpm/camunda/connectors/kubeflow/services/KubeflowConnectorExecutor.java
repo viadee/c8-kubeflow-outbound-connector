@@ -70,8 +70,7 @@ public class KubeflowConnectorExecutor {
     protected HttpRequest httpRequest;
     protected HttpClient httpClient;
     protected String kubeflowMultiNs;
-
-    private String kubeflowUrl;
+    protected String kubeflowUrl;
 
     public KubeflowConnectorExecutor(KubeflowConnectorRequest connectorRequest, long processInstanceKey,
             KubeflowApisEnum kubeflowApisEnum,
@@ -190,8 +189,8 @@ public class KubeflowConnectorExecutor {
         kubeflowMultiNs = System.getenv(KUBEFLOW_NAMESPACE_ENV);
 
         if (configPropertyGroup != null) {
-            kubeflowUrl = configPropertyGroup.kubeflowUrl() == null ? kubeflowUrl : configPropertyGroup.kubeflowUrl();
-            kubeflowMultiNs = configPropertyGroup.multiusernamespace() == null ? kubeflowMultiNs
+            kubeflowUrl = StringUtils.isBlank(configPropertyGroup.kubeflowUrl()) ? kubeflowUrl : configPropertyGroup.kubeflowUrl();
+            kubeflowMultiNs = StringUtils.isBlank(configPropertyGroup.multiusernamespace()) ? kubeflowMultiNs
                     : configPropertyGroup.multiusernamespace();
         }
 

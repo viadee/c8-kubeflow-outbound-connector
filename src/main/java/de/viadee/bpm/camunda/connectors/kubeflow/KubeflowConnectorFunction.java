@@ -43,6 +43,7 @@ public class KubeflowConnectorFunction implements OutboundConnectorFunction {
       throw new RuntimeException(response.body());
     }
 
+    // TODO retun httpResponse and not only httpResponse.body
     ObjectMapper mapper = new ObjectMapper();
     TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
     };

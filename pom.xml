@@ -246,6 +246,13 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${plugin.version.maven-surefire-plugin}</version>
+                    <configuration>
+                        <!--set env vars for KubeflowConnectorExecutorTest.java-->
+                        <environmentVariables>
+                            <KF_CONNECTOR_URL>http://localhost:8080</KF_CONNECTOR_URL>
+                            <KF_CONNECTOR_MULTIUSER_NS>testNamespace</KF_CONNECTOR_MULTIUSER_NS>
+                        </environmentVariables>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
