@@ -7,10 +7,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 public class PipelinesIT extends BaseIntegrationTest {
 
-  private HttpResponse<String> getPipelines(String pipelineVersion) throws Exception {
-    return getExecutor(pipelineVersion, "get_pipelines", null).execute();
-  }
-
   @ParameterizedTest
   @CsvSource({"pipelinesV1", "pipelinesV2"})
   public void testGetPipelines(String pipelineVersion) throws Exception {
