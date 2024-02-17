@@ -1,4 +1,4 @@
-package de.viadee.bpm.camunda.connectors.kubeflow.unit.async;
+package de.viadee.bpm.camunda.connectors.kubeflow.async;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

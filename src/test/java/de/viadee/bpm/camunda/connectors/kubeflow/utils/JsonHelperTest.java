@@ -1,4 +1,4 @@
-package de.viadee.bpm.camunda.connectors.kubeflow.unit.utils;
+package de.viadee.bpm.camunda.connectors.kubeflow.utils;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.doReturn;
