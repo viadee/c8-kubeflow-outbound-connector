@@ -550,7 +550,7 @@
     {
       "id": "kubeflowapi.runName",
       "label": "Run Name",
-      "description": "Specify the name of the run. When starting a run, the actual is being prepended, by 'processInstanceId_'.",
+      "description": "Specify the suffix of the name of the run.",
       "type": "String",
       "group": "kubeflowapi",
       "feel": "optional",
