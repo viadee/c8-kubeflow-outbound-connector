@@ -6,6 +6,7 @@ import de.viadee.bpm.camunda.connectors.kubeflow.auth.NoAuthentication;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.Configuration;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.KubeflowApi;
+import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.Timeout;
 import de.viadee.bpm.camunda.connectors.kubeflow.services.KubeflowConnectorExecutor;
 import de.viadee.bpm.camunda.connectors.kubeflow.services.async.ExecutionHandler;
 import io.camunda.connector.api.error.ConnectorInputException;
@@ -41,7 +42,7 @@ class KubeflowConnectorFunctionTest {
         new Configuration("http://localhost:8281", "testNamespace"),
         new KubeflowApi(api, operation, null, null,
             null, null, null, null, null, null, null, null),
-        20
+        new Timeout(20)
     );
     var context = OutboundConnectorContextBuilder.create()
         .variables(objectMapper.writeValueAsString(kubeflowConnectorRequest))
@@ -62,7 +63,7 @@ class KubeflowConnectorFunctionTest {
         new Configuration("http://localhost:8281", "testNamespace"),
         new KubeflowApi(api, operation, null, null,
             null, null, null, null, null, null, null, null),
-        20
+        new Timeout(20)
     );
     var context = OutboundConnectorContextBuilder.create()
         .variables(objectMapper.writeValueAsString(kubeflowConnectorRequest))
@@ -84,7 +85,7 @@ class KubeflowConnectorFunctionTest {
         new Configuration(url, "testNamespace"),
         new KubeflowApi("pipelinesV1", "get_pipelines", null, null,
             null, null, null, null, null, null, null, null),
-        20
+        new Timeout(20)
     );
     var context = OutboundConnectorContextBuilder.create()
         .variables(objectMapper.writeValueAsString(kubeflowConnectorRequest))

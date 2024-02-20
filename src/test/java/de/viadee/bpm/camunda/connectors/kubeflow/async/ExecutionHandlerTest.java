@@ -6,6 +6,7 @@ import de.viadee.bpm.camunda.connectors.kubeflow.auth.NoAuthentication;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.Configuration;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.KubeflowApi;
+import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.Timeout;
 import de.viadee.bpm.camunda.connectors.kubeflow.services.async.ExecutionHandler;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -26,7 +27,7 @@ class ExecutionHandlerTest {
         new Configuration("http://localhost:8281", "testNamespace"),
         new KubeflowApi("pipelinesV1", pipelineOperation, null, null,
             null, null, null, null, null, null, null, null),
-        20
+        new Timeout(20)
     );
     // when
     var executor = executionHandler.getExecutor(kubeflowConnectorRequest, 123456789);
