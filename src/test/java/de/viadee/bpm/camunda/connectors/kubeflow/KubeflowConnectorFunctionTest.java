@@ -1,4 +1,4 @@
-package de.viadee.bpm.camunda.connectors.kubeflow.unit;
+package de.viadee.bpm.camunda.connectors.kubeflow;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.viadee.bpm.camunda.connectors.kubeflow.KubeflowConnectorFunction;

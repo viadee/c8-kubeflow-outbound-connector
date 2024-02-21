@@ -5,7 +5,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import de.viadee.bpm.camunda.connectors.kubeflow.utils.RunUtil;
 import java.net.http.HttpResponse;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
