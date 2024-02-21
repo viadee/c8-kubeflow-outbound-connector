@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.utils.URIBuilder;
@@ -51,8 +52,7 @@ public class KubeflowConnectorExecutor {
     protected HttpRequest httpRequest;
     protected HttpClient httpClient;
     protected String kubeflowMultiNs;
-
-    private String kubeflowUrl;
+    protected String kubeflowUrl;
 
     public KubeflowConnectorExecutor(KubeflowConnectorRequest connectorRequest, long processInstanceKey,
             KubeflowApisEnum kubeflowApisEnum,
@@ -106,8 +106,8 @@ public class KubeflowConnectorExecutor {
         kubeflowMultiNs = System.getenv(KUBEFLOW_NAMESPACE_ENV);
 
         if (configPropertyGroup != null) {
-            kubeflowUrl = configPropertyGroup.kubeflowUrl() == null ? kubeflowUrl : configPropertyGroup.kubeflowUrl();
-            kubeflowMultiNs = configPropertyGroup.multiusernamespace() == null ? kubeflowMultiNs
+            kubeflowUrl = StringUtils.isBlank(configPropertyGroup.kubeflowUrl()) ? kubeflowUrl : configPropertyGroup.kubeflowUrl();
+            kubeflowMultiNs = StringUtils.isBlank(configPropertyGroup.multiusernamespace()) ? kubeflowMultiNs
                     : configPropertyGroup.multiusernamespace();
         }
 
