@@ -1,7 +1,15 @@
 package de.viadee.bpm.camunda.connectors.kubeflow;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.mockito.Mockito.mock;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.viadee.bpm.camunda.connectors.kubeflow.KubeflowConnectorFunction;
+
 import de.viadee.bpm.camunda.connectors.kubeflow.auth.NoAuthentication;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.Configuration;
@@ -11,13 +19,6 @@ import de.viadee.bpm.camunda.connectors.kubeflow.services.KubeflowConnectorExecu
 import de.viadee.bpm.camunda.connectors.kubeflow.services.async.ExecutionHandler;
 import io.camunda.connector.api.error.ConnectorInputException;
 import io.camunda.connector.test.outbound.OutboundConnectorContextBuilder;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.assertj.core.api.Assertions.catchThrowable;
 
 
 class KubeflowConnectorFunctionTest {

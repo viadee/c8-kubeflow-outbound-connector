@@ -16,7 +16,7 @@
         <!-- external libraries -->
         <version.assertj>3.24.2</version.assertj>
         <version.junit-jupiter>5.10.0</version.junit-jupiter>
-        <version.mockito>5.6.0</version.mockito>
+        <version.mockito>5.10.0</version.mockito>
         <version.slf4j>2.0.9</version.slf4j>
         <!-- maven plugins -->
         <plugin.version.maven-clean-plugin>3.3.1</plugin.version.maven-clean-plugin>
@@ -31,6 +31,8 @@
         <skipTests>false</skipTests>
         <skipUnitTests>${skipTests}</skipUnitTests>
         <skipIntegrationTests>${skipTests}</skipIntegrationTests>
+        <!-- added due to incompatibility of byte buddy (mockito) with Java 21 https://github.com/raphw/byte-buddy/issues/1396 -->
+        <argLine>-Dnet.bytebuddy.experimental=true</argLine>
     </properties>
     <dependencies>
         <dependency>
