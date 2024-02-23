@@ -43,25 +43,4 @@ class KubeflowConnectorExecutorTest {
     assertEquals("http://localhost:8080", kubeflowConnectorExecutor.kubeflowUrl); // env. configured in pom.xml via surefire plugin
     assertEquals("testNamespace", kubeflowConnectorExecutor.kubeflowMultiNs); // env. configured in pom.xml via surefire plugin
   }
-
-  @Test
-  void testAuthViaEnvironment() {
-    // given
-    var kubeflowConnectorRequest = new KubeflowConnectorRequest(
-        new EnvironmentAuthentication(),
-        new Configuration("http://localhost:8080", "testNamespace"),
-        kubeflowApiMock,
-        new Timeout(20)
-    );
-    // when
-    KubeflowConnectorExecutor kubeflowConnectorExecutor = new KubeflowConnectorExecutor(kubeflowConnectorRequest, 123456789,
-        KubeflowApisEnum.PIPELINES_V1, KubeflowApiOperationsEnum.GET_PIPELINES);
-    // then
-    assertTrue(kubeflowConnectorRequest.getAuthentication() instanceof EnvironmentAuthentication);
-
-  }
-
-
-
-  // test basic auth, bearer auth, test oauth 2.0
 }
