@@ -64,7 +64,7 @@ jobs:
         run: |
           timeout 5m bash -c \
           'until \
-          kustomize build ./src/test/resources/kubeflow-environment \
+          kustomize build ./src/it/resources/kubeflow-environment \
           | kubectl apply -f -; \
           do echo "Retrying to apply resources"; sleep 10; done'
 

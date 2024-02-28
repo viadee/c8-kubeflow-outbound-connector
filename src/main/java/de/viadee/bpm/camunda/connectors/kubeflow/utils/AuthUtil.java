@@ -40,7 +40,7 @@ public class AuthUtil {
                 NoAuthentication noAuthentication = new NoAuthentication();
                 connectorRequest.setAuthentication(noAuthentication);
             } else if (authMode.equals(KUBEFLOW_AUTH_MODE_BASIC)) {
-                BasicAuthentication basicAuthentication = (BasicAuthentication) authPropertyGroup;
+                BasicAuthentication basicAuthentication = new BasicAuthentication();
                 basicAuthentication.setUsername(System.getenv(KUBEFLOW_AUTH_BASIC_USERNAME));
                 basicAuthentication.setPassword(System.getenv(KUBEFLOW_AUTH_BASIC_PASSWORD));
                 connectorRequest.setAuthentication(basicAuthentication);
@@ -51,7 +51,7 @@ public class AuthUtil {
                             "Authentication parameters missing for basic authentication in environment! Required are username and password.");
                 }
             } else if (authMode.equals(KUBEFLOW_AUTH_MODE_BEARER)) {
-                BearerAuthentication bearerAuthentication = (BearerAuthentication) authPropertyGroup;
+                BearerAuthentication bearerAuthentication = new BearerAuthentication();
                 bearerAuthentication.setToken(System.getenv(KUBEFLOW_AUTH_BEARER_TOKEN));
                 connectorRequest.setAuthentication(bearerAuthentication);
                 if (StringUtils.isBlank(bearerAuthentication.getToken())) {
@@ -79,7 +79,7 @@ public class AuthUtil {
                             "Authentication parameters missing for OAuth (client-credentials flow) authentication in environment! Required are token endpoint, clientId, clientSecret, scopes and client authentication.");
                 }
             } else if (authMode.equals(KUBEFLOW_AUTH_MODE_OAUTH_PASSWORD)) {
-                OAuthAuthenticationPasswordFlow oAuthAuthenticationPasswordFlow = (OAuthAuthenticationPasswordFlow) authPropertyGroup;
+                OAuthAuthenticationPasswordFlow oAuthAuthenticationPasswordFlow = new OAuthAuthenticationPasswordFlow();
                 oAuthAuthenticationPasswordFlow
                         .setOauthTokenEndpoint(System.getenv(KUBEFLOW_AUTH_OAUTH_TOKEN_ENDPOINT));
                 oAuthAuthenticationPasswordFlow.setClientId(System.getenv(KUBEFLOW_AUTH_OAUTH_CLIENT_ID));
