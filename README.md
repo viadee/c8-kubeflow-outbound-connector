@@ -73,9 +73,34 @@ If necessary, you can adjust `application.properties` in test scope.
 ## Element Template
 The element templates can be found in the [kubeflow-connector.json](./element-templates/kubeflow-connector.json) file.
 
-## Contact Information
-For any queries and further support, please drop us a mail at [???](mailto:???)
+# Local development environment setup
 
+Install minikube as per their [documentation](https://minikube.sigs.k8s.io/docs/start/).
+
+Start a minikube cluster. Use 16 GB of ram and cpus as possible. Make sure qemu is installed (e.g. via [Homebrew](https://brew.sh/))
+
+Example for Mac:
+```bash
+minikube start --driver qemu --memory 16384 --cpus 6
+```
+Enable Ingress in minikube
+
+```bash
+minikube addons enable ingress
+````
+
+Deploy Keycloak by running the following command from [keycloak folder](./src/test/resources/kubeflow-environment/)
+```bash
+kustomize build . | kubectl apply -f - 
+```
+
+Deploy the development environment in minikube. It contains Kubeflow and Keycloak.
+```bash
+
+```
+
+## Contact Information
+For any queries and further support, please drop us a mail at [camunda8-connector-su-aaaamkuzw6jcci2hm7rscvue7y@viadee.slack.com](mailto:camunda8-connector-su-aaaamkuzw6jcci2hm7rscvue7y@viadee.slack.com)
 
 # OLD ==========
 
