@@ -1,27 +1,6 @@
-> A Connector template for new C8 outbound connector
->
-> To use this template update the following resources to match the name of your connector:
->
-> * [README](./README.md) (title, description)
-> * [Element Template](./element-templates/template-connector.json)
-> * [POM](./pom.xml) (artifact name, id, description)
-> * [Connector Function](src/main/java/io/camunda/example/MyConnectorFunction.java) (rename, implement, update `OutboundConnector` annotation)
-> * [Service Provider Interface (SPI)](./src/main/resources/META-INF/services/io.camunda.connector.api.outbound.OutboundConnectorFunction) (rename)
->
-> ...and delete this hint.
-> 
-> Read more about [creating Connectors](https://docs.camunda.io/docs/components/connectors/custom-built-connectors/connector-sdk/#creating-a-custom-connector)
->
-> Check out the [Connectors SDK](https://github.com/camunda/connector-sdk)
+# Kubeflow Connector
 
-
-# Connector Template
-
-Camunda Outbound Connector Template
-
-Emulates a simple outbound connector function that takes a message and echoes it back.
-
-The function will throw an exception if your message starts with `fail`. This can be used to test error handling.
+A custom Camunda 8 outbound connector to communicate with the [Kubeflow](https://www.kubeflow.org/) API. It supports version 1 aqnd version 2 of the Kubeflow API and supports the functions mentioned below in the [API section](#api-section).
 
 ## Build
 
@@ -36,23 +15,27 @@ This will create the following artifacts:
 - A thin JAR without dependencies.
 - An fat JAR containing all dependencies, potentially shaded to avoid classpath conflicts. This will not include the SDK artifacts since those are in scope `provided` and will be brought along by the respective Connector Runtime executing the Connector.
 
-### Shading dependencies
+## <a id="api-section"></a> API
+Currenty this connector supports the following methods from the Kubeflow Pipeline API.
 
-You can use the `maven-shade-plugin` defined in the [Maven configuration](./pom.xml) to relocate common dependencies
-that are used in other Connectors and the [Connector Runtime](https://github.com/camunda-community-hub/spring-zeebe/tree/master/connector-runtime#building-connector-runtime-bundles).
-This helps to avoid classpath conflicts when the Connector is executed. 
+- Get Pipelines
+- Get Experiments
+- Get Runs
+- Get Run by ID
+- Get Run by Name
+- Start Run
+- Start Run and Monitor
+- Create Experiment
 
-Use the `relocations` configuration in the Maven Shade plugin to define the dependencies that should be shaded.
-The [Maven Shade documentation](https://maven.apache.org/plugins/maven-shade-plugin/examples/class-relocation.html) 
-provides more details on relocations.
-
-## API
+### Get Pipelines
 
 ### Input
 
+
+
 | Name     | Description      | Example           | Notes                                                                      |
 |----------|------------------|-------------------|----------------------------------------------------------------------------|
-| username | Mock username    | `alice`           | Has no effect on the function call outcome.                                |
+| filter | define the filter to apply to the call    | `alice`           | Has no effect on the function call outcome.                                |
 | token    | Mock token value | `my-secret-token` | Has no effect on the function call outcome.                                |
 | message  | Mock message     | `Hello World`     | Echoed back in the output. If starts with 'fail', an error will be thrown. |
 
@@ -88,13 +71,20 @@ In your IDE you can also simply navigate to the `LocalContainerRuntime` class in
 If necessary, you can adjust `application.properties` in test scope.
 
 ## Element Template
+The element templates can be found in the [kubeflow-connector.json](./element-templates/kubeflow-connector.json) file.
 
-The element template for this sample connector is generated automatically based on the connector
-input class using the [Element Template Generator](https://github.com/camunda/connectors/tree/main/connector-sdk/element-template-generator).
-The generation is embedded in the Maven build and can be triggered by running `mvn clean package`.
+## Contact Information
+For any queries and further support, please drop us a mail at [???](mailto:???)
 
-It is not mandatory to generate the element template for your connector and you can also create it manually.
-However, the generator provides a convenient way to create the template and keep it in sync with the connector input class
-and empowers you to prototype and iterate quickly.
 
-The generated element template can be found in [element-templates/template-connector.json](./element-templates/template-connector.json).
+# OLD ==========
+
+### Shading dependencies
+
+You can use the `maven-shade-plugin` defined in the [Maven configuration](./pom.xml) to relocate common dependencies
+that are used in other Connectors and the [Connector Runtime](https://github.com/camunda-community-hub/spring-zeebe/tree/master/connector-runtime#building-connector-runtime-bundles).
+This helps to avoid classpath conflicts when the Connector is executed. 
+
+Use the `relocations` configuration in the Maven Shade plugin to define the dependencies that should be shaded.
+The [Maven Shade documentation](https://maven.apache.org/plugins/maven-shade-plugin/examples/class-relocation.html) 
+provides more details on relocations.
