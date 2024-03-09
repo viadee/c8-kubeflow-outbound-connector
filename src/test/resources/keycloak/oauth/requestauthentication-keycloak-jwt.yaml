@@ -1,0 +1,12 @@
+apiVersion: security.istio.io/v1
+kind: RequestAuthentication
+metadata:
+  name: keycloak-jwt
+  namespace: kubeflow
+spec:
+  jwtRules:
+  - issuer: http://keycloak.127.0.0.1.sslip.io/realms/kubeflow
+    jwksUri: http://keycloak.keycloak.svc.cluster.local:8080/realms/kubeflow/protocol/openid-connect/certs
+    outputClaimToHeaders:
+    - header: kubeflow-userid
+      claim: email

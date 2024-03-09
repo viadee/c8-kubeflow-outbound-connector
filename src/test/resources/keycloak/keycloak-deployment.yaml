@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak
+  namespace: keycloak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak
+  template:
+    metadata:
+      labels:
+        app: keycloak
+      namespace: keycloak
+    spec:
+      containers:
+      - name: keycloak
+        image: quay.io/keycloak/keycloak:24.0
+        volumeMounts:
+          - name: kubeflow-realm-config
+            mountPath: /opt/keycloak/data/import
+        env:
+        - name: KEYCLOAK_ADMIN
+          value: "admin"
+        - name: KEYCLOAK_ADMIN_PASSWORD
+          value: "admin"
+        - name: DB_VENDOR
+          value: "h2"
+        - name: KC_PROXY
+          value: "edge"
+        args: ["start-dev", "--import-realm"]
+        ports:
+        - name: http
+          containerPort: 8080
+        resources:
+          requests:
+            cpu: 700m
+            memory: 500Mi
+          limits:
+            cpu: 1000m
+            memory: 1G
+      volumes:
+      - name: kubeflow-realm-config
+        configMap:
+          name: kubeflow-realm-config
+          items:
+          - key: body
+            path: kubeflow-realm-export.json

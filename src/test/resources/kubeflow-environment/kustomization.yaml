@@ -40,9 +40,9 @@ resources:
   - https://github.com/kubeflow/manifests//common/istio-1-17/istio-namespace/base/?timeout=120&ref=v1.8-branch
   - https://github.com/kubeflow/manifests//common/istio-1-17/istio-install/base/?timeout=120&ref=v1.8-branch
   # OIDC Authservice
-  - https://github.com/kubeflow/manifests//common/oidc-client/oidc-authservice/base/?timeout=120&ref=v1.8-branch
+  - https://github.com/kubeflow/manifests//common/oidc-client/oauth2-proxy/base/?timeout=120&ref=v1.8-branch
   # Dex
-  - https://github.com/kubeflow/manifests//common/dex/overlays/istio/?timeout=120&ref=v1.8-branch
+  #- https://github.com/kubeflow/manifests//common/dex/overlays/oauth2-proxy/?timeout=120&ref=v1.8-branch
   # Kubeflow namespace
   - https://github.com/kubeflow/manifests//common/kubeflow-namespace/base/?timeout=120&ref=v1.8-branch
   # Kubeflow Roles
@@ -61,6 +61,9 @@ resources:
   # User namespace
   - https://github.com/kubeflow/manifests//common/user-namespace/base/?timeout=120&ref=v1.8-branch
 
+  # Kubeflow ingress
+  - ./kubeflow-ingress.yaml
+
 patches:
   # Make the istio-ingressgateway a NodePort service.
   # This way, we can access it locally.
@@ -72,3 +75,25 @@ patches:
       kind: Service
       name: istio-ingressgateway
       namespace: istio-system
+
+  # - patch: |
+  #     - op: replace
+  #       spec:
+  #         jwtRules:
+  #           # forwardOriginalToken must be set to true so the authorization header will
+  #           # be passed between Kubeflow Components and Istio can configure the
+  #           # Kubeflow Auth Headers based on this request authorization header.
+  #           - forwardOriginalToken: true
+  #             issuer: http://dex.auth.svc.cluster.local:5556/dexmm
+  #             # These 5 lines provides integration of istio/oauth2-proxy with
+  #             # Kubeflow custom auth headers.
+  #             outputClaimToHeaders:
+  #               - header: kubeflow-userid
+  #                 claim: email
+  #               - header: kubeflow-groups
+  #                 claim: groups
+  #   target:
+  #     kind: RequestAuthentication
+  #     name: dex-jwt
+  #     namespace: istio-system
+    
