@@ -1,0 +1,30 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: add-request-header-filter
+  namespace: kubeflow
+spec:
+  workloadSelector:
+    labels:
+      app: ml-pipeline
+  configPatches:
+  - applyTo: HTTP_FILTER
+    match:
+      context: SIDECAR_INBOUND # This targets inbound traffic to the sidecar. Use SIDECAR_OUTBOUND for outbound.
+      listener:
+        filterChain:
+          filter:
+            name: "envoy.filters.network.http_connection_manager"
+            subFilter:
+              name: "envoy.filters.http.router"
+    patch:
+      operation: INSERT_BEFORE
+      value: # Lua filter specification for request header manipulation
+        name: envoy.lua
+        typed_config:
+          "@type": "type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua"
+          inlineCode: |
+            function envoy_on_request(request_handle)
+              -- Add or modify the request header
+              request_handle:headers():add("kubeflow-userid", "user@example.com")
+            end
