@@ -5,7 +5,7 @@ metadata:
   namespace: kubeflow
 spec:
   rules:
-    - host: kubeflow.127.0.0.1.sslip.io
+    - host: localhost
       http:
         paths:
           - path: /

@@ -29,6 +29,8 @@ spec:
           value: "h2"
         - name: KC_PROXY
           value: "edge"
+        - name: KC_HTTP_RELATIVE_PATH
+          value: /auth
         args: ["start-dev", "--import-realm"]
         ports:
         - name: http

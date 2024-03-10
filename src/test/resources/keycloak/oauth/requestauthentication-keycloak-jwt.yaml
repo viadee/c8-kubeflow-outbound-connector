@@ -5,8 +5,8 @@ metadata:
   namespace: kubeflow
 spec:
   jwtRules:
-  - issuer: http://keycloak.127.0.0.1.sslip.io/realms/kubeflow
-    jwksUri: http://keycloak.keycloak.svc.cluster.local:8080/realms/kubeflow/protocol/openid-connect/certs
+  - issuer: http://localhost/auth/realms/kubeflow
+    jwksUri: http://keycloak.keycloak.svc.cluster.local:8080/auth/realms/kubeflow/protocol/openid-connect/certs
     # forwardOriginalToken must be set to true so the authorization header will
     # be passed between Kubeflow Components and Istio can configure the
     # Kubeflow Auth Headers based on this request authorization header.

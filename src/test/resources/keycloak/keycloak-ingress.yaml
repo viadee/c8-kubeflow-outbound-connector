@@ -5,10 +5,10 @@ metadata:
   namespace: keycloak
 spec:
   rules:
-    - host: keycloak.127.0.0.1.sslip.io
+    - host: localhost
       http:
         paths:
-          - path: /
+          - path: /auth
             pathType: Prefix
             backend:
               service:

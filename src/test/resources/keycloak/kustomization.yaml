@@ -7,5 +7,5 @@ resources:
   - keycloak-realm-config.yaml
 
   # auth config
-  - oauth/authorizationpolicy.yaml
   - oauth/requestauthentication-keycloak-jwt.yaml
+  - oauth/profile-service.yaml
