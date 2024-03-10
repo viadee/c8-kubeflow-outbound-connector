@@ -2,7 +2,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: kubeflow
-  namespace: kubeflow
+  namespace: istio-system
 spec:
   rules:
     - host: localhost
@@ -12,13 +12,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: centraldashboard
-                port:
-                  number: 80
-          - path: /pipeline
-            pathType: Prefix
-            backend:
-              service:
-                name: ml-pipeline-ui
+                name: istio-ingressgateway
                 port:
                   number: 80

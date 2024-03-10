@@ -1,0 +1,43 @@
+injectResponseHeaders:
+- name: kubeflow-groups
+  values:
+  - claim: groups
+- name: kubeflow-userid
+  values:
+  - claim: email
+metricsServer:
+  BindAddress: 0.0.0.0:44180
+  SecureBindAddress: ""
+  TLS: null
+providers:
+# ==== DEX configuration
+- clientID: kubeflow
+  clientSecretFile: /etc/oauth2_proxy/CLIENT_SECRET
+  id: oidc=kubeflow-oidc-authservice
+  loginURL: /auth/realms/kubeflow/protocol/openid-connect/auth
+  loginURLParameters:
+  - default:
+    - force
+    name: approval_prompt
+  oidcConfig:
+    audienceClaims:
+    - aud
+    emailClaim: email
+    groupsClaim: groups
+    issuerURL: http://localhost/auth/realms/kubeflow
+    jwksURL: http://keycloak.keycloak.svc.cluster.local:8080/auth/realms/kubeflow/protocol/openid-connect/certs
+    skipDiscovery: true
+    userIDClaim: email
+  scope: openid profile email
+  provider: oidc
+  redeemURL: http://keycloak.keycloak.svc.cluster.local:8080/auth/realms/kubeflow/protocol/openid-connect/token
+server:
+  BindAddress: 0.0.0.0:8080
+  SecureBindAddress: ""
+  TLS: null
+upstreamConfig:
+  upstreams:
+  - id: static://200
+    path: /
+    static: true
+    staticCode: 200
