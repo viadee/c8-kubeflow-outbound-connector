@@ -7,6 +7,12 @@ spec:
   jwtRules:
   - issuer: http://keycloak.127.0.0.1.sslip.io/realms/kubeflow
     jwksUri: http://keycloak.keycloak.svc.cluster.local:8080/realms/kubeflow/protocol/openid-connect/certs
+    # forwardOriginalToken must be set to true so the authorization header will
+    # be passed between Kubeflow Components and Istio can configure the
+    # Kubeflow Auth Headers based on this request authorization header.
+    forwardOriginalToken: true
     outputClaimToHeaders:
     - header: kubeflow-userid
       claim: email
+    - header: kubeflow-groups
+      claim: groups
