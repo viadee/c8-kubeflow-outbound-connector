@@ -10,7 +10,7 @@ metricsServer:
   SecureBindAddress: ""
   TLS: null
 providers:
-# ==== DEX configuration
+# ==== Keycloak configuration
 - clientID: kubeflow
   clientSecretFile: /etc/oauth2_proxy/CLIENT_SECRET
   id: oidc=kubeflow-oidc-authservice
