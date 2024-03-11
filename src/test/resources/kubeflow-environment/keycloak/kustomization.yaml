@@ -1,12 +1,8 @@
-
 resources:
   - keycloak-namespace.yaml
   - keycloak-deployment.yaml
   - keycloak-service.yaml
   - keycloak-ingress.yaml
   - keycloak-realm-config.yaml
-
-  # oauth config
-  #- oauth/requestauthentication-keycloak-jwt.yaml
-  - oauth/profile-service.yaml
-  - oauth/ingress-oauth2-proxy.yaml
+  - profile-service.yaml
+  - oauth2-proxy-ingress.yaml
