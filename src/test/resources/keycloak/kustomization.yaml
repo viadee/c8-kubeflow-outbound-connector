@@ -6,6 +6,7 @@ resources:
   - keycloak-ingress.yaml
   - keycloak-realm-config.yaml
 
-  # auth config
-  - oauth/requestauthentication-keycloak-jwt.yaml
+  # oauth config
+  #- oauth/requestauthentication-keycloak-jwt.yaml
   - oauth/profile-service.yaml
+  - oauth/ingress-oauth2-proxy.yaml

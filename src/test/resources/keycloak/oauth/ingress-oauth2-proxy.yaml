@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: outh2-proxy-ingress
+  namespace: istio-system
+spec:
+  rules:
+    - host: localhost
+      http:
+        paths:
+          - path: /oauth2
+            pathType: Prefix
+            backend:
+              service:
+                name: authservice
+                port:
+                  number: 8080

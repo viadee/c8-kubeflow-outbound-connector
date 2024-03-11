@@ -13,7 +13,7 @@ providers:
 # ==== Keycloak configuration
 - clientID: kubeflow
   clientSecretFile: /etc/oauth2_proxy/CLIENT_SECRET
-  id: oidc=kubeflow-oidc-authservice
+  id: oidc=kubeflow
   loginURL: /auth/realms/kubeflow/protocol/openid-connect/auth
   loginURLParameters:
   - default:
