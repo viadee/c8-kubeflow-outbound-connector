@@ -6,3 +6,4 @@ resources:
   - keycloak-realm-config.yaml
   - profile-service.yaml
   - oauth2-proxy-ingress.yaml
+  - keycloak-virtualservice.yaml
