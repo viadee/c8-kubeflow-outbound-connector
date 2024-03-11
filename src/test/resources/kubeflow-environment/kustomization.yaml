@@ -87,6 +87,11 @@ patches:
       name: oauth2-proxy
       namespace: istio-system
 
+images:
+  - name: quay.io/oauth2-proxy/oauth2-proxy:v7.4.0
+    newName: quay.io/oauth2-proxy/oauth2-proxy
+    newTag: v7.6.0
+
 configMapGenerator:
 - name: oauth2-proxy
   namespace: istio-system
