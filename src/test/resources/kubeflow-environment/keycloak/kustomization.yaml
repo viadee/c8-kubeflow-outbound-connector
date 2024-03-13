@@ -2,7 +2,7 @@ resources:
   - keycloak-namespace.yaml
   - keycloak-deployment.yaml
   - keycloak-service.yaml
-  - keycloak-ingress.yaml
+  #- keycloak-ingress.yaml
   - keycloak-realm-config.yaml
   - profile-service.yaml
   - oauth2-proxy-ingress.yaml

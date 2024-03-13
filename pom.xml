@@ -350,16 +350,16 @@
                 <version>3.5.0</version>
                 <executions>
                     <execution>
-                    <id>add-test-source</id>
-                    <phase>process-resources</phase>
-                    <goals>
-                        <goal>add-test-source</goal>
-                    </goals>
-                    <configuration>
-                        <sources>
-                        <source>src/it</source>
-                        </sources>
-                    </configuration>
+                        <id>add-test-source</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/it</source>
+                            </sources>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

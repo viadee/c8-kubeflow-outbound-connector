@@ -72,23 +72,22 @@ public class BaseIntegrationTest {
   private OAuthAuthenticationClientCredentialsFlow createOAuthAuthenticationClientCredentialsFlow() throws Exception {
     String kubeflowUrl = getKubeflowUrl();
 
+    String keycloakServer = getEnvOrDefault("KUBEFLOW_HOST", DEFAULT_KUBEFLOW_HOST);
+
     OAuthAuthenticationClientCredentialsFlow oAuthAuthenticationClientCredentialsFlow = new OAuthAuthenticationClientCredentialsFlow();
     oAuthAuthenticationClientCredentialsFlow.setAudience("kubeflow");
     oAuthAuthenticationClientCredentialsFlow.setClientAuthentication("bearer");
     oAuthAuthenticationClientCredentialsFlow.setClientId("kubeflow");
     oAuthAuthenticationClientCredentialsFlow.setClientSecretCC("Jq09L1liFa0UiaXnL3pcnXzlqOKXaoOW");
-    oAuthAuthenticationClientCredentialsFlow.setOauthTokenEndpoint("http://localhost:8080/auth/realms/kubeflow/protocol/openid-connect/token");
+    oAuthAuthenticationClientCredentialsFlow.setOauthTokenEndpoint(kubeflowUrl+"/auth/realms/kubeflow/protocol/openid-connect/token");
     oAuthAuthenticationClientCredentialsFlow.setScopes("profile email openid groups");
 
     return oAuthAuthenticationClientCredentialsFlow;
   }
 
   private String getKubeflowUrl() throws Exception {
-    ProcessBuilder processBuilder = new ProcessBuilder("kubectl", "-n", "istio-system", "port-forward", "svc/istio-ingressgateway", "8080:80");
-    Process process = processBuilder.start();
-
     String host = getEnvOrDefault(KUBEFLOW_HOST, DEFAULT_KUBEFLOW_HOST);
-    return "http://" + host + ":8080";
+    return "http://" + host + ":30000";
   }
 
   private String getEnvOrDefault(String env, String defaultValue) {
