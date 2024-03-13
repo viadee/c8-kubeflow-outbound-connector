@@ -342,6 +342,27 @@
                     <skipTests>${skipUnitTests}</skipTests>
                 </configuration>
             </plugin>
+            <!-- Configure the build-helper-maven-plugin to add the src/it 
+            directory as a test source -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                    <id>add-test-source</id>
+                    <phase>process-resources</phase>
+                    <goals>
+                        <goal>add-test-source</goal>
+                    </goals>
+                    <configuration>
+                        <sources>
+                        <source>src/it</source>
+                        </sources>
+                    </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>

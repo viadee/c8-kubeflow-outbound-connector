@@ -21,7 +21,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 public class RunsIT extends BaseIntegrationTest {
 
   private void createRun(String pipelineVersion, String runName, String pipelineId, String experimentId)
-      throws IOException, URISyntaxException, InterruptedException {
+      throws Exception {
     var test  = getExecutor(pipelineVersion, "start_run", null, pipelineId, experimentId, runName).execute();
   }
 
@@ -43,7 +43,7 @@ public class RunsIT extends BaseIntegrationTest {
   }
 
   private String createExperimentAndGetId(String pipelineVersion, String experimentName)
-      throws IOException, URISyntaxException, InterruptedException {
+      throws Exception {
     HttpResponse<String> response = getExecutor(pipelineVersion, "create_experiment", experimentName, null,
         null, null).execute();
 
