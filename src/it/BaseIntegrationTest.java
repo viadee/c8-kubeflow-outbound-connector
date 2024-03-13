@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import de.viadee.bpm.camunda.connectors.kubeflow.auth.NoAuthentication;
+import de.viadee.bpm.camunda.connectors.kubeflow.auth.OAuthAuthenticationClientCredentialsFlow;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.KubeflowApi;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.Timeout;
@@ -30,7 +31,7 @@ public class BaseIntegrationTest {
   private static final String DEFAULT_KUBEFLOW_HOST = "localhost";
 
   private static final String KUBEFLOW_NAMESPACE_ENV_KEY = "KUBEFLOW_NAMESPACE";
-  private static final String DEFAULT_KUBEFLOW_NAMESPACE = "kubeflow-user-example-com";
+  private static final String DEFAULT_KUBEFLOW_NAMESPACE = "kubeflow-service-example-com";
 
   private static final String KUBEFLOW_USERNAME_ENV_KEY = "KUBEFLOW_USERNAME";
   private static final String DEFAULT_KUBEFLOW_USERNAME = "user@example.com";
@@ -38,7 +39,14 @@ public class BaseIntegrationTest {
   private static final String KUBEFLOW_PASSWORD_ENV_KEY = "KUBEFLOW_PASSWORD";
   private static final String DEFAULT_KUBEFLOW_PASSWORD = "12341234";
 
+  private static final String KUBEFLOW_CLIENT_ID_ENV_KEY = "KUBEFLOW_CLIENT_ID";
+  private static final String DEFAULT_KUBEFLOW_CLIENT_ID = "kubeflow";
+
+  private static final String KUBEFLOW_CLIENT_SECRET_ENV_KEY = "KUBEFLOW_CLIENT_SECRET";
+  private static final String DEFAULT_CLIENT_SECRET = "Jq09L1liFa0UiaXnL3pcnXzlqOKXaoOW";
+
   private Configuration configuration;
+  private OAuthAuthenticationClientCredentialsFlow oAuthAuthenticationClientCredentialsFlow;
 
   protected static final Integer PROCESS_INSTANCE_ID = 100;
 
@@ -62,25 +70,26 @@ public class BaseIntegrationTest {
         getEnvOrDefault(KUBEFLOW_NAMESPACE_ENV_KEY, DEFAULT_KUBEFLOW_NAMESPACE));
   }
 
+  private OAuthAuthenticationClientCredentialsFlow createOAuthAuthenticationClientCredentialsFlow() throws Exception {
+    String kubeflowUrl = getKubeflowUrl();
+
+    OAuthAuthenticationClientCredentialsFlow oAuthAuthenticationClientCredentialsFlow = new OAuthAuthenticationClientCredentialsFlow();
+    oAuthAuthenticationClientCredentialsFlow.setAudience("kubeflow");
+    oAuthAuthenticationClientCredentialsFlow.setClientAuthentication("bearer");
+    oAuthAuthenticationClientCredentialsFlow.setClientId("kubeflow");
+    oAuthAuthenticationClientCredentialsFlow.setClientSecretCC("Jq09L1liFa0UiaXnL3pcnXzlqOKXaoOW");
+    oAuthAuthenticationClientCredentialsFlow.setOauthTokenEndpoint("http://localhost:8080/auth/realms/kubeflow/protocol/openid-connect/token");
+    oAuthAuthenticationClientCredentialsFlow.setScopes("profile email openid groups");
+
+    return oAuthAuthenticationClientCredentialsFlow;
+  }
+
   private String getKubeflowUrl() throws Exception {
-    ProcessBuilder processBuilder = new ProcessBuilder("kubectl", "-n", "istio-system", "get", "svc",
-        "istio-ingressgateway", "-ojsonpath={.spec.ports[?(@.name == 'http2')].nodePort}");
+    ProcessBuilder processBuilder = new ProcessBuilder("kubectl", "-n", "istio-system", "port-forward", "svc/istio-ingressgateway", "8080:80");
     Process process = processBuilder.start();
 
-    StringBuilder output = new StringBuilder();
-    try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-      String line;
-      while ((line = reader.readLine()) != null) {
-        output.append(line).append("\n");
-      }
-    }
-    int exitVal = process.waitFor();
-    if (exitVal != 0) {
-      throw new IOException("Failed to get kubeflow url");
-    }
-
     String host = getEnvOrDefault(KUBEFLOW_HOST, DEFAULT_KUBEFLOW_HOST);
-    return "http://" + host + ":" + output.toString().trim();
+    return "http://" + host + ":8080";
   }
 
   private String getEnvOrDefault(String env, String defaultValue) {
@@ -92,14 +101,6 @@ public class BaseIntegrationTest {
     return configuration;
   }
 
-  protected String getCookie() throws IOException, URISyntaxException, InterruptedException {
-    String username = getEnvOrDefault(KUBEFLOW_USERNAME_ENV_KEY, DEFAULT_KUBEFLOW_USERNAME);
-    String password = getEnvOrDefault(KUBEFLOW_PASSWORD_ENV_KEY, DEFAULT_KUBEFLOW_PASSWORD);
-    String cookie = KubeflowLogin.getIstioAuthSession(this.getConfiguration().kubeflowUrl(), username, password);
-
-    return cookie;
-  }
-
   protected KubeflowConnectorExecutor getExecutor(String pipelineVersion, String operation, String experimentName,
       String pipelineId, String experimentId, String runName)
       throws IOException, URISyntaxException, InterruptedException {
@@ -107,7 +108,7 @@ public class BaseIntegrationTest {
     KubeflowApi kubeflowApi = new KubeflowApi(pipelineVersion, operation, null, runName,
         null, pipelineId, experimentId, null, null, experimentName, null, httpHeaders);
     KubeflowConnectorRequest kubeflowConnectorRequest = new KubeflowConnectorRequest(
-        new NoAuthentication(), // Authentication via Headers
+        this.createOAuthAuthenticationClientCredentialsFlow, // Authentication via OAuth
         this.getConfiguration(),
         kubeflowApi,
         new Timeout(20));

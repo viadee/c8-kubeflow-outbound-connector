@@ -32,7 +32,7 @@ jobs:
     # This way, we can control the cost of the runner.
     timeout-minutes: 20
     # Only run on pull requests to main and on pushes to main.
-    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
+    #if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
     # Run only if the unit-test job is successful
     needs: unit
     steps:
