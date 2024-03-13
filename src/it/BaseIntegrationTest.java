@@ -22,7 +22,6 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.Configuration;
-import de.viadee.bpm.camunda.connectors.kubeflow.integration.util.KubeflowLogin;
 import org.threeten.bp.OffsetDateTime;
 
 public class BaseIntegrationTest {
@@ -103,12 +102,11 @@ public class BaseIntegrationTest {
 
   protected KubeflowConnectorExecutor getExecutor(String pipelineVersion, String operation, String experimentName,
       String pipelineId, String experimentId, String runName)
-      throws IOException, URISyntaxException, InterruptedException {
-    var httpHeaders = Map.of("Cookie", this.getCookie());
+      throws Exception {
     KubeflowApi kubeflowApi = new KubeflowApi(pipelineVersion, operation, null, runName,
-        null, pipelineId, experimentId, null, null, experimentName, null, httpHeaders);
+        null, pipelineId, experimentId, null, null, experimentName, null, null);
     KubeflowConnectorRequest kubeflowConnectorRequest = new KubeflowConnectorRequest(
-        this.createOAuthAuthenticationClientCredentialsFlow, // Authentication via OAuth
+        this.createOAuthAuthenticationClientCredentialsFlow(), // Authentication via OAuth
         this.getConfiguration(),
         kubeflowApi,
         new Timeout(20));
