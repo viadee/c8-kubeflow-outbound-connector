@@ -66,8 +66,8 @@ jobs:
           export KUBEFLOW_HOST=$(minikube ip)
           echo "KUBEFLOW_HOST=$KUBEFLOW_HOST"
           # replace issuer in oauth2-proxy config
-          envsubst < ./src/test/resources/kubeflow-environment/oauth2_proxy.yml > ./src/test/resources/kubeflow-environment/oauth2_proxy2.yml \ 
-          && mv ./src/test/resources/kubeflow-environment/oauth2_proxy2.yml ./src/test/resources/kubeflow-environment/oauth2_proxy.yml
+          envsubst < ./src/test/resources/kubeflow-environment/oauth2_proxy.yml > ./src/test/resources/kubeflow-environment/oauth2_proxy2.yml 
+          mv ./src/test/resources/kubeflow-environment/oauth2_proxy2.yml ./src/test/resources/kubeflow-environment/oauth2_proxy.yml
           # setup environment
           timeout 5m bash -c \
           'until \
