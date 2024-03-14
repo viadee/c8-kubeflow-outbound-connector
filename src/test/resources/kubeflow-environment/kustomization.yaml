@@ -60,8 +60,6 @@ resources:
   - https://github.com/kubeflow/manifests//apps/profiles/upstream/overlays/kubeflow/?timeout=120&ref=v1.8-branch
   # User namespace
   - https://github.com/kubeflow/manifests//common/user-namespace/base/?timeout=120&ref=v1.8-branch
-  # Kubeflow ingress
-  #- ./kubeflow-ingress.yaml
   # Keycloak
   - ./keycloak
 
