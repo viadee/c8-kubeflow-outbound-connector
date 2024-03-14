@@ -72,8 +72,6 @@ public class BaseIntegrationTest {
   private OAuthAuthenticationClientCredentialsFlow createOAuthAuthenticationClientCredentialsFlow() throws Exception {
     String kubeflowUrl = getKubeflowUrl();
 
-    String keycloakServer = getEnvOrDefault("KUBEFLOW_HOST", DEFAULT_KUBEFLOW_HOST);
-
     OAuthAuthenticationClientCredentialsFlow oAuthAuthenticationClientCredentialsFlow = new OAuthAuthenticationClientCredentialsFlow();
     oAuthAuthenticationClientCredentialsFlow.setAudience("kubeflow");
     oAuthAuthenticationClientCredentialsFlow.setClientAuthentication("bearer");
@@ -87,6 +85,7 @@ public class BaseIntegrationTest {
 
   private String getKubeflowUrl() throws Exception {
     String host = getEnvOrDefault(KUBEFLOW_HOST, DEFAULT_KUBEFLOW_HOST);
+    System.out.println("========> " + host);
     return "http://" + host + ":30000";
   }
 
