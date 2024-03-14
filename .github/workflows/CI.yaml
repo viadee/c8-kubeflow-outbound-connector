@@ -66,7 +66,7 @@ jobs:
           export KUBEFLOW_HOST=$(minikube ip)
           echo "KUBEFLOW_HOST=$KUBEFLOW_HOST"
           # setup environment
-          timeout 5m bash -c \
+          timeout 6m bash -c \
           'until \
           kustomize build ./src/test/resources/kubeflow-environment \
           | envsubst | kubectl apply -f -; \
