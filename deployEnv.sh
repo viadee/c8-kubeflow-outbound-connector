@@ -27,6 +27,6 @@ else
   printf "\nURLs:\n"
   printf "\nKubeflow UI: http://localhost:30000/"
   printf "\nKeycloak Admin UI: http://localhost:30000/auth/\n\n"
-  prinf "\n\nKeep this terminal open! Press Ctrl+C to stop the port-forward.\n\n"
+  printf "\n\nKeep this terminal open! Press Ctrl+C to stop the port-forward.\n\n"
   kubectl port-forward -n istio-system svc/istio-ingressgateway 30000:80
 fi
