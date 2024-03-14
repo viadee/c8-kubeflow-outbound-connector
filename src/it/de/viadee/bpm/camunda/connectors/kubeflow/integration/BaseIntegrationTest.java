@@ -27,20 +27,7 @@ public class BaseIntegrationTest {
   private static final String KUBEFLOW_NAMESPACE_ENV_KEY = "KUBEFLOW_NAMESPACE";
   private static final String DEFAULT_KUBEFLOW_NAMESPACE = "kubeflow-service-example-com";
 
-  private static final String KUBEFLOW_USERNAME_ENV_KEY = "KUBEFLOW_USERNAME";
-  private static final String DEFAULT_KUBEFLOW_USERNAME = "user@example.com";
-
-  private static final String KUBEFLOW_PASSWORD_ENV_KEY = "KUBEFLOW_PASSWORD";
-  private static final String DEFAULT_KUBEFLOW_PASSWORD = "12341234";
-
-  private static final String KUBEFLOW_CLIENT_ID_ENV_KEY = "KUBEFLOW_CLIENT_ID";
-  private static final String DEFAULT_KUBEFLOW_CLIENT_ID = "kubeflow";
-
-  private static final String KUBEFLOW_CLIENT_SECRET_ENV_KEY = "KUBEFLOW_CLIENT_SECRET";
-  private static final String DEFAULT_CLIENT_SECRET = "Jq09L1liFa0UiaXnL3pcnXzlqOKXaoOW";
-
   private Configuration configuration;
-  private OAuthAuthenticationClientCredentialsFlow oAuthAuthenticationClientCredentialsFlow;
 
   protected static final Integer PROCESS_INSTANCE_ID = 100;
 
