@@ -58,7 +58,7 @@ public class BaseIntegrationTest {
     oAuthAuthenticationClientCredentialsFlow.setAudience("kubeflow");
     oAuthAuthenticationClientCredentialsFlow.setClientAuthentication("bearer");
     oAuthAuthenticationClientCredentialsFlow.setClientId("kubeflow");
-    oAuthAuthenticationClientCredentialsFlow.setClientSecretCC("Jq09L1liFa0UiaXnL3pcnXzlqOKXaoOW");
+    oAuthAuthenticationClientCredentialsFlow.setClientSecretCC("Jq09L1liFa0UiaXnL3pcnXzlqOKXaoOW2");
     oAuthAuthenticationClientCredentialsFlow.setOauthTokenEndpoint(kubeflowUrl+"/auth/realms/kubeflow/protocol/openid-connect/token");
     oAuthAuthenticationClientCredentialsFlow.setScopes("profile email openid groups");
 
