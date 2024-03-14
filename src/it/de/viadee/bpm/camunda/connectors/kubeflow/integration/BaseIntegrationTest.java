@@ -1,28 +1,23 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.integration;
 
+import java.net.http.HttpResponse;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.threeten.bp.OffsetDateTime;
+
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import de.viadee.bpm.camunda.connectors.kubeflow.auth.NoAuthentication;
+
 import de.viadee.bpm.camunda.connectors.kubeflow.auth.OAuthAuthenticationClientCredentialsFlow;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.KubeflowConnectorRequest;
+import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.Configuration;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.KubeflowApi;
 import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.Timeout;
 import de.viadee.bpm.camunda.connectors.kubeflow.services.KubeflowConnectorExecutor;
 import de.viadee.bpm.camunda.connectors.kubeflow.services.async.ExecutionHandler;
 import de.viadee.bpm.camunda.connectors.kubeflow.utils.OffsetDateTimeDeserializer;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
-import java.net.URISyntaxException;
-import java.net.http.HttpResponse;
-import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
-
-import de.viadee.bpm.camunda.connectors.kubeflow.entities.input.Configuration;
-import org.threeten.bp.OffsetDateTime;
 
 public class BaseIntegrationTest {
 
@@ -85,7 +80,7 @@ public class BaseIntegrationTest {
 
   private String getKubeflowUrl() throws Exception {
     String host = getEnvOrDefault(KUBEFLOW_HOST, DEFAULT_KUBEFLOW_HOST);
-    return "http://" + host + ":30001";
+    return "http://" + host + ":30000";
   }
 
   private String getEnvOrDefault(String env, String defaultValue) {

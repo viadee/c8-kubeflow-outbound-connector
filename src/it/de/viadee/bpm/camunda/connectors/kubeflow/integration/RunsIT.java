@@ -1,5 +1,14 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.integration;
 
+import java.net.http.HttpResponse;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+
 import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApisEnum;
 import io.swagger.client.model.V1ApiExperiment;
 import io.swagger.client.model.V1ApiListPipelinesResponse;
@@ -8,15 +17,6 @@ import io.swagger.client.model.V1ApiRun;
 import io.swagger.client.model.V2beta1Experiment;
 import io.swagger.client.model.V2beta1ListRunsResponse;
 import io.swagger.client.model.V2beta1Run;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.http.HttpResponse;
-import java.util.List;
-import java.util.stream.Collectors;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 
 public class RunsIT extends BaseIntegrationTest {
 
