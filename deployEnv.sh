@@ -1,4 +1,8 @@
 #!/bin/bash
+export KUBEFLOW_HOST=localhost
+envsubst < ./src/test/resources/kubeflow-environment/oauth2_proxy.yml > ./src/test/resources/kubeflow-environment/oauth2_proxy2.yml 
+mv ./src/test/resources/kubeflow-environment/oauth2_proxy2.yml ./src/test/resources/kubeflow-environment/oauth2_proxy.yml
+
 printf "\n\nApplying resources...\n\n"
 while ! kustomize build ./src/test/resources/kubeflow-environment | kubectl apply -f -; do
   printf "\n\nRetrying to apply resources...\n\n"
