@@ -19,14 +19,14 @@ printf "\n\nDeployment finished!\n\n"
 printf "Checking if NodePort is reachable on localhost...\n\n"
 if nc -v -z -w2 localhost 30000 &> /dev/null; then
   printf "\n\nNodePort is reachable!\n\n"
-  printf "\nURLs:\n"
-  printf "\nKubeflow UI: http://localhost:30000/"
-  printf "\nKeycloak Admin UI: http://localhost:30000/auth/\n\n"
+  printf "\n\x1b[6;30;42mURLs:"
+  printf "\nKubeflow UI: \x1b[6;37;42mhttp://localhost:30000/\x1b[6;30;42m"
+  printf "\nKeycloak Admin UI: \x1b[6;37;42mhttp://localhost:30000/auth/\x1b[0m\n\n"
 else
   printf "\n\nNodePort is not reachable. Starting port forward...\n\n"
-  printf "\nURLs:\n"
-  printf "\nKubeflow UI: http://localhost:30000/"
-  printf "\nKeycloak Admin UI: http://localhost:30000/auth/\n\n"
-  printf "\n\nKeep this terminal open! Press Ctrl+C to stop the port-forward.\n\n"
+  printf "\n\x1b[6;30;42mURLs:"
+  printf "\nKubeflow UI: \x1b[6;37;42mhttp://localhost:30000/\x1b[6;30;42m"
+  printf "\nKeycloak Admin UI: \x1b[6;37;42mhttp://localhost:30000/auth/\x1b[0m\n\n"
+  printf "\n\n\x1b[6;30;42mKeep this terminal open! Press \x1b[6;37;42mCtrl+C \x1b[6;30;42mto stop the port-forward.\x1b[0m\n\n"
   kubectl port-forward -n istio-system svc/istio-ingressgateway 30000:80
 fi
