@@ -95,3 +95,6 @@ jobs:
         run: |
           kubectl get deployments -A
           kubectl describe deployments -A
+
+          kubectl get pods -A
+          kubectl describe pods -A
