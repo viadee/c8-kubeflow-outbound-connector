@@ -91,6 +91,9 @@ jobs:
 
       - name: Run mvn clean integration-test
         run: |
+          # Export minikube IP to KUBEFLOW_HOST
+          export KUBEFLOW_HOST=$(minikube ip)
+          echo "KUBEFLOW_HOST=$KUBEFLOW_HOST"
           mvn --batch-mode clean verify -DskipUnitTests
 
       - name: Print deployment descriptions on failure
