@@ -75,28 +75,40 @@ The element templates can be found in the [kubeflow-connector.json](./element-te
 
 # Local development environment setup
 
-Install minikube as per their [documentation](https://minikube.sigs.k8s.io/docs/start/).
+Start a local kubernets cluster e.g. with mimikube or kind.
 
-Start a minikube cluster. Use 16 GB of ram and cpus as possible. Make sure qemu is installed (e.g. via [Homebrew](https://brew.sh/))
-
-Example for Mac:
+Run the following command from the root folder in order to deploy the dev environment into the kubernetes cluster.
 ```bash
-minikube start --driver qemu --memory 16384 --cpus 6
+deployEnv.sh
 ```
-Enable Ingress in minikube
+This will deploy the relevant Kubeflow components (e.g. Pipelines) and a Keycloak server used for authentication and check if the NodePort is reachable on localhost and if not create a port-forward to the local port 30000.
 
+If the NodePorts are not directly exposed on your local machine, you can create a port-forward manually to reach it using the following command.
 ```bash
-minikube addons enable ingress
-````
-
-Deploy Keycloak by running the following command from [keycloak folder](./src/test/resources/kubeflow-environment/)
-```bash
-kustomize build . | kubectl apply -f - 
+kubectl port-forward -n istio-system svc/istio-ingressgateway 30000:80    
 ```
 
-Deploy the development environment in minikube. It contains Kubeflow and Keycloak.
-```bash
+## Credentials used in the dev test environment
+### Keycloak admin
+URL: [http://localhost:30000/auth/](http://localhost:30000/auth/)
 
+``` 
+username: admin
+password: admin
+```
+
+### User for loging into the Kubeflow UI
+URL: [http://localhost:30000/](http://localhost:30000/)
+``` 
+username: user@example.com
+password: 12341234
+```
+
+### Client credentials for authenticating against the Kubeflow API
+The following credentials can be used during a client-credentials oauth flow to authenticate against Kubeflow
+``` 
+client-id: kubeflow
+client-secret: Jq09L1liFa0UiaXnL3pcnXzlqOKXaoOW
 ```
 
 ## Contact Information
