@@ -85,8 +85,7 @@ public class BaseIntegrationTest {
 
   private String getKubeflowUrl() throws Exception {
     String host = getEnvOrDefault(KUBEFLOW_HOST, DEFAULT_KUBEFLOW_HOST);
-    System.out.println("========> " + host);
-    return "http://" + host + ":30000";
+    return "http://" + host + ":30001";
   }
 
   private String getEnvOrDefault(String env, String defaultValue) {
