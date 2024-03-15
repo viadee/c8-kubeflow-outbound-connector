@@ -1,6 +1,6 @@
 # Kubeflow Connector
 
-A custom Camunda 8 outbound connector to communicate with the [Kubeflow](https://www.kubeflow.org/) API. It supports version 1 aqnd version 2 of the Kubeflow API and supports the functions mentioned below in the [API section](#api-section).
+A custom Camunda 8 outbound connector to communicate with the [Kubeflow](https://www.kubeflow.org/) API. It supports standalone as well as multi-suer setup and version 1 and 2 of the Kubeflow API. It currently supports the functions mentioned below in the [API section](#api-section).
 
 ## Build
 
@@ -16,7 +16,7 @@ This will create the following artifacts:
 - An fat JAR containing all dependencies, potentially shaded to avoid classpath conflicts. This will not include the SDK artifacts since those are in scope `provided` and will be brought along by the respective Connector Runtime executing the Connector.
 
 ## <a id="api-section"></a> API
-Currenty this connector supports the following methods from the Kubeflow Pipeline API.
+Currenty this connector supports the following methods from the Kubeflow Pipeline API in both API versions 1 and 2.
 
 - Get Pipelines
 - Get Experiments
@@ -29,17 +29,44 @@ Currenty this connector supports the following methods from the Kubeflow Pipelin
 
 ### Get Pipelines
 
-### Input
+#### Input
+
+Parameter Filter
+
+API Version 1:
+
+```json
+{ "predicates":
+  [
+    {
+      "op":"IS_SUBSTRING",
+      "key": "name",
+      "string_value": "Control"
+    }
+  ]
+}
+```
+
+API Version 2:
+```json
+{ "predicates":
+  [
+    {
+      "operation":"IS_SUBSTRING",
+      "key": "name",
+      "string_value": "Control"
+    }
+  ]
+}
+```
+For details on filter structure and options check the proto-buffer files:
+
+Version 1: [https://github.com/kubeflow/pipelines/blob/master/backend/api/v1beta1/filter.proto](https://github.com/kubeflow/pipelines/blob/master/backend/api/v1beta1/filter.proto)
+
+Version 2: [https://github.com/kubeflow/pipelines/blob/master/backend/api/v2beta1/filter.proto](https://github.com/kubeflow/pipelines/blob/master/backend/api/v2beta1/filter.proto)
 
 
-
-| Name     | Description      | Example           | Notes                                                                      |
-|----------|------------------|-------------------|----------------------------------------------------------------------------|
-| filter | define the filter to apply to the call    | `alice`           | Has no effect on the function call outcome.                                |
-| token    | Mock token value | `my-secret-token` | Has no effect on the function call outcome.                                |
-| message  | Mock message     | `Hello World`     | Echoed back in the output. If starts with 'fail', an error will be thrown. |
-
-### Output
+#### Output
 
 ```json
 {
