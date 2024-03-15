@@ -27,6 +27,9 @@ Currenty this connector supports the following methods from the Kubeflow Pipelin
 - Start Run and Monitor
 - Create Experiment
 
+The inputs describes the parameters that can be set in the modeler for the operation.
+The output is the complete output you will get written into the variable you enter under Output mapping in the result variable. In the result expression you can more specifically extract the data as required to limit the output.
+
 ### Get Pipelines
 
 #### Input
@@ -65,22 +68,130 @@ Version 1: [https://github.com/kubeflow/pipelines/blob/master/backend/api/v1beta
 
 Version 2: [https://github.com/kubeflow/pipelines/blob/master/backend/api/v2beta1/filter.proto](https://github.com/kubeflow/pipelines/blob/master/backend/api/v2beta1/filter.proto)
 
-
 #### Output
 
+API Version 1:
 ```json
 {
-  "result": {
-    "myProperty": "Message received: ..."
-  }
+  "pipelines":[
+    {
+      "id":"2d974767-3d50-40b8-9bfc-7767d4a13a5c",
+      "created_at":"2024-03-15T10:43:45Z",
+      "name":"[Tutorial] DSL - Control structures",
+      "description":"...",
+      "default_version":{
+        "id":"dadc4c6d-b864-49e6-808e-946424e532ba",
+        "name":"[Tutorial] DSL - Control structures",
+        "created_at":"2024-03-15T10:43:45Z",
+        "resource_references":[
+          {
+            "key":{
+              "type":"PIPELINE",
+              "id":"2d974767-3d50-40b8-9bfc-7767d4a13a5c"
+            },
+            "relationship":"OWNER"
+          }
+        ],
+        "description":"..."
+      }
+    }
+  ],
+  "total_size":1
 }
 ```
 
-### Error codes
+API Version 2:
+```json
+{
+  "pipelines": [
+    {
+      "pipeline_id":"369eea92-e69c-4af4-802a-9f403a362bc5",
+      "display_name":"[Tutorial] DSL - Control structures",
+      "description":"...",
+      "created_at":"2024-03-14T22:09:25Z"
+    }
+  ],
+  "total_size":1
+}
+```
 
-| Code | Description                                |
-|------|--------------------------------------------|
-| FAIL | Message starts with 'fail' (ignoring case) |
+### Get Experiments
+
+#### Input
+
+Parameter Filter
+
+API Version 1:
+```json
+{ "predicates":
+  [
+    {
+      "op":"IS_SUBSTRING",
+      "key": "name",
+      "string_value": "test"
+    }
+  ]
+}
+```
+
+API Version 2:
+```json
+{ "predicates":
+  [
+    {
+      "operation":"IS_SUBSTRING",
+      "key": "name",
+      "string_value": "test"
+    }
+  ]
+}
+```
+
+#### Output
+
+API Version 1:
+```json
+{
+  "experiments":[
+    {
+      "id":"f4e404a0-6b83-44a8-9eae-9678706188a0",
+      "name":"Testexperiment",
+      "created_at":"2024-03-15T11:47:52Z",
+      "resource_references":[
+        {
+          "key":{
+            "type":"NAMESPACE",
+            "id":"kubeflow-user-example-com"
+          },
+          "relationship":"OWNER"
+        }
+      ],
+      "storage_state":"STORAGESTATE_AVAILABLE"
+    }
+  ],
+  "total_size":1
+}
+```
+
+API Version 2:
+```json
+{
+  "experiments": [
+    {
+      "experiment_id": "f4e404a0-6b83-44a8-9eae-9678706188a0",
+      "display_name": "Testexperiment",
+      "created_at": "2024-03-15T11:47:52Z",
+      "namespace": "kubeflow-user-example-com",
+      "storage_state": "AVAILABLE"
+    }
+  ],
+  "total_size": 1
+}
+```
+
+### Error handling
+
+In case a return code >= 400 is returned by the API calls, the connector will raise an exception.
 
 ## Test locally
 
