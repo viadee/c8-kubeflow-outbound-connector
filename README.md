@@ -2,7 +2,7 @@
 
 A custom Camunda 8 outbound connector to communicate with the [Kubeflow](https://www.kubeflow.org/) API. It supports standalone as well as multi-suer setup and version 1 and 2 of the Kubeflow API. It currently supports the functions mentioned below in the [API section](#api-section).
 
-## Build
+# Build
 
 You can package the Connector by running the following command:
 
@@ -15,7 +15,7 @@ This will create the following artifacts:
 - A thin JAR without dependencies.
 - An fat JAR containing all dependencies, potentially shaded to avoid classpath conflicts. This will not include the SDK artifacts since those are in scope `provided` and will be brought along by the respective Connector Runtime executing the Connector.
 
-## <a id="api-section"></a> API
+# <a id="api-section"></a> API
 Currenty this connector supports the following methods from the Kubeflow Pipeline API in both API versions 1 and 2.
 
 - Get Pipelines
@@ -30,11 +30,11 @@ Currenty this connector supports the following methods from the Kubeflow Pipelin
 The inputs describes the parameters that can be set in the modeler for the operation.
 The output is the complete output you will get written into the variable you enter under Output mapping in the result variable. In the result expression you can more specifically extract the data as required to limit the output.
 
-### Get Pipelines
+## Get Pipelines
 
-#### Input
+### Input
 
-Parameter Filter
+#### Parameter Filter (optional)
 
 API Version 1:
 
@@ -68,7 +68,11 @@ Version 1: [https://github.com/kubeflow/pipelines/blob/master/backend/api/v1beta
 
 Version 2: [https://github.com/kubeflow/pipelines/blob/master/backend/api/v2beta1/filter.proto](https://github.com/kubeflow/pipelines/blob/master/backend/api/v2beta1/filter.proto)
 
-#### Output
+#### Parameter Namespace (optional)
+
+API Version 1 and 2: If omitted, shared pipelines will also be returned.
+
+### Output
 
 API Version 1:
 ```json
@@ -115,11 +119,11 @@ API Version 2:
 }
 ```
 
-### Get Experiments
+## Get Experiments
 
-#### Input
+### Input
 
-Parameter Filter
+#### Parameter Filter
 
 API Version 1:
 ```json
@@ -147,7 +151,11 @@ API Version 2:
 }
 ```
 
-#### Output
+#### Parameter Namespace (required in multiuser deployment)
+
+API Version 1 and 2: namespace where the experiments should be retrieved from.
+
+### Output
 
 API Version 1:
 ```json
