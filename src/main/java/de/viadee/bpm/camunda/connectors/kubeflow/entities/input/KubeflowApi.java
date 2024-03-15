@@ -2,6 +2,7 @@ package de.viadee.bpm.camunda.connectors.kubeflow.entities.input;
 
 import java.util.Map;
 
+import io.camunda.connector.feel.annotation.FEEL;
 import jakarta.validation.constraints.NotEmpty;
 
 public record KubeflowApi(
@@ -21,6 +22,7 @@ public record KubeflowApi(
 
     String experimentId,
 
+    @FEEL
     String filter,
 
     String pollingInterval,
