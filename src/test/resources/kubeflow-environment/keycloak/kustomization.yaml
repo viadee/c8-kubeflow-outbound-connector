@@ -5,3 +5,5 @@ resources:
   - keycloak-realm-config.yaml
   - profile-service.yaml
   - keycloak-virtualservice.yaml
+  - rolebinding-service-user-namespace.yaml
+  - authpolicy-service-user-namespace.yaml
