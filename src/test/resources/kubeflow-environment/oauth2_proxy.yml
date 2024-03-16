@@ -24,7 +24,7 @@ providers:
     - aud
     emailClaim: email
     groupsClaim: groups
-    issuerURL: http://localhost:30000/auth/realms/kubeflow
+    issuerURL: http://${KUBEFLOW_HOST}:30000/auth/realms/kubeflow
     jwksURL: http://keycloak.keycloak.svc.cluster.local:8080/auth/realms/kubeflow/protocol/openid-connect/certs
     skipDiscovery: true
     userIDClaim: email
