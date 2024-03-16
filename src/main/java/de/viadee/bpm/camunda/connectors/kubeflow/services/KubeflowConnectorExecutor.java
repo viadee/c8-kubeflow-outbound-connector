@@ -101,12 +101,13 @@ public class KubeflowConnectorExecutor {
 
     private void setConfigurationParameters() {
         var configPropertyGroup = connectorRequest.getConfiguration();
+        var typeOfUserMode = TypeOfUserModeEnum.fromValue(configPropertyGroup.typeOfUserMode());
 
         kubeflowUrl = System.getenv(KUBEFLOW_URL_ENV);
 
         if (configPropertyGroup != null) {
             kubeflowUrl = StringUtils.isBlank(configPropertyGroup.kubeflowUrl()) ? kubeflowUrl : configPropertyGroup.kubeflowUrl();
-            isMultiUserMode = TypeOfUserModeEnum.MULTI_USER_MODE.equals(configPropertyGroup.typeOfUserMode()) ? true : false;
+            isMultiUserMode = TypeOfUserModeEnum.MULTI_USER_MODE.equals(typeOfUserMode) ? true : false;
         }
 
         if (kubeflowUrl == null) {

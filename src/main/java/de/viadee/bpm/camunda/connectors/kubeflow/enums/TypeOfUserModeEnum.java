@@ -1,5 +1,7 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.enums;
 
+import java.util.Arrays;
+
 public enum TypeOfUserModeEnum {
   SINGLE_USER_MODE("singleUserMode"),
   MULTI_USER_MODE("multiUserMode");
@@ -12,5 +14,15 @@ public enum TypeOfUserModeEnum {
 
   public String getValue() {
     return value;
+  }
+
+  public static TypeOfUserModeEnum fromValue(String value) {
+    return Arrays
+        .stream(values())
+        .filter(typeOfUserModeEnum -> typeOfUserModeEnum.value.equals(value))
+        .findFirst()
+        .orElseThrow(
+            () -> new IllegalArgumentException("Unbekannter Wert: " + value)
+        );
   }
 }
