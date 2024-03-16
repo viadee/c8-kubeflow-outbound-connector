@@ -28,7 +28,7 @@ class AuthUtilTest {
     // given
     var kubeflowConnectorRequest = new KubeflowConnectorRequest(
         new EnvironmentAuthentication(),
-        new Configuration("http://localhost:8080", "testNamespace"),
+        new Configuration("http://localhost:8080", "multiUserMode"),
         kubeflowApiMock,
         new Timeout(20)
     );
