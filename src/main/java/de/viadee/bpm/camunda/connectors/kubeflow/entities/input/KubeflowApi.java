@@ -11,8 +11,6 @@ public record KubeflowApi(
     @NotEmpty
     String operation,
 
-    String namespace,
-
     String runId,
 
     String runName,
@@ -31,5 +29,8 @@ public record KubeflowApi(
 
     String experimentDescription,
 
-    Map<String, String> httpHeaders
+    Map<String, String> httpHeaders,
+
+    String namespace
+
 ) { }

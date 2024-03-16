@@ -1,5 +1,6 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.integration;
 
+import de.viadee.bpm.camunda.connectors.kubeflow.enums.TypeOfUserModeEnum;
 import java.net.http.HttpResponse;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -47,8 +48,7 @@ public class BaseIntegrationTest {
   private Configuration createConfiguration() throws Exception {
     String kubeflowUrl = getKubeflowUrl();
 
-    return new Configuration(kubeflowUrl,
-        getEnvOrDefault(KUBEFLOW_NAMESPACE_ENV_KEY, DEFAULT_KUBEFLOW_NAMESPACE));
+    return new Configuration(kubeflowUrl, TypeOfUserModeEnum.MULTI_USER_MODE.getValue());
   }
 
   private OAuthAuthenticationClientCredentialsFlow createOAuthAuthenticationClientCredentialsFlow() throws Exception {
@@ -82,8 +82,9 @@ public class BaseIntegrationTest {
   protected KubeflowConnectorExecutor getExecutor(String pipelineVersion, String operation, String experimentName,
       String pipelineId, String experimentId, String runName)
       throws Exception {
+    var namespace = getEnvOrDefault(KUBEFLOW_NAMESPACE_ENV_KEY, DEFAULT_KUBEFLOW_NAMESPACE);
     KubeflowApi kubeflowApi = new KubeflowApi(pipelineVersion, operation, null, runName,
-        null, pipelineId, experimentId, null, null, experimentName, null, null);
+        null, pipelineId, experimentId, null, null, experimentName, null, null, namespace);
     KubeflowConnectorRequest kubeflowConnectorRequest = new KubeflowConnectorRequest(
         this.createOAuthAuthenticationClientCredentialsFlow(), // Authentication via OAuth
         this.getConfiguration(),

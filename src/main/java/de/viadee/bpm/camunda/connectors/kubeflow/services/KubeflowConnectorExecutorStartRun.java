@@ -1,5 +1,13 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.services;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import de.viadee.bpm.camunda.connectors.kubeflow.utils.OffsetDateTimeDeserializer;
+import io.swagger.client.model.V1ApiListExperimentsResponse;
+import io.swagger.client.model.V2beta1Experiment;
+import io.swagger.client.model.V2beta1ListExperimentsResponse;
 import java.io.IOException;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublisher;
@@ -31,6 +39,7 @@ import io.swagger.client.model.V2beta1PipelineVersionReference;
 import io.swagger.client.model.V2beta1Run;
 import io.swagger.client.model.V2beta1RuntimeConfig;
 import io.swagger.client.model.V2beta1RuntimeState;
+import org.threeten.bp.OffsetDateTime;
 
 public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor {
 
@@ -160,10 +169,24 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 
 	private String getIdOfAlreadyStartedRunByName(String runName)
 			throws InstantiationException, IllegalAccessException, IOException {
+
+		/*
+		the namespace is a required param. when trying to find a run by its name. However,
+		when starting the operation "Start Run and Monitor" the properties panel does not
+		ask for the namespace to be specified. This is, because Kubeflow can derive the
+		namespace with the help of the experiment id (an experiment is always uniquely
+		assigned to a namespace). In order to start the operation "Get Run By Name",
+		we, thus, need to first find the experiment via the ID from the properties
+		panel and extract the namespace from the resulting object if it exists.
+		 */
+		var namespaceInWhichRunPotentiallyStarted = getNamespaceByExperimentId(
+				connectorRequest.getKubeflowapi().experimentId());
+
+		// use previously determined namespace to search for run by its name
 		KubeflowApi kubeflowApi = new KubeflowApi(kubeflowApisEnum.getValue(),
 				KubeflowApiOperationsEnum.GET_RUN_BY_NAME.getValue(), null,
 				null, null, null, null, runName, null, null, null, connectorRequest.getKubeflowapi()
-				.httpHeaders());
+				.httpHeaders(), namespaceInWhichRunPotentiallyStarted);
 
 		KubeflowConnectorRequest getRunByNameConnectorRequest = new KubeflowConnectorRequest(
 				connectorRequest.getAuthentication(),
@@ -180,6 +203,51 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 						.orElse(null);
 
 		return id;
+	}
+
+	private String getNamespaceByExperimentId(String experimentId) throws JsonProcessingException {
+		KubeflowApi kubeflowApi = new KubeflowApi(kubeflowApisEnum.getValue(),
+				KubeflowApiOperationsEnum.GET_EXPERIMENTS.getValue(), null,
+				null, null, null, null, null, null, null, null, connectorRequest.getKubeflowapi()
+				.httpHeaders(), null);
+
+		KubeflowConnectorRequest getExperimentsConnectorRequest = new KubeflowConnectorRequest(
+				connectorRequest.getAuthentication(),
+				connectorRequest.getConfiguration(), kubeflowApi,
+				connectorRequest.getTimeout());
+
+		var response = ExecutionHandler.getExecutor(getExperimentsConnectorRequest, processInstanceKey).execute();
+
+		var objectMapper = new ObjectMapper()
+				.registerModule(new SimpleModule().addDeserializer(OffsetDateTime.class,
+						new OffsetDateTimeDeserializer()))
+				.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
+				.enable(DeserializationFeature.READ_ENUMS_USING_TO_STRING);
+
+		if (KubeflowApisEnum.PIPELINES_V1.getValue().equals(kubeflowApisEnum.getValue())) {
+			var experiment = objectMapper.readValue(response.body(), V1ApiListExperimentsResponse.class)
+					.getExperiments()
+					.stream()
+					.filter(exp -> exp.getId().equals(experimentId))
+					.findFirst()
+					.orElse(null);
+
+			return experiment == null ? null :
+					experiment.getResourceReferences().stream()
+							.filter(refs -> refs.getKey().getType().equals("NAMESPACE"))
+							.findFirst()
+							.map(V1ApiResourceReference::getKey)
+							.map(V1ApiResourceKey::getId)
+							.orElse(null);
+		} else {
+			return objectMapper.readValue(response.body(), V2beta1ListExperimentsResponse.class)
+					.getExperiments()
+					.stream()
+					.filter(exp -> exp.getExperimentId().equals(experimentId))
+					.findFirst()
+					.map(V2beta1Experiment::getNamespace)
+					.orElse(null);
+		}
 	}
 
 	private HttpResponse<String> retrieveRunStatusWithDelay(KubeflowCallable kubeflowCallable, long delay,

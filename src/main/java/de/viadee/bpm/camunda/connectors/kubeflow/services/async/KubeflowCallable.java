@@ -32,7 +32,7 @@ public class KubeflowCallable implements Callable<HttpResponse<String>> {
             throws InstantiationException, IllegalAccessException, IOException {
         KubeflowApi kubeflowApi = new KubeflowApi(connectorRequest.getKubeflowapi().api(), KubeflowApiOperationsEnum.GET_RUN_BY_ID.getValue(),
             runId, null, null, null, null, null, null, null, null, connectorRequest.getKubeflowapi()
-            .httpHeaders());
+            .httpHeaders(), null);
         KubeflowConnectorRequest getRunByIdConnectorRequest = new KubeflowConnectorRequest(connectorRequest.getAuthentication(),
                 connectorRequest.getConfiguration(), kubeflowApi, connectorRequest.getTimeout());
         KubeflowConnectorExecutorGetRunById getRunByIdExecutor = (KubeflowConnectorExecutorGetRunById) ExecutionHandler.getExecutor(
