@@ -17,18 +17,18 @@ public enum KubeflowApiOperationsEnum {
                 "/pipeline/apis/%s/runs"),
         START_RUN_AND_MONITOR("start_run_and_monitor","POST", false,
                 "/pipeline/apis/%s/runs"),
-        CREATE_EXPERIMENT("create_experiment", "POST", false,
+        CREATE_EXPERIMENT("create_experiment", "POST", true,
             "/pipeline/apis/%s/experiments");
 
         private final String value;
         private final String httpMethod;
-        private final boolean requiresMultiuserFilter;
+        private final boolean isNamespaceFilterRequired;
         private final String apiUrl;
 
-        KubeflowApiOperationsEnum(String value, String httpMethod, boolean requiresMultiuserFilter, String apiUrl) {
+        KubeflowApiOperationsEnum(String value, String httpMethod, boolean isNamespaceFilterRequired, String apiUrl) {
             this.value = value;
             this.httpMethod = httpMethod;
-            this.requiresMultiuserFilter = requiresMultiuserFilter;
+            this.isNamespaceFilterRequired = isNamespaceFilterRequired;
             this.apiUrl = apiUrl;
         }
 
@@ -40,8 +40,8 @@ public enum KubeflowApiOperationsEnum {
             return httpMethod;
         }
 
-        public boolean requiresMultiuserFilter() {
-            return requiresMultiuserFilter;
+        public boolean isNamespaceFilterRequired() {
+            return isNamespaceFilterRequired;
         }
 
         public String getApiUrl() {

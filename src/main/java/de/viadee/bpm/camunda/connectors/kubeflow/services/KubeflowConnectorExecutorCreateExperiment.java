@@ -43,10 +43,10 @@ public class KubeflowConnectorExecutorCreateExperiment extends KubeflowConnector
     }
 
     private V1ApiExperiment getPayloadForEndpointV1() {
-        var v1ApiResourceReference = new V1ApiResourceReference()
+        var v1ApiResourceReference = new V1ApiResourceReference() // TODO in singleUserMode no namespace is needed
             .key(new V1ApiResourceKey()
                 .type(V1ApiResourceType.NAMESPACE)
-                .id(super.kubeflowMultiNs));
+                .id(connectorRequest.getKubeflowapi().namespace()));
 
         var v1ApiExperiment = new V1ApiExperiment()
             .name(getName())
@@ -60,7 +60,7 @@ public class KubeflowConnectorExecutorCreateExperiment extends KubeflowConnector
         var v2Beta1Experiment = new V2beta1Experiment()
             .displayName(getName())
             .description(getDescription())
-            .namespace(super.kubeflowMultiNs);
+            .namespace(connectorRequest.getKubeflowapi().namespace());
         return JsonHelper.objectMapper.convertValue(v2Beta1Experiment,
             new TypeReference<>() {});
     }

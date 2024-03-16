@@ -11,6 +11,8 @@ public record KubeflowApi(
     @NotEmpty
     String operation,
 
+    String namespace,
+
     String runId,
 
     String runName,
