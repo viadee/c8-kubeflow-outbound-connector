@@ -391,6 +391,10 @@
           "value": "get_runs"
         },
         {
+          "name": "Get Experiment by ID",
+          "value": "get_experiment_by_id"
+        },
+        {
           "name": "Get Run by ID",
           "value": "get_run_by_id"
         },
@@ -588,6 +592,27 @@
       }
     },
     {
+      "id": "kubeflowapi.experimentId",
+      "label": "Experiment ID",
+      "description": "Specify the id of the experiment.",
+      "type": "String",
+      "group": "kubeflowapi",
+      "feel": "optional",
+      "constraints": {
+        "notEmpty": true
+      },
+      "binding": {
+        "type": "zeebe:input",
+        "name": "kubeflowapi.experimentId"
+      },
+      "condition": {
+        "property": "kubeflowapi.operation",
+        "oneOf": [
+          "get_experiment_by_id"
+        ]
+      }
+    },
+    {
       "id": "kubeflowapi.runName",
       "label": "Run Name",
       "description": "Specify the suffix of the name of the run.",
@@ -681,7 +706,6 @@
       "type": "String",
       "group": "output",
       "feel": "required",
-      "value": "={result: state}",
       "binding": {
         "type": "zeebe:taskHeader",
         "key": "resultExpression"

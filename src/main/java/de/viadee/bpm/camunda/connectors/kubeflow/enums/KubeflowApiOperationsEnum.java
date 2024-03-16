@@ -18,6 +18,8 @@ public enum KubeflowApiOperationsEnum {
         START_RUN_AND_MONITOR("start_run_and_monitor","POST", false,
                 "/pipeline/apis/%s/runs"),
         CREATE_EXPERIMENT("create_experiment", "POST", true,
+            "/pipeline/apis/%s/experiments"),
+        GET_EXPERIMENT_BY_ID("get_experiment_by_id", "GET", false,
             "/pipeline/apis/%s/experiments");
 
         private final String value;
