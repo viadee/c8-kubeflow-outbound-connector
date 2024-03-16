@@ -1,5 +1,14 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.integration;
 
+import java.net.http.HttpResponse;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+
 import de.viadee.bpm.camunda.connectors.kubeflow.enums.KubeflowApisEnum;
 import io.swagger.client.model.V1ApiExperiment;
 import io.swagger.client.model.V1ApiListPipelinesResponse;
@@ -8,20 +17,11 @@ import io.swagger.client.model.V1ApiRun;
 import io.swagger.client.model.V2beta1Experiment;
 import io.swagger.client.model.V2beta1ListRunsResponse;
 import io.swagger.client.model.V2beta1Run;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.http.HttpResponse;
-import java.util.List;
-import java.util.stream.Collectors;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 
 public class RunsIT extends BaseIntegrationTest {
 
   private void createRun(String pipelineVersion, String runName, String pipelineId, String experimentId)
-      throws IOException, URISyntaxException, InterruptedException {
+      throws Exception {
     var test  = getExecutor(pipelineVersion, "start_run", null, pipelineId, experimentId, runName).execute();
   }
 
@@ -43,7 +43,7 @@ public class RunsIT extends BaseIntegrationTest {
   }
 
   private String createExperimentAndGetId(String pipelineVersion, String experimentName)
-      throws IOException, URISyntaxException, InterruptedException {
+      throws Exception {
     HttpResponse<String> response = getExecutor(pipelineVersion, "create_experiment", experimentName, null,
         null, null).execute();
 

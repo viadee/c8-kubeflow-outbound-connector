@@ -259,7 +259,7 @@ public class KubeflowConnectorExecutor {
         try {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-            if (response.statusCode() >= 300) {
+            if (response.statusCode() >= 400) {
                 throw new RuntimeException(response.body());
             }
 

@@ -40,9 +40,9 @@ resources:
   - https://github.com/kubeflow/manifests//common/istio-1-17/istio-namespace/base/?timeout=120&ref=v1.8-branch
   - https://github.com/kubeflow/manifests//common/istio-1-17/istio-install/base/?timeout=120&ref=v1.8-branch
   # OIDC Authservice
-  - https://github.com/kubeflow/manifests//common/oidc-client/oidc-authservice/base/?timeout=120&ref=v1.8-branch
+  - https://github.com/kubeflow/manifests//common/oidc-client/oauth2-proxy/base/?timeout=120&ref=v1.8-branch
   # Dex
-  - https://github.com/kubeflow/manifests//common/dex/overlays/istio/?timeout=120&ref=v1.8-branch
+  #- https://github.com/kubeflow/manifests//common/dex/overlays/oauth2-proxy/?timeout=120&ref=v1.8-branch
   # Kubeflow namespace
   - https://github.com/kubeflow/manifests//common/kubeflow-namespace/base/?timeout=120&ref=v1.8-branch
   # Kubeflow Roles
@@ -60,15 +60,47 @@ resources:
   - https://github.com/kubeflow/manifests//apps/profiles/upstream/overlays/kubeflow/?timeout=120&ref=v1.8-branch
   # User namespace
   - https://github.com/kubeflow/manifests//common/user-namespace/base/?timeout=120&ref=v1.8-branch
+  # Keycloak
+  - ./keycloak
 
 patches:
-  # Make the istio-ingressgateway a NodePort service.
+  # Make the istio-ingressgateway a NodePort on port 30000 service.
   # This way, we can access it locally.
   - patch: |
       - op: replace
         path: /spec/type
         value: NodePort
+      - op: add
+        path: /spec/ports/1/nodePort
+        value: 30000
     target:
       kind: Service
       name: istio-ingressgateway
       namespace: istio-system
+  - patch: |
+      - op: replace
+        path: /data
+        value:
+          CLIENT_SECRET: SnEwOUwxbGlGYTBVaWFYbkwzcGNuWHpscU9LWGFvT1c=
+          COOKIE_SECRET: N2QxNmZlZTkyZjhkMTFiODk0MGIwODFiM2Y4YjhhY2I=
+    target:
+      kind: Secret
+      name: oauth2-proxy
+      namespace: istio-system
+
+images:
+  - name: quay.io/oauth2-proxy/oauth2-proxy:v7.4.0
+    newName: quay.io/oauth2-proxy/oauth2-proxy
+    newTag: v7.6.0
+
+configMapGenerator:
+- name: oauth2-proxy
+  namespace: istio-system
+  behavior: replace
+  files: 
+    - oauth2_proxy.cfg
+- name: oauth2-proxy-alpha
+  namespace: istio-system
+  behavior: replace
+  files: 
+    - oauth2_proxy.yml
