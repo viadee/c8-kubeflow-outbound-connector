@@ -614,7 +614,7 @@
     },
     {
       "id": "kubeflowapi.runName",
-      "label": "Run Name",
+      "label": "Suffix of Run Name",
       "description": "Specify the suffix of the name of the run.",
       "type": "String",
       "group": "kubeflowapi",
