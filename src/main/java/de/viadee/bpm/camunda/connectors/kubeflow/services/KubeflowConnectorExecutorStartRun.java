@@ -179,13 +179,14 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 			throws InstantiationException, IllegalAccessException, IOException {
 
 		/*
-		the namespace is a required param. when trying to find a run by its name. However,
-		when starting the operation "Start Run and Monitor" the properties panel does not
-		ask for the namespace to be specified. This is, because Kubeflow can derive the
-		namespace with the help of the experiment id (an experiment is always uniquely
-		assigned to a namespace). In order to start the operation "Get Run By Name",
-		we, thus, need to first find the experiment via the ID from the properties
-		panel and extract the namespace from the resulting object if it exists.
+		in case of multi-user mode, the namespace is a required param. when trying to find
+		a run by its name. However, when starting the operation "Start Run and Monitor"
+		the properties panel does not ask for the namespace to be specified. This is,
+		because Kubeflow can derive the namespace with the help of the experiment id
+		(an experiment is always uniquely assigned to a namespace). In order to
+		start the operation "Get Run By Name", we, thus, need to first find
+		the experiment via the ID from the properties panel and extract
+		the namespace from the resulting object if it exists.
 		 */
 		var namespaceInWhichRunPotentiallyStarted = super.isMultiUserMode? getNamespaceByExperimentId(
 				connectorRequest.getKubeflowapi().experimentId()) : null;
