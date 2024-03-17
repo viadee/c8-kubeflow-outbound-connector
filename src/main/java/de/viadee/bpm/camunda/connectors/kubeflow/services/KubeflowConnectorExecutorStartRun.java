@@ -187,9 +187,8 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 		we, thus, need to first find the experiment via the ID from the properties
 		panel and extract the namespace from the resulting object if it exists.
 		 */
-		// TODO only relevant for multi user mode
-		var namespaceInWhichRunPotentiallyStarted = getNamespaceByExperimentId(
-				connectorRequest.getKubeflowapi().experimentId());
+		var namespaceInWhichRunPotentiallyStarted = super.isMultiUserMode? getNamespaceByExperimentId(
+				connectorRequest.getKubeflowapi().experimentId()) : null;
 
 		// use previously determined namespace to search for run by its name
 		KubeflowApi kubeflowApi = new KubeflowApi(kubeflowApisEnum.getValue(),
@@ -214,7 +213,7 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 		return id;
 	}
 
-	private String getNamespaceByExperimentId(String experimentId) throws JsonProcessingException {
+	private String getNamespaceByExperimentId(String experimentId) {
 
 		// get experiment
 		KubeflowApi getExperimentKubeflowApi = new KubeflowApi(kubeflowApisEnum.getValue(),
@@ -247,7 +246,7 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 				namespace = v2Experiment.getNamespace();
 			}
 		} catch (Exception e) {
-			namespace = null;
+			throw new RuntimeException("Could not derive namespace from experiment ID: " + e);
 		}
 
 		return namespace;
