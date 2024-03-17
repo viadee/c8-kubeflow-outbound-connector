@@ -67,7 +67,7 @@ public class KubeflowConnectorExecutorGetRunByName extends KubeflowConnectorExec
   }
 
   public Optional<V1ApiRun> getRunByNameV1Typed()
-      throws IOException, InstantiationException, IllegalAccessException {
+      throws IOException {
     var httpResponse = this.execute();
     if (JsonHelper.getAsJsonElement(httpResponse.body(), new ObjectMapper()).isEmpty()) {
       return Optional.ofNullable(null);
@@ -78,7 +78,7 @@ public class KubeflowConnectorExecutorGetRunByName extends KubeflowConnectorExec
   }
 
   public Optional<V2beta1Run> getRunByNameV2Typed()
-      throws IOException, InstantiationException, IllegalAccessException {
+      throws IOException {
     var httpResponse = this.execute();
     if (JsonHelper.getAsJsonElement(httpResponse.body(), new ObjectMapper()).isEmpty()) {
       return Optional.ofNullable(null);
@@ -92,7 +92,7 @@ public class KubeflowConnectorExecutorGetRunByName extends KubeflowConnectorExec
     var predicate = new V1FilterPredicate()
         .op(V2beta1PredicateOperation.EQUALS)
         .key(FILTER_BY_KEY)
-        .stringValue(connectorRequest.getKubeflowapi().filter());
+        .stringValue(connectorRequest.getKubeflowapi().runName());
 
     return new V1Filter()
         .addPredicatesItem(predicate);
@@ -102,7 +102,7 @@ public class KubeflowConnectorExecutorGetRunByName extends KubeflowConnectorExec
     var predicate = new V2beta1Predicate()
         .operation(V2beta1PredicateOperation.EQUALS)
         .key(FILTER_BY_KEY)
-        .stringValue(connectorRequest.getKubeflowapi().filter());
+        .stringValue(connectorRequest.getKubeflowapi().runName());
 
     return new V2beta1Filter()
         .addPredicatesItem(predicate);

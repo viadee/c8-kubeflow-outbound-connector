@@ -630,9 +630,30 @@
       "condition": {
         "property": "kubeflowapi.operation",
         "oneOf": [
-          "get_run_by_name",
           "start_run",
           "start_run_and_monitor"
+        ]
+      }
+    },
+    {
+      "id": "kubeflowapi.runName",
+      "label": "Run Name",
+      "description": "Specify the name of the run.",
+      "type": "String",
+      "group": "kubeflowapi",
+      "feel": "optional",
+      "optional": false,
+      "constraints": {
+        "notEmpty": true
+      },
+      "binding": {
+        "type": "zeebe:input",
+        "name": "kubeflowapi.runName"
+      },
+      "condition": {
+        "property": "kubeflowapi.operation",
+        "oneOf": [
+          "get_run_by_name"
         ]
       }
     },
