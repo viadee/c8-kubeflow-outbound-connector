@@ -38,12 +38,12 @@ public class RunUtil {
 
   public V1ApiRun readV1RunAsTypedResponse(HttpResponse<String> runResponse)
       throws JsonProcessingException {
-    V1ApiRunDetail v1ApiRunResponse = null;
+    V1ApiRun v1ApiRunResponse = null;
     if (!JsonHelper.getAsJsonElement(runResponse.body(), new ObjectMapper()).isEmpty()) {
       v1ApiRunResponse = runMapper
-          .readValue(runResponse.body(), V1ApiRunDetail.class);
+          .readValue(runResponse.body(), V1ApiRunDetail.class).getRun();
     }
-    return v1ApiRunResponse.getRun();
+    return v1ApiRunResponse;
   }
 
   public String extractIdFromV1RunResponse(HttpResponse<String> runResponse) throws JsonProcessingException {
