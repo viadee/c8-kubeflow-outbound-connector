@@ -197,7 +197,123 @@ API Version 2:
 }
 ```
 
-### Error handling
+## <a id="get-runs"></a> Get Runs
+
+### Input
+
+#### Parameter Filter
+
+API Version 1:
+```json
+{ "predicates":
+  [
+    {
+      "op":"IS_SUBSTRING",
+      "key": "name",
+      "string_value": "test"
+    }
+  ]
+}
+```
+
+API Version 2:
+```json
+{ "predicates":
+  [
+    {
+      "operation":"IS_SUBSTRING",
+      "key": "name",
+      "string_value": "test"
+    }
+  ]
+}
+```
+
+#### Parameter Namespace (required in multiuser deployment)
+
+API Version 1 and 2: namespace where the runs should be retrieved from.
+
+### Output
+
+API Version 1: [https://www.kubeflow.org/docs/components/pipelines/v1/reference/api/kubeflow-pipeline-api-spec/#/definitions/apiListRunsResponse](https://www.kubeflow.org/docs/components/pipelines/v1/reference/api/kubeflow-pipeline-api-spec/#/definitions/apiListRunsResponse)
+
+API Version 2: [https://www.kubeflow.org/docs/components/pipelines/v2/reference/api/kubeflow-pipeline-api-spec/#/definitions/v2beta1ListRunsResponse](https://www.kubeflow.org/docs/components/pipelines/v2/reference/api/kubeflow-pipeline-api-spec/#/definitions/v2beta1ListRunsResponse)
+
+
+## Get Run By ID
+
+### Input
+
+#### Parameter Run ID
+The ID of the run that should be retrieved. 
+
+### Output
+
+API Version 1: [https://www.kubeflow.org/docs/components/pipelines/v1/reference/api/kubeflow-pipeline-api-spec/#/definitions/apiRunDetail](https://www.kubeflow.org/docs/components/pipelines/v1/reference/api/kubeflow-pipeline-api-spec/#/definitions/apiRunDetail)
+
+API Version 2: [https://www.kubeflow.org/docs/components/pipelines/v2/reference/api/kubeflow-pipeline-api-spec/#/definitions/v2beta1Run](https://www.kubeflow.org/docs/components/pipelines/v2/reference/api/kubeflow-pipeline-api-spec/#/definitions/v2beta1Run)
+
+## Get Run By Name
+This request tries to retrieve a single run by looking for a run that contains the name defined in the name parameter.
+
+### Input
+
+#### Parameter Name
+The name to look for in the runs. This looks for the name as a substring not as equal.
+
+### Output
+equal to responses of [Get Runs](#get-runs)
+
+
+## <a id="start-run"></a> Start Run
+This operation starts a run and continues the process without waiting for the pipeline to finish.
+
+### Input
+
+#### Parameter Pipeline ID
+The ID of the pipeline that should be run.
+
+#### Parameter Experiment ID
+The ID of the experiment in which the run should be started.
+
+### Output
+
+API Version 1: [https://www.kubeflow.org/docs/components/pipelines/v1/reference/api/kubeflow-pipeline-api-spec/#/definitions/apiRunDetail](https://www.kubeflow.org/docs/components/pipelines/v1/reference/api/kubeflow-pipeline-api-spec/#/definitions/apiRunDetail)
+
+API Version 2: [https://www.kubeflow.org/docs/components/pipelines/v2/reference/api/kubeflow-pipeline-api-spec/#/definitions/v2beta1Run](https://www.kubeflow.org/docs/components/pipelines/v2/reference/api/kubeflow-pipeline-api-spec/#/definitions/v2beta1Run)
+
+## Start Run and Monitor
+This operation starts a run and monitors it until it finishes are throws an error. If the connector crashes during the run, the connector will pick up the already started run and monitor it after receiving the job again from Zeebe.
+
+### Input
+
+#### Parameter Pipeline ID
+The ID of the pipeline that should be run.
+
+#### Parameter Experiment ID
+The ID of the experiment in which the run should be started.
+
+### Output
+see [Start Run](#start-run)
+
+## Create Experiment
+This operation allows to create an experiment, which can e. g. be used in a subsequent run.
+
+### Input
+
+#### Parameter Experiment Name
+The name of the experiment to create.
+
+#### Parameter Experiment Description (optional)
+The description of the experiment.
+
+### Output
+
+API Version 1: [https://www.kubeflow.org/docs/components/pipelines/v1/reference/api/kubeflow-pipeline-api-spec/#/definitions/apiExperiment](https://www.kubeflow.org/docs/components/pipelines/v1/reference/api/kubeflow-pipeline-api-spec/#/definitions/apiExperiment)
+
+API Version 2: [https://www.kubeflow.org/docs/components/pipelines/v2/reference/api/kubeflow-pipeline-api-spec/#/definitions/v2beta1Experiment](https://www.kubeflow.org/docs/components/pipelines/v2/reference/api/kubeflow-pipeline-api-spec/#/definitions/v2beta1Experiment)
+
+## Error handling
 
 In case a return code >= 400 is returned by the API calls, the connector will raise an exception.
 
