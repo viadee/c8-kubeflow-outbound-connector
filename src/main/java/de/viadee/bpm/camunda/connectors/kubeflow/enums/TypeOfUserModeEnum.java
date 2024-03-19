@@ -3,7 +3,6 @@ package de.viadee.bpm.camunda.connectors.kubeflow.enums;
 import java.util.Arrays;
 
 public enum TypeOfUserModeEnum {
-  SINGLE_USER_MODE("singleUserMode"),
   MULTI_USER_MODE("multiUserMode");
 
   private final String value;

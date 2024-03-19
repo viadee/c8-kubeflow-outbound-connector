@@ -76,19 +76,14 @@
     {
       "id": "configuration.typeOfUserMode",
       "label": "Type of User Mode",
-      "description": "Specify the type of user mode in use.",
       "type": "Dropdown",
       "group": "configuration",
-      "value": "singleUserMode",
+      "value": "multiUserMode",
       "optional": false,
       "constraints": {
         "notEmpty": true
       },
       "choices": [
-        {
-          "name": "Single-User Mode",
-          "value": "singleUserMode"
-        },
         {
           "name": "Multi-User Mode",
           "value": "multiUserMode"

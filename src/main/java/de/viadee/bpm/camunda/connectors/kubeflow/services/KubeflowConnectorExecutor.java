@@ -107,7 +107,7 @@ public class KubeflowConnectorExecutor {
 
         if (configPropertyGroup != null) {
             kubeflowUrl = StringUtils.isBlank(configPropertyGroup.kubeflowUrl()) ? kubeflowUrl : configPropertyGroup.kubeflowUrl();
-            isMultiUserMode = TypeOfUserModeEnum.MULTI_USER_MODE.equals(typeOfUserMode) ? true : false;
+            isMultiUserMode = TypeOfUserModeEnum.MULTI_USER_MODE.equals(typeOfUserMode);
         }
 
         if (kubeflowUrl == null) {
