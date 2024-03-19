@@ -20,6 +20,7 @@ Currenty this connector supports the following methods from the Kubeflow Pipelin
 
 - Get Pipelines
 - Get Experiments
+- Get Experiment by ID
 - Get Runs
 - Get Run by ID
 - Get Run by Name
@@ -196,6 +197,19 @@ API Version 2:
   "total_size": 1
 }
 ```
+
+## Get Experiment By ID
+
+### Input
+
+#### Parameter Experiment ID
+The ID of the experiment that should be retrieved. 
+
+### Output
+
+API Version 1: [https://www.kubeflow.org/docs/components/pipelines/v1/reference/api/kubeflow-pipeline-api-spec/#/definitions/apiExperiment](https://www.kubeflow.org/docs/components/pipelines/v1/reference/api/kubeflow-pipeline-api-spec/#/definitions/apiExperiment)
+
+API Version 2: [https://www.kubeflow.org/docs/components/pipelines/v2/reference/api/kubeflow-pipeline-api-spec/#/definitions/v2beta1Experiment](https://www.kubeflow.org/docs/components/pipelines/v2/reference/api/kubeflow-pipeline-api-spec/#/definitions/v2beta1Experiment)
 
 ## <a id="get-runs"></a> Get Runs
 
