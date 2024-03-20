@@ -74,17 +74,24 @@
       }
     },
     {
-      "id": "configuration.multiusernamespace",
-      "label": "Kubeflow Namespace",
-      "description": "If Kubeflow is running in a multiuser mode, define namespace to use.",
-      "type": "String",
+      "id": "configuration.typeOfUserMode",
+      "label": "Type of User Mode",
+      "type": "Dropdown",
       "group": "configuration",
-      "feel": "optional",
-      "optional": true,
-      "tooltip": "If left empty, namespace is read from environment variable 'KF_CONNECTOR_MULTIUSER_NS'.",
+      "value": "multiUserMode",
+      "optional": false,
+      "constraints": {
+        "notEmpty": true
+      },
+      "choices": [
+        {
+          "name": "Multi-User Mode",
+          "value": "multiUserMode"
+        }
+      ],
       "binding": {
         "type": "zeebe:input",
-        "name": "configuration.multiusernamespace"
+        "name": "configuration.typeOfUserMode"
       }
     },
     {
@@ -379,6 +386,10 @@
           "value": "get_runs"
         },
         {
+          "name": "Get Experiment by ID",
+          "value": "get_experiment_by_id"
+        },
+        {
           "name": "Get Run by ID",
           "value": "get_run_by_id"
         },
@@ -408,6 +419,34 @@
         "oneOf": [
           "pipelinesV1",
           "pipelinesV2"
+        ]
+      }
+    },
+    {
+      "id": "kubeflowapi.namespace",
+      "label": "Namespace",
+      "description": "Specify the name of the namespace.",
+      "type": "String",
+      "group": "kubeflowapi",
+      "feel": "optional",
+      "optional": false,
+      "binding": {
+        "type": "zeebe:input",
+        "name": "kubeflowapi.namespace"
+      },
+      "constraints": {
+        "notEmpty": true
+      },
+      "condition": {
+        "allMatch": [
+          {
+            "property": "configuration.typeOfUserMode",
+            "equals": "multiUserMode"
+          },
+          {
+            "property": "kubeflowapi.operation",
+            "oneOf": ["get_experiments", "get_runs", "get_run_by_name", "create_experiment"]
+          }
         ]
       }
     },
@@ -548,8 +587,29 @@
       }
     },
     {
+      "id": "kubeflowapi.experimentId",
+      "label": "Experiment ID",
+      "description": "Specify the id of the experiment.",
+      "type": "String",
+      "group": "kubeflowapi",
+      "feel": "optional",
+      "constraints": {
+        "notEmpty": true
+      },
+      "binding": {
+        "type": "zeebe:input",
+        "name": "kubeflowapi.experimentId"
+      },
+      "condition": {
+        "property": "kubeflowapi.operation",
+        "oneOf": [
+          "get_experiment_by_id"
+        ]
+      }
+    },
+    {
       "id": "kubeflowapi.runName",
-      "label": "Run Name",
+      "label": "Suffix of Run Name",
       "description": "Specify the suffix of the name of the run.",
       "type": "String",
       "group": "kubeflowapi",
@@ -565,9 +625,30 @@
       "condition": {
         "property": "kubeflowapi.operation",
         "oneOf": [
-          "get_run_by_name",
           "start_run",
           "start_run_and_monitor"
+        ]
+      }
+    },
+    {
+      "id": "kubeflowapi.runName",
+      "label": "Run Name",
+      "description": "Specify the name of the run.",
+      "type": "String",
+      "group": "kubeflowapi",
+      "feel": "optional",
+      "optional": false,
+      "constraints": {
+        "notEmpty": true
+      },
+      "binding": {
+        "type": "zeebe:input",
+        "name": "kubeflowapi.runName"
+      },
+      "condition": {
+        "property": "kubeflowapi.operation",
+        "oneOf": [
+          "get_run_by_name"
         ]
       }
     },
@@ -641,7 +722,6 @@
       "type": "String",
       "group": "output",
       "feel": "required",
-      "value": "={result: state}",
       "binding": {
         "type": "zeebe:taskHeader",
         "key": "resultExpression"

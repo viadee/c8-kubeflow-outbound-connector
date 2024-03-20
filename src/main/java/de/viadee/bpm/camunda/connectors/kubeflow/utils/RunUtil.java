@@ -1,5 +1,6 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.utils;
 
+import io.swagger.client.model.V1ApiRunDetail;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +41,7 @@ public class RunUtil {
     V1ApiRun v1ApiRunResponse = null;
     if (!JsonHelper.getAsJsonElement(runResponse.body(), new ObjectMapper()).isEmpty()) {
       v1ApiRunResponse = runMapper
-          .readValue(runResponse.body(), V1ApiRun.class);
+          .readValue(runResponse.body(), V1ApiRunDetail.class).getRun();
     }
     return v1ApiRunResponse;
   }

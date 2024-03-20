@@ -24,9 +24,9 @@ class ExecutionHandlerTest {
     // given
     KubeflowConnectorRequest kubeflowConnectorRequest = new KubeflowConnectorRequest(
         new NoAuthentication(),
-        new Configuration("http://localhost:8281", "testNamespace"),
+        new Configuration("http://localhost:8281", "multiUserMode"),
         new KubeflowApi("pipelinesV1", pipelineOperation, null, null,
-            null, null, null, null, null, null, null, null),
+            null, null, null, null, null, null, null, null, null),
         new Timeout(20)
     );
     // when

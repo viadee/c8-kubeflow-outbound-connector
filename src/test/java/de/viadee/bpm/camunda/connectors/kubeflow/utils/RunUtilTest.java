@@ -33,7 +33,7 @@ class RunUtilTest {
   @Test
   void readV1RunAsTypedResponse() throws JsonProcessingException {
     // given
-    when(httpResponseMock.body()).thenReturn("{\"id\":\"1\",\"name\":\"test\"}");
+    when(httpResponseMock.body()).thenReturn("{\"run\":{\"id\":\"1\",\"name\":\"test\"}}");
     // when
     var result = runUtil.readV1RunAsTypedResponse(httpResponseMock);
     // then
@@ -45,7 +45,7 @@ class RunUtilTest {
   @Test
   void extractIdFromV1RunResponse() throws JsonProcessingException {
     // given
-    when(httpResponseMock.body()).thenReturn("{\"id\":\"1\",\"name\":\"test\"}");
+    when(httpResponseMock.body()).thenReturn("{\"run\":{\"id\":\"1\",\"name\":\"test\"}}");
     // when
     var result = runUtil.extractIdFromV1RunResponse(httpResponseMock);
     // then
