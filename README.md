@@ -1,6 +1,6 @@
 # Kubeflow Connector
 
-A custom Camunda 8 outbound connector to communicate with the [Kubeflow](https://www.kubeflow.org/) API. It supports standalone as well as multi-suer setup and version 1 and 2 of the Kubeflow API. It currently supports the functions mentioned below in the [API section](#api-section).
+A custom Camunda 8 outbound connector to communicate with the [Kubeflow](https://www.kubeflow.org/) API. It supports the multi-user setup with profiles and namespaces as well as version 1 and 2 of the Kubeflow Pipeline API. It currently supports the functions mentioned below in the [API section](#api-section).
 
 # Build and Run
 
@@ -223,7 +223,10 @@ This request tries to retrieve a single run by looking for a run that contains t
 ### Input
 
 #### Parameter Name
-The name to look for in the runs. This looks for the name as a substring not as equal.
+The name to look for in the runs. This looks for the name to be equal.
+
+#### Parameter Namespace
+The namespace where to look for runs.
 
 ### Output
 equal to responses of [Get Runs](#get-runs)
@@ -239,6 +242,12 @@ The ID of the pipeline that should be run.
 
 #### Parameter Experiment ID
 The ID of the experiment in which the run should be started.
+
+#### Parameter Suffix of run name
+The name of the triggered run will be created as such: <Camunda_process_instance_id>_<suffix_of_run_name>.
+
+#### Parameter Run parameters (optional)
+If the pipeline requires parameters to run they can be set here.
 
 ### Output
 
@@ -256,6 +265,15 @@ The ID of the pipeline that should be run.
 
 #### Parameter Experiment ID
 The ID of the experiment in which the run should be started.
+
+#### Polling interval
+You can define the interval in which the connector should regularly check the state of the run using ISO 8601 format. E. g. PT10S means every 10 seconds.
+
+#### Parameter Suffix of run name
+The name of the triggered run will be created as such: <Camunda_process_instance_id>_<suffix_of_run_name>.
+
+#### Parameter Run parameters (optional)
+If the pipeline requires parameters to run they can be set here.
 
 ### Output
 see [Start Run](#start-run)
