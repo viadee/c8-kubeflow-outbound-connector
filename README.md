@@ -2,8 +2,9 @@
 
 A custom Camunda 8 outbound connector to communicate with the [Kubeflow](https://www.kubeflow.org/) API. It supports standalone as well as multi-suer setup and version 1 and 2 of the Kubeflow API. It currently supports the functions mentioned below in the [API section](#api-section).
 
-# Build
+# Build and Run
 
+## Build a deployable jar file
 You can package the Connector by running the following command:
 
 ```bash
@@ -14,6 +15,26 @@ This will create the following artifacts:
 
 - A thin JAR without dependencies.
 - An fat JAR containing all dependencies, potentially shaded to avoid classpath conflicts. This will not include the SDK artifacts since those are in scope `provided` and will be brought along by the respective Connector Runtime executing the Connector.
+
+### Shading dependencies
+
+You can use the `maven-shade-plugin` defined in the [Maven configuration](./pom.xml) to relocate common dependencies
+that are used in other Connectors and the [Connector Runtime](https://github.com/camunda-community-hub/spring-zeebe/tree/master/connector-runtime#building-connector-runtime-bundles).
+This helps to avoid classpath conflicts when the Connector is executed. 
+
+Use the `relocations` configuration in the Maven Shade plugin to define the dependencies that should be shaded.
+The [Maven Shade documentation](https://maven.apache.org/plugins/maven-shade-plugin/examples/class-relocation.html) 
+provides more details on relocations.
+
+## Configure a local environment for the Connector
+The example bpmn models provided in the bpmn folder of the repository are set up in a way that they rely on environment variables being defined for the kubeflow and authentication configuration. We provided an [example.env](example.env) file that is tailored to the local development environment. You can copy this file to *.env* so that it is considered when you start the connector runtime locally.
+
+##  Start the connector locally
+In order to start the connector locally run
+```bash
+mvn spring-boot:run
+```
+
 
 # <a id="api-section"></a> API
 Currenty this connector supports the following methods from the Kubeflow Pipeline API in both API versions 1 and 2.
@@ -312,15 +333,3 @@ client-secret: Jq09L1liFa0UiaXnL3pcnXzlqOKXaoOW
 
 ## Contact Information
 For any queries and further support, please drop us a mail at [camunda8-connector-su-aaaamkuzw6jcci2hm7rscvue7y@viadee.slack.com](mailto:camunda8-connector-su-aaaamkuzw6jcci2hm7rscvue7y@viadee.slack.com)
-
-# OLD ==========
-
-### Shading dependencies
-
-You can use the `maven-shade-plugin` defined in the [Maven configuration](./pom.xml) to relocate common dependencies
-that are used in other Connectors and the [Connector Runtime](https://github.com/camunda-community-hub/spring-zeebe/tree/master/connector-runtime#building-connector-runtime-bundles).
-This helps to avoid classpath conflicts when the Connector is executed. 
-
-Use the `relocations` configuration in the Maven Shade plugin to define the dependencies that should be shaded.
-The [Maven Shade documentation](https://maven.apache.org/plugins/maven-shade-plugin/examples/class-relocation.html) 
-provides more details on relocations.
