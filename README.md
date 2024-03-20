@@ -75,50 +75,9 @@ API Version 1 and 2: If omitted, shared pipelines will also be returned.
 
 ### Output
 
-API Version 1:
-```json
-{
-  "pipelines":[
-    {
-      "id":"2d974767-3d50-40b8-9bfc-7767d4a13a5c",
-      "created_at":"2024-03-15T10:43:45Z",
-      "name":"[Tutorial] DSL - Control structures",
-      "description":"...",
-      "default_version":{
-        "id":"dadc4c6d-b864-49e6-808e-946424e532ba",
-        "name":"[Tutorial] DSL - Control structures",
-        "created_at":"2024-03-15T10:43:45Z",
-        "resource_references":[
-          {
-            "key":{
-              "type":"PIPELINE",
-              "id":"2d974767-3d50-40b8-9bfc-7767d4a13a5c"
-            },
-            "relationship":"OWNER"
-          }
-        ],
-        "description":"..."
-      }
-    }
-  ],
-  "total_size":1
-}
-```
+API Version 1: [https://www.kubeflow.org/docs/components/pipelines/v1/reference/api/kubeflow-pipeline-api-spec/#/definitions/apiListPipelinesResponse](https://www.kubeflow.org/docs/components/pipelines/v1/reference/api/kubeflow-pipeline-api-spec/#/definitions/apiListPipelinesResponse)
 
-API Version 2:
-```json
-{
-  "pipelines": [
-    {
-      "pipeline_id":"369eea92-e69c-4af4-802a-9f403a362bc5",
-      "display_name":"[Tutorial] DSL - Control structures",
-      "description":"...",
-      "created_at":"2024-03-14T22:09:25Z"
-    }
-  ],
-  "total_size":1
-}
-```
+API Version 2: [https://www.kubeflow.org/docs/components/pipelines/v2/reference/api/kubeflow-pipeline-api-spec/#operation--apis-v2beta1-pipelines-get](https://www.kubeflow.org/docs/components/pipelines/v2/reference/api/kubeflow-pipeline-api-spec/#operation--apis-v2beta1-pipelines-get)
 
 ## Get Experiments
 
@@ -158,45 +117,9 @@ API Version 1 and 2: namespace where the experiments should be retrieved from.
 
 ### Output
 
-API Version 1:
-```json
-{
-  "experiments":[
-    {
-      "id":"f4e404a0-6b83-44a8-9eae-9678706188a0",
-      "name":"Testexperiment",
-      "created_at":"2024-03-15T11:47:52Z",
-      "resource_references":[
-        {
-          "key":{
-            "type":"NAMESPACE",
-            "id":"kubeflow-user-example-com"
-          },
-          "relationship":"OWNER"
-        }
-      ],
-      "storage_state":"STORAGESTATE_AVAILABLE"
-    }
-  ],
-  "total_size":1
-}
-```
+API Version 1: [https://www.kubeflow.org/docs/components/pipelines/v1/reference/api/kubeflow-pipeline-api-spec/#/definitions/apiListExperimentsResponse](https://www.kubeflow.org/docs/components/pipelines/v1/reference/api/kubeflow-pipeline-api-spec/#/definitions/apiListExperimentsResponse)
 
-API Version 2:
-```json
-{
-  "experiments": [
-    {
-      "experiment_id": "f4e404a0-6b83-44a8-9eae-9678706188a0",
-      "display_name": "Testexperiment",
-      "created_at": "2024-03-15T11:47:52Z",
-      "namespace": "kubeflow-user-example-com",
-      "storage_state": "AVAILABLE"
-    }
-  ],
-  "total_size": 1
-}
-```
+API Version 2: [https://www.kubeflow.org/docs/components/pipelines/v2/reference/api/kubeflow-pipeline-api-spec/#/definitions/v2beta1ListExperimentsResponse](https://www.kubeflow.org/docs/components/pipelines/v2/reference/api/kubeflow-pipeline-api-spec/#/definitions/v2beta1ListExperimentsResponse)
 
 ## Get Experiment By ID
 
