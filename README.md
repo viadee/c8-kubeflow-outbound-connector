@@ -289,6 +289,9 @@ The name of the experiment to create.
 #### Parameter Experiment Description (optional)
 The description of the experiment.
 
+#### Parameter Namespace
+The namespace where to create the experiment in.
+
 ### Output
 
 API Version 1: [https://www.kubeflow.org/docs/components/pipelines/v1/reference/api/kubeflow-pipeline-api-spec/#/definitions/apiExperiment](https://www.kubeflow.org/docs/components/pipelines/v1/reference/api/kubeflow-pipeline-api-spec/#/definitions/apiExperiment)
@@ -304,7 +307,7 @@ The element templates can be found in the [kubeflow-connector.json](./element-te
 
 # Local development environment setup
 
-Start a local kubernets cluster e.g. with mimikube or kind.
+Start a local kubernets cluster e.g. with minikube or kind.
 
 Run the following command from the root folder in order to deploy the dev environment into the kubernetes cluster.
 ```bash
