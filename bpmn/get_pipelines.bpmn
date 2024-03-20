@@ -10,6 +10,7 @@
         <zeebe:taskDefinition type="de.viadee.bpm.camunda:connector-kubeflow:1" />
         <zeebe:ioMapping>
           <zeebe:input source="http://localhost:30000" target="configuration.kubeflowUrl" />
+          <zeebe:input source="multiUserMode" target="configuration.typeOfUserMode" />
           <zeebe:input source="environment" target="authentication.type" />
           <zeebe:input source="pipelinesV1" target="kubeflowapi.api" />
           <zeebe:input source="get_pipelines" target="kubeflowapi.operation" />

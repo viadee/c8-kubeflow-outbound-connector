@@ -10,10 +10,11 @@
         <zeebe:taskDefinition type="de.viadee.bpm.camunda:connector-kubeflow:1" />
         <zeebe:ioMapping>
           <zeebe:input source="http://localhost:30000" target="configuration.kubeflowUrl" />
-          <zeebe:input source="kubeflow-user-example-com" target="configuration.multiusernamespace" />
+          <zeebe:input source="multiUserMode" target="configuration.typeOfUserMode" />
           <zeebe:input source="environment" target="authentication.type" />
           <zeebe:input source="pipelinesV1" target="kubeflowapi.api" />
           <zeebe:input source="get_runs" target="kubeflowapi.operation" />
+          <zeebe:input source="kubeflow-user-example-com" target="kubeflowapi.namespace" />
           <zeebe:input source="20" target="timeout.connectionTimeoutInSeconds" />
         </zeebe:ioMapping>
         <zeebe:taskHeaders>
