@@ -27,12 +27,12 @@ class KubeflowConnectorExecutorTest {
   }
 
   @ParameterizedTest
-  @CsvSource(value = {"null, null", "'', ''", "' ', ' '"}, nullValues = {"null"})
-  void readConfigurationParameterFromSystemEnvWhenBlank(String kubeflowUrl, String multiusernamespace) {
+  @CsvSource(value = {"null", "''", "' '"}, nullValues = {"null"})
+  void readConfigurationParameterFromSystemEnvWhenBlank(String kubeflowUrl) {
     // given
     var kubeflowConnectorRequest = new KubeflowConnectorRequest(
         new NoAuthentication(),
-        new Configuration(kubeflowUrl, multiusernamespace),
+        new Configuration(kubeflowUrl, "multiUserMode"),
         kubeflowApiMock,
         new Timeout(20)
     );
@@ -41,6 +41,5 @@ class KubeflowConnectorExecutorTest {
         KubeflowApisEnum.PIPELINES_V1, KubeflowApiOperationsEnum.GET_PIPELINES);
     // then
     assertEquals("http://localhost:8080", kubeflowConnectorExecutor.kubeflowUrl); // env. configured in pom.xml via surefire plugin
-    assertEquals("testNamespace", kubeflowConnectorExecutor.kubeflowMultiNs); // env. configured in pom.xml via surefire plugin
   }
 }

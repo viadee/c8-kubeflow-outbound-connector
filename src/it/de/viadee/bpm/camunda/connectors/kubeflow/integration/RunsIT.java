@@ -22,7 +22,7 @@ public class RunsIT extends BaseIntegrationTest {
 
   private void createRun(String pipelineVersion, String runName, String pipelineId, String experimentId)
       throws Exception {
-    var test  = getExecutor(pipelineVersion, "start_run", null, pipelineId, experimentId, runName).execute();
+    getExecutor(pipelineVersion, "start_run", null, pipelineId, experimentId, runName).execute();
   }
 
   private List<String> getNamesOfRuns(String pipelineVersion) throws Exception {

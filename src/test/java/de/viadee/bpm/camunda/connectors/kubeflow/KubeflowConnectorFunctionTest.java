@@ -40,9 +40,9 @@ class KubeflowConnectorFunctionTest {
     // given
     var kubeflowConnectorRequest = new KubeflowConnectorRequest(
         new NoAuthentication(),
-        new Configuration("http://localhost:8281", "testNamespace"),
+        new Configuration("http://localhost:8281", "multiUserMode"),
         new KubeflowApi(api, operation, null, null,
-            null, null, null, null, null, null, null, null),
+            null, null, null, null, null, null, null, null, null),
         new Timeout(20)
     );
     var context = OutboundConnectorContextBuilder.create()
@@ -61,9 +61,9 @@ class KubeflowConnectorFunctionTest {
     // given
     var kubeflowConnectorRequest = new KubeflowConnectorRequest(
         new NoAuthentication(),
-        new Configuration("http://localhost:8281", "testNamespace"),
+        new Configuration("http://localhost:8281", "multiUserMode"),
         new KubeflowApi(api, operation, null, null,
-            null, null, null, null, null, null, null, null),
+            null, null, null, null, null, null, null, null, null),
         new Timeout(20)
     );
     var context = OutboundConnectorContextBuilder.create()
@@ -83,9 +83,9 @@ class KubeflowConnectorFunctionTest {
     // given
     var kubeflowConnectorRequest = new KubeflowConnectorRequest(
         new NoAuthentication(),
-        new Configuration(url, "testNamespace"),
+        new Configuration(url, "multiUserMode"),
         new KubeflowApi("pipelinesV1", "get_pipelines", null, null,
-            null, null, null, null, null, null, null, null),
+            null, null, null, null, null, null, null, null, null),
         new Timeout(20)
     );
     var context = OutboundConnectorContextBuilder.create()

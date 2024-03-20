@@ -1,5 +1,12 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.services;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import de.viadee.bpm.camunda.connectors.kubeflow.utils.OffsetDateTimeDeserializer;
+import io.swagger.client.model.V1ApiExperiment;
+import io.swagger.client.model.V2beta1Experiment;
 import java.io.IOException;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublisher;
@@ -31,6 +38,7 @@ import io.swagger.client.model.V2beta1PipelineVersionReference;
 import io.swagger.client.model.V2beta1Run;
 import io.swagger.client.model.V2beta1RuntimeConfig;
 import io.swagger.client.model.V2beta1RuntimeState;
+import org.threeten.bp.OffsetDateTime;
 
 public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor {
 
@@ -47,7 +55,13 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 			V2beta1RuntimeState.CANCELED.getValue());
 
 	private RunUtil runUtil;
-	private String runName;
+	private String runNameWithKeyAndSuffix;
+
+	private static ObjectMapper experimentObjectMapper = new ObjectMapper()
+			.registerModule(new SimpleModule().addDeserializer(OffsetDateTime.class,
+					new OffsetDateTimeDeserializer()))
+			.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
+			.enable(DeserializationFeature.READ_ENUMS_USING_TO_STRING);
 
 	public KubeflowConnectorExecutorStartRun(KubeflowConnectorRequest connectorRequest, long processInstanceKey,
 			KubeflowApisEnum kubeflowApisEnum,
@@ -58,8 +72,8 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 
 	@Override
 	protected BodyPublisher buildPayloadForKubeflowEndpoint() {
-		//define runName
-		runName = processInstanceKey+"_"+connectorRequest.getKubeflowapi().runName();
+		// derive complete name of run using process instance key and suffix from prop. panel
+		runNameWithKeyAndSuffix = processInstanceKey+"_"+connectorRequest.getKubeflowapi().runName();
 		
 		try {
 			if (KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum)) {
@@ -82,7 +96,7 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 		} else if (kubeflowApiOperationsEnum.equals(KubeflowApiOperationsEnum.START_RUN_AND_MONITOR)) {
 			String idOfAlreadyStartedRun;
 			try {
-				idOfAlreadyStartedRun = getIdOfAlreadyStartedRunByName(this.runName);
+				idOfAlreadyStartedRun = getIdOfAlreadyStartedRunByName();
 			} catch (InstantiationException | IllegalAccessException | IOException e) {
 				throw new RuntimeException(e);
 			}
@@ -135,7 +149,7 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 						.id(connectorRequest.getKubeflowapi().experimentId()));
 
 		var v1ApiRun = new V1ApiRun()
-				.name(this.runName)
+				.name(this.runNameWithKeyAndSuffix)
 				.pipelineSpec(v1ApiPipelineSpec)
 				.addResourceReferencesItem(v1ApiResourceReference);
 
@@ -150,7 +164,7 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 				.parameters(connectorRequest.getKubeflowapi().runParameters());
 
 		var v2ApiRun = new V2beta1Run()
-				.displayName(this.runName)
+				.displayName(this.runNameWithKeyAndSuffix)
 				.runtimeConfig(v2beta1RuntimeConfig)
 				.pipelineVersionReference(v2beta1PipelineVersionReference)
 				.experimentId(connectorRequest.getKubeflowapi().experimentId());
@@ -158,12 +172,27 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 		return v2ApiRun;
 	}
 
-	private String getIdOfAlreadyStartedRunByName(String runName)
+	private String getIdOfAlreadyStartedRunByName()
 			throws InstantiationException, IllegalAccessException, IOException {
+
+		/*
+		in case of multi-user mode, the namespace is a required param. when trying to find
+		a run by its name. However, when starting the operation "Start Run and Monitor"
+		the properties panel does not ask for the namespace to be specified. This is,
+		because Kubeflow can derive the namespace with the help of the experiment id
+		(an experiment is always uniquely assigned to a namespace). In order to
+		start the operation "Get Run By Name", we, thus, need to first find
+		the experiment via the ID from the properties panel and extract
+		the namespace from the resulting object if it exists.
+		 */
+		var namespaceInWhichRunPotentiallyStarted = super.isMultiUserMode? getNamespaceByExperimentId(
+				connectorRequest.getKubeflowapi().experimentId()) : null;
+
+		// use previously determined namespace to search for run by its name
 		KubeflowApi kubeflowApi = new KubeflowApi(kubeflowApisEnum.getValue(),
 				KubeflowApiOperationsEnum.GET_RUN_BY_NAME.getValue(), null,
-				null, null, null, null, runName, null, null, null, connectorRequest.getKubeflowapi()
-				.httpHeaders());
+				runNameWithKeyAndSuffix, null, null, null, null, null, null, null, connectorRequest.getKubeflowapi()
+				.httpHeaders(), namespaceInWhichRunPotentiallyStarted);
 
 		KubeflowConnectorRequest getRunByNameConnectorRequest = new KubeflowConnectorRequest(
 				connectorRequest.getAuthentication(),
@@ -171,15 +200,53 @@ public class KubeflowConnectorExecutorStartRun extends KubeflowConnectorExecutor
 				connectorRequest.getTimeout());
 
 		KubeflowConnectorExecutorGetRunByName getRunByNameExecutor = (KubeflowConnectorExecutorGetRunByName) ExecutionHandler
-				.getExecutor(
-						getRunByNameConnectorRequest,
-						processInstanceKey);
+				.getExecutor(getRunByNameConnectorRequest, processInstanceKey);
+
 		String id = KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum)
 				? getRunByNameExecutor.getRunByNameV1Typed().map(V1ApiRun::getId).orElse(null)
 				: getRunByNameExecutor.getRunByNameV2Typed().map(V2beta1Run::getRunId)
 						.orElse(null);
 
 		return id;
+	}
+
+	private String getNamespaceByExperimentId(String experimentId) {
+
+		// get experiment
+		KubeflowApi getExperimentKubeflowApi = new KubeflowApi(kubeflowApisEnum.getValue(),
+				KubeflowApiOperationsEnum.GET_EXPERIMENT_BY_ID.getValue(), null,
+				null, null, null, experimentId, null, null, null, null, connectorRequest.getKubeflowapi()
+				.httpHeaders(), null);
+
+		KubeflowConnectorRequest getExperimentConnectorRequest = new KubeflowConnectorRequest(
+				connectorRequest.getAuthentication(),
+				connectorRequest.getConfiguration(), getExperimentKubeflowApi,
+				connectorRequest.getTimeout());
+
+		var experimentHttpResponse = ExecutionHandler.getExecutor(getExperimentConnectorRequest, processInstanceKey).execute();
+
+		// get namespace
+		String namespace;
+		try {
+			if (KubeflowApisEnum.PIPELINES_V1.getValue().equals(kubeflowApisEnum.getValue())) {
+				var v1Experiment = experimentObjectMapper.readValue(experimentHttpResponse.body(), V1ApiExperiment.class);
+				namespace = v1Experiment.getResourceReferences() == null ? null :
+						v1Experiment.getResourceReferences()
+								.stream()
+								.filter(refs -> refs.getKey().getType().getValue().equals("NAMESPACE"))
+								.findFirst()
+								.map(V1ApiResourceReference::getKey)
+								.map(V1ApiResourceKey::getId)
+								.orElse(null);
+			} else {
+				var v2Experiment = experimentObjectMapper.readValue(experimentHttpResponse.body(), V2beta1Experiment.class);
+				namespace = v2Experiment.getNamespace();
+			}
+		} catch (Exception e) {
+			throw new RuntimeException("Could not derive namespace from experiment ID: " + e);
+		}
+
+		return namespace;
 	}
 
 	private HttpResponse<String> retrieveRunStatusWithDelay(KubeflowCallable kubeflowCallable, long delay,

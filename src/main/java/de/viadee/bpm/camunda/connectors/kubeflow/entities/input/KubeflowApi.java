@@ -29,5 +29,8 @@ public record KubeflowApi(
 
     String experimentDescription,
 
-    Map<String, String> httpHeaders
+    Map<String, String> httpHeaders,
+
+    String namespace
+
 ) { }

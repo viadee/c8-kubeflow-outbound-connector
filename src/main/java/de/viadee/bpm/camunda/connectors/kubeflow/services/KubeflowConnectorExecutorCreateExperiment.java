@@ -43,24 +43,27 @@ public class KubeflowConnectorExecutorCreateExperiment extends KubeflowConnector
     }
 
     private V1ApiExperiment getPayloadForEndpointV1() {
-        var v1ApiResourceReference = new V1ApiResourceReference()
-            .key(new V1ApiResourceKey()
-                .type(V1ApiResourceType.NAMESPACE)
-                .id(super.kubeflowMultiNs));
-
+        var v1ApiResourceReference = super.isMultiUserMode ? createV1ApiResourceReference() : null;
         var v1ApiExperiment = new V1ApiExperiment()
             .name(getName())
             .description(getDescription())
             .addResourceReferencesItem(v1ApiResourceReference);
-
         return v1ApiExperiment;
     }
 
+    private V1ApiResourceReference createV1ApiResourceReference() {
+        return new V1ApiResourceReference().key(
+            new V1ApiResourceKey()
+                .type(V1ApiResourceType.NAMESPACE)
+                .id(connectorRequest.getKubeflowapi().namespace()));
+    }
+
     private Map<String, Object> getPayloadForEndpointV2() {
+        var namespace = super.isMultiUserMode ? connectorRequest.getKubeflowapi().namespace() : null;
         var v2Beta1Experiment = new V2beta1Experiment()
             .displayName(getName())
             .description(getDescription())
-            .namespace(super.kubeflowMultiNs);
+            .namespace(namespace);
         return JsonHelper.objectMapper.convertValue(v2Beta1Experiment,
             new TypeReference<>() {});
     }

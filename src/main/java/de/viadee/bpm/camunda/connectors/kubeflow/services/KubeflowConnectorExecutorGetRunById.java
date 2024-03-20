@@ -52,16 +52,4 @@ public class KubeflowConnectorExecutorGetRunById extends KubeflowConnectorExecut
             connectorRequest.getKubeflowapi().runId());
         uriBuilder.setPath(kubeflowUrlPath);
     }
-
-    public V1ApiRun getRunByIdV1Typed(HttpClient httpClient)
-        throws IOException, InstantiationException, IllegalAccessException {
-        var httpResponse = this.execute();
-        return runUtil.readV1RunAsTypedResponse(httpResponse);
-    }
-
-    public V2beta1Run getRunByIdV2Typed(HttpClient httpClient)
-        throws IOException, InstantiationException, IllegalAccessException {
-        var httpResponse = this.execute();
-        return runUtil.readV2RunAsTypedResponse(httpResponse);
-    }
 }

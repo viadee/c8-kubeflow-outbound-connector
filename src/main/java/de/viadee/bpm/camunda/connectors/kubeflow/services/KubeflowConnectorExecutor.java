@@ -1,5 +1,6 @@
 package de.viadee.bpm.camunda.connectors.kubeflow.services;
 
+import de.viadee.bpm.camunda.connectors.kubeflow.enums.TypeOfUserModeEnum;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -38,7 +39,6 @@ import de.viadee.bpm.camunda.connectors.kubeflow.utils.JsonHelper;
 public class KubeflowConnectorExecutor {
 
     private static final String KUBEFLOW_URL_ENV = "KF_CONNECTOR_URL";
-    private static final String KUBEFLOW_NAMESPACE_ENV = "KF_CONNECTOR_MULTIUSER_NS";
     private static final String URI_PARAMETER_FILTER = "filter";
     private static final Pair<String, String> URI_PARAMETER_PAIR_V1_TYPE_NS = Pair.of("resource_reference_key.type",
             "NAMESPACE");
@@ -51,7 +51,7 @@ public class KubeflowConnectorExecutor {
     protected KubeflowApiOperationsEnum kubeflowApiOperationsEnum;
     protected HttpRequest httpRequest;
     protected HttpClient httpClient;
-    protected String kubeflowMultiNs;
+    protected boolean isMultiUserMode;
     protected String kubeflowUrl;
 
     public KubeflowConnectorExecutor(KubeflowConnectorRequest connectorRequest, long processInstanceKey,
@@ -101,18 +101,17 @@ public class KubeflowConnectorExecutor {
 
     private void setConfigurationParameters() {
         var configPropertyGroup = connectorRequest.getConfiguration();
+        var typeOfUserMode = TypeOfUserModeEnum.fromValue(configPropertyGroup.typeOfUserMode());
 
         kubeflowUrl = System.getenv(KUBEFLOW_URL_ENV);
-        kubeflowMultiNs = System.getenv(KUBEFLOW_NAMESPACE_ENV);
 
         if (configPropertyGroup != null) {
             kubeflowUrl = StringUtils.isBlank(configPropertyGroup.kubeflowUrl()) ? kubeflowUrl : configPropertyGroup.kubeflowUrl();
-            kubeflowMultiNs = StringUtils.isBlank(configPropertyGroup.multiusernamespace()) ? kubeflowMultiNs
-                    : configPropertyGroup.multiusernamespace();
+            isMultiUserMode = TypeOfUserModeEnum.MULTI_USER_MODE.equals(typeOfUserMode);
         }
 
-        if (kubeflowUrl == null || kubeflowMultiNs == null) {
-            throw new RuntimeException("Configuration parameters not found: url, cookie, and/or namespace null.");
+        if (kubeflowUrl == null) {
+            throw new RuntimeException("Configuration parameters not found: kubeflow url is null.");
         }
     }
 
@@ -190,18 +189,20 @@ public class KubeflowConnectorExecutor {
     }
 
     protected void addNamespaceFilter(URIBuilder uriBuilder) {
-        if (kubeflowApiOperationsEnum.requiresMultiuserFilter()) {
-            if (KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum)) {
-                uriBuilder.addParameter(URI_PARAMETER_PAIR_V1_TYPE_NS.getKey(),
+        if (isMultiUserMode) {
+            if (kubeflowApiOperationsEnum.isNamespaceFilterRequired()) {
+                var namespace = connectorRequest.getKubeflowapi().namespace();
+                if (KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum)) {
+                    uriBuilder.addParameter(URI_PARAMETER_PAIR_V1_TYPE_NS.getKey(),
                         URI_PARAMETER_PAIR_V1_TYPE_NS.getValue());
-                uriBuilder.addParameter(URI_PARAMETER_V1_ID, kubeflowMultiNs);
-            } else {
-                uriBuilder.addParameter(URI_PARAMETER_V2_NS, kubeflowMultiNs);
+                    uriBuilder.addParameter(URI_PARAMETER_V1_ID, namespace);
+                } else {
+                    uriBuilder.addParameter(URI_PARAMETER_V2_NS, namespace);
+                }
             }
         }
     }
 
-    // Sample: 'password=123&custom=secret&username=abc&ts=1570704369823'
     public static HttpRequest.BodyPublisher ofFormData(Map<String, Object> data) {
         var builder = new StringBuilder();
         for (Map.Entry<String, Object> entry : data.entrySet()) {
