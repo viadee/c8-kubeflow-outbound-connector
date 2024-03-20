@@ -26,14 +26,20 @@ Use the `relocations` configuration in the Maven Shade plugin to define the depe
 The [Maven Shade documentation](https://maven.apache.org/plugins/maven-shade-plugin/examples/class-relocation.html) 
 provides more details on relocations.
 
-## Configure a local environment for the Connector
-The example bpmn models provided in the bpmn folder of the repository are set up in a way that they rely on environment variables being defined for the kubeflow and authentication configuration. We provided an [example.env](example.env) file that is tailored to the local development environment. You can copy this file to *.env* so that it is considered when you start the connector runtime locally.
+## Test locally
 
-##  Start the connector locally
-In order to start the connector locally run
+Run unit tests
+
 ```bash
-mvn spring-boot:run
+mvn clean verify
 ```
+
+## Test with local runtime
+In your IDE you can also simply navigate to the `LocalContainerRuntime` class in test scope and run it via your IDE.
+If necessary, you can adjust `application.properties` in test scope.
+
+### Configure a local environment for the Connector
+The example bpmn models provided in the bpmn folder of the repository are set up in a way that they rely on environment variables being defined for the kubeflow and authentication configuration. We provided an [example.env](example.env) file that is tailored to the local development environment. You can copy this file to *.env* so that it is considered when you start the connector runtime locally.
 
 
 # <a id="api-section"></a> API
@@ -274,21 +280,6 @@ API Version 2: [https://www.kubeflow.org/docs/components/pipelines/v2/reference/
 ## Error handling
 
 In case a return code >= 400 is returned by the API calls, the connector will raise an exception.
-
-## Test locally
-
-Run unit tests
-
-```bash
-mvn clean verify
-```
-
-### Test with local runtime
-
-Use the [Camunda Connector Runtime](https://github.com/camunda-community-hub/spring-zeebe/tree/master/connector-runtime#building-connector-runtime-bundles) to run your function as a local Java application.
-
-In your IDE you can also simply navigate to the `LocalContainerRuntime` class in test scope and run it via your IDE.
-If necessary, you can adjust `application.properties` in test scope.
 
 ## Element Template
 The element templates can be found in the [kubeflow-connector.json](./element-templates/kubeflow-connector.json) file.
