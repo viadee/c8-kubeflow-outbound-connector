@@ -12,7 +12,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <!-- connector SDK version -->
-        <version.connectors>8.4.5</version.connectors>
+        <version.connectors>8.3.8</version.connectors>
         <!-- external libraries -->
         <version.assertj>3.24.2</version.assertj>
         <version.junit-jupiter>5.10.0</version.junit-jupiter>
