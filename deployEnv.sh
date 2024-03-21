@@ -19,6 +19,7 @@ done
 kubectl wait --for=condition=available --timeout=300s deployment --all --all-namespaces
 
 printf "\n\nDeployment finished!\n\n"
+sed -i '' 's/'"$KUBEFLOW_HOST"':3000/${KUBEFLOW_HOST}:3000/g' ./src/test/resources/kubeflow-environment/oauth2_proxy.yml
 
 printf "Checking if NodePort is reachable on localhost...\n\n"
 if nc -v -z -w2 localhost 30000 &> /dev/null; then
@@ -34,5 +35,3 @@ else
   printf "\n\n\x1b[6;30;42mKeep this terminal open! Press \x1b[6;37;42mCtrl+C \x1b[6;30;42mto stop the port-forward.\x1b[0m\n\n"
   kubectl port-forward -n istio-system svc/istio-ingressgateway 30000:80
 fi
-
-sed -i '' 's/'"$KUBEFLOW_HOST"':3000/${KUBEFLOW_HOST}:3000/g' ./src/test/resources/kubeflow-environment/oauth2_proxy.yml
