@@ -82,7 +82,10 @@ public class BaseIntegrationTest {
   protected KubeflowConnectorExecutor getExecutor(String pipelineVersion, String operation, String experimentName,
       String pipelineId, String experimentId, String runName)
       throws Exception {
-    var namespace = getEnvOrDefault(KUBEFLOW_NAMESPACE_ENV_KEY, DEFAULT_KUBEFLOW_NAMESPACE);
+    var namespace = "";
+    if (!operation.equals("get_pipelines")) {
+      namespace = getEnvOrDefault(KUBEFLOW_NAMESPACE_ENV_KEY, DEFAULT_KUBEFLOW_NAMESPACE);
+    }
     KubeflowApi kubeflowApi = new KubeflowApi(pipelineVersion, operation, null, runName,
         null, pipelineId, experimentId, null, null, experimentName, null, null, namespace);
     KubeflowConnectorRequest kubeflowConnectorRequest = new KubeflowConnectorRequest(
