@@ -191,24 +191,20 @@ public class KubeflowConnectorExecutor {
     protected void addNamespaceFilter(URIBuilder uriBuilder) {
         if (isMultiUserMode) {
             var namespace = connectorRequest.getKubeflowapi().namespace();
-            if (kubeflowApiOperationsEnum.isNamespaceFilterRequired()) {
-                if (KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum)) {
-                    uriBuilder.addParameter(URI_PARAMETER_PAIR_V1_TYPE_NS.getKey(),
-                        URI_PARAMETER_PAIR_V1_TYPE_NS.getValue());
-                    uriBuilder.addParameter(URI_PARAMETER_V1_ID, namespace);
-                } else {
-                    uriBuilder.addParameter(URI_PARAMETER_V2_NS, namespace);
-                }
-            } else if (KubeflowApiOperationsEnum.GET_PIPELINES.equals(kubeflowApiOperationsEnum) 
-                        && namespace != null) {
-                if (KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum)) {
-                    uriBuilder.addParameter(URI_PARAMETER_PAIR_V1_TYPE_NS.getKey(),
-                        URI_PARAMETER_PAIR_V1_TYPE_NS.getValue());
-                    uriBuilder.addParameter(URI_PARAMETER_V1_ID, namespace);
-                } else {
-                    uriBuilder.addParameter(URI_PARAMETER_V2_NS, namespace);
-                }
+            if (kubeflowApiOperationsEnum.isNamespaceFilterRequired() ||
+                (KubeflowApiOperationsEnum.GET_PIPELINES.equals(kubeflowApiOperationsEnum) && namespace != null)) {
+                setNamespaceParameter(uriBuilder, namespace);
             }
+        }
+    }
+
+    private void setNamespaceParameter(URIBuilder uriBuilder, String namespace) {
+        if (KubeflowApisEnum.PIPELINES_V1.equals(kubeflowApisEnum)) {
+            uriBuilder.addParameter(URI_PARAMETER_PAIR_V1_TYPE_NS.getKey(),
+                URI_PARAMETER_PAIR_V1_TYPE_NS.getValue());
+            uriBuilder.addParameter(URI_PARAMETER_V1_ID, namespace);
+        } else {
+            uriBuilder.addParameter(URI_PARAMETER_V2_NS, namespace);
         }
     }
 
