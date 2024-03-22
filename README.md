@@ -58,6 +58,8 @@ Currenty this connector supports the following methods from the Kubeflow Pipelin
 The inputs describes the parameters that can be set in the modeler for the operation.
 The output is the complete output you will get written into the variable you enter under Output mapping in the result variable. In the result expression you can more specifically extract the data as required to limit the output.
 
+In every operation additional HTTP headers can be set under Kubeflow API -> HTTP Headers if necessary.
+
 ## Get Pipelines
 
 ### Input
