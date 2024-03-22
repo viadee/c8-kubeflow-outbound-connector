@@ -14,7 +14,7 @@
           <zeebe:input source="environment" target="authentication.type" />
           <zeebe:input source="pipelinesV1" target="kubeflowapi.api" />
           <zeebe:input source="get_pipelines" target="kubeflowapi.operation" />
-          <zeebe:input source="{ &#34;predicates&#34;:&#10;  [&#10;    {&#10;      &#34;op&#34;:&#34;IS_SUBSTRING&#34;,&#10;      &#34;key&#34;: &#34;name&#34;,&#10;      &#34;string_value&#34;: &#34;Control&#34;&#10;    }&#10;  ]&#10;}" target="kubeflowapi.filter" />
+          <zeebe:input source="kubeflow-user-example-com" target="kubeflowapi.namespace" />
           <zeebe:input source="20" target="timeout.connectionTimeoutInSeconds" />
         </zeebe:ioMapping>
         <zeebe:taskHeaders>
