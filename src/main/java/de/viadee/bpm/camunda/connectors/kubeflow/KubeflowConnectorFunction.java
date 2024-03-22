@@ -32,7 +32,7 @@ public class KubeflowConnectorFunction implements OutboundConnectorFunction {
     HttpResponse<String> response = connectorExecutor.execute();
 
     // raise error based on status code
-    if (response.statusCode() >= 300) {
+    if (response.statusCode() >= 400) {
       throw new RuntimeException(response.body());
     }
 

@@ -451,6 +451,31 @@
       }
     },
     {
+      "id": "kubeflowapi.namespace",
+      "label": "Namespace",
+      "description": "Specify the name of the namespace.",
+      "type": "String",
+      "group": "kubeflowapi",
+      "feel": "optional",
+      "optional": true,
+      "binding": {
+        "type": "zeebe:input",
+        "name": "kubeflowapi.namespace"
+      },
+      "condition": {
+        "allMatch": [
+          {
+            "property": "configuration.typeOfUserMode",
+            "equals": "multiUserMode"
+          },
+          {
+            "property": "kubeflowapi.operation",
+            "oneOf": ["get_pipelines"]
+          }
+        ]
+      }
+    },
+    {
       "id": "kubeflowapi.pipelineId",
       "label": "Pipeline ID",
       "description": "Specify the id of the pipeline to run.",

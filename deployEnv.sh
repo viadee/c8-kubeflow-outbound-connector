@@ -19,6 +19,7 @@ done
 kubectl wait --for=condition=available --timeout=300s deployment --all --all-namespaces
 
 printf "\n\nDeployment finished!\n\n"
+sed -i '' 's/'"$KUBEFLOW_HOST"':3000/${KUBEFLOW_HOST}:3000/g' ./src/test/resources/kubeflow-environment/oauth2_proxy.yml
 
 printf "Checking if NodePort is reachable on localhost...\n\n"
 if nc -v -z -w2 localhost 30000 &> /dev/null; then

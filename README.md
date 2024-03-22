@@ -1,9 +1,10 @@
 # Kubeflow Connector
 
-A custom Camunda 8 outbound connector to communicate with the [Kubeflow](https://www.kubeflow.org/) API. It supports version 1 aqnd version 2 of the Kubeflow API and supports the functions mentioned below in the [API section](#api-section).
+A custom Camunda 8 outbound connector to communicate with the [Kubeflow](https://www.kubeflow.org/) API. It supports the multi-user setup with profiles and namespaces as well as version 1 and 2 of the Kubeflow Pipeline API. It currently supports the functions mentioned below in the [API section](#api-section).
 
-## Build
+# Build and Run
 
+## Build a deployable jar file
 You can package the Connector by running the following command:
 
 ```bash
@@ -15,45 +16,15 @@ This will create the following artifacts:
 - A thin JAR without dependencies.
 - An fat JAR containing all dependencies, potentially shaded to avoid classpath conflicts. This will not include the SDK artifacts since those are in scope `provided` and will be brought along by the respective Connector Runtime executing the Connector.
 
-## <a id="api-section"></a> API
-Currenty this connector supports the following methods from the Kubeflow Pipeline API.
+### Shading dependencies
 
-- Get Pipelines
-- Get Experiments
-- Get Runs
-- Get Run by ID
-- Get Run by Name
-- Start Run
-- Start Run and Monitor
-- Create Experiment
+You can use the `maven-shade-plugin` defined in the [Maven configuration](./pom.xml) to relocate common dependencies
+that are used in other Connectors and the [Connector Runtime](https://github.com/camunda-community-hub/spring-zeebe/tree/master/connector-runtime#building-connector-runtime-bundles).
+This helps to avoid classpath conflicts when the Connector is executed. 
 
-### Get Pipelines
-
-### Input
-
-
-
-| Name     | Description      | Example           | Notes                                                                      |
-|----------|------------------|-------------------|----------------------------------------------------------------------------|
-| filter | define the filter to apply to the call    | `alice`           | Has no effect on the function call outcome.                                |
-| token    | Mock token value | `my-secret-token` | Has no effect on the function call outcome.                                |
-| message  | Mock message     | `Hello World`     | Echoed back in the output. If starts with 'fail', an error will be thrown. |
-
-### Output
-
-```json
-{
-  "result": {
-    "myProperty": "Message received: ..."
-  }
-}
-```
-
-### Error codes
-
-| Code | Description                                |
-|------|--------------------------------------------|
-| FAIL | Message starts with 'fail' (ignoring case) |
+Use the `relocations` configuration in the Maven Shade plugin to define the dependencies that should be shaded.
+The [Maven Shade documentation](https://maven.apache.org/plugins/maven-shade-plugin/examples/class-relocation.html) 
+provides more details on relocations.
 
 ## Test locally
 
@@ -63,19 +34,282 @@ Run unit tests
 mvn clean verify
 ```
 
-### Test with local runtime
-
-Use the [Camunda Connector Runtime](https://github.com/camunda-community-hub/spring-zeebe/tree/master/connector-runtime#building-connector-runtime-bundles) to run your function as a local Java application.
-
+## Test with local runtime
 In your IDE you can also simply navigate to the `LocalContainerRuntime` class in test scope and run it via your IDE.
 If necessary, you can adjust `application.properties` in test scope.
+
+### Configure a local environment for the Connector
+The example bpmn models provided in the bpmn folder of the repository are set up in a way that they rely on environment variables being defined for the kubeflow and authentication configuration. We provided an [example.env](example.env) file that is tailored to the local development environment. You can copy this file to *.env* so that it is considered when you start the connector runtime locally.
+
+
+# <a id="api-section"></a> API
+Currenty this connector supports the following methods from the Kubeflow Pipeline API in both API versions 1 and 2.
+
+- Get Pipelines
+- Get Experiments
+- Get Experiment by ID
+- Get Runs
+- Get Run by ID
+- Get Run by Name
+- Start Run
+- Start Run and Monitor
+- Create Experiment
+
+The inputs describes the parameters that can be set in the modeler for the operation.
+The output is the complete output you will get written into the variable you enter under Output mapping in the result variable. In the result expression you can more specifically extract the data as required to limit the output.
+
+In every operation additional HTTP headers can be set under Kubeflow API -> HTTP Headers if necessary.
+
+## Get Pipelines
+
+### Input
+
+#### Parameter Filter (optional)
+
+API Version 1:
+
+```json
+{ "predicates":
+  [
+    {
+      "op":"IS_SUBSTRING",
+      "key": "name",
+      "string_value": "Control"
+    }
+  ]
+}
+```
+
+API Version 2:
+```json
+{ "predicates":
+  [
+    {
+      "operation":"IS_SUBSTRING",
+      "key": "name",
+      "string_value": "Control"
+    }
+  ]
+}
+```
+For details on filter structure and options check the proto-buffer files:
+
+Version 1: [https://github.com/kubeflow/pipelines/blob/master/backend/api/v1beta1/filter.proto](https://github.com/kubeflow/pipelines/blob/master/backend/api/v1beta1/filter.proto)
+
+Version 2: [https://github.com/kubeflow/pipelines/blob/master/backend/api/v2beta1/filter.proto](https://github.com/kubeflow/pipelines/blob/master/backend/api/v2beta1/filter.proto)
+
+#### Parameter Namespace (optional)
+
+API Version 1 and 2: If omitted, shared pipelines will also be returned.
+
+### Output
+
+API Version 1: [https://www.kubeflow.org/docs/components/pipelines/v1/reference/api/kubeflow-pipeline-api-spec/#/definitions/apiListPipelinesResponse](https://www.kubeflow.org/docs/components/pipelines/v1/reference/api/kubeflow-pipeline-api-spec/#/definitions/apiListPipelinesResponse)
+
+API Version 2: [https://www.kubeflow.org/docs/components/pipelines/v2/reference/api/kubeflow-pipeline-api-spec/#operation--apis-v2beta1-pipelines-get](https://www.kubeflow.org/docs/components/pipelines/v2/reference/api/kubeflow-pipeline-api-spec/#operation--apis-v2beta1-pipelines-get)
+
+## Get Experiments
+
+### Input
+
+#### Parameter Filter
+
+API Version 1:
+```json
+{ "predicates":
+  [
+    {
+      "op":"IS_SUBSTRING",
+      "key": "name",
+      "string_value": "test"
+    }
+  ]
+}
+```
+
+API Version 2:
+```json
+{ "predicates":
+  [
+    {
+      "operation":"IS_SUBSTRING",
+      "key": "name",
+      "string_value": "test"
+    }
+  ]
+}
+```
+
+#### Parameter Namespace (required in multiuser deployment)
+
+API Version 1 and 2: namespace where the experiments should be retrieved from.
+
+### Output
+
+API Version 1: [https://www.kubeflow.org/docs/components/pipelines/v1/reference/api/kubeflow-pipeline-api-spec/#/definitions/apiListExperimentsResponse](https://www.kubeflow.org/docs/components/pipelines/v1/reference/api/kubeflow-pipeline-api-spec/#/definitions/apiListExperimentsResponse)
+
+API Version 2: [https://www.kubeflow.org/docs/components/pipelines/v2/reference/api/kubeflow-pipeline-api-spec/#/definitions/v2beta1ListExperimentsResponse](https://www.kubeflow.org/docs/components/pipelines/v2/reference/api/kubeflow-pipeline-api-spec/#/definitions/v2beta1ListExperimentsResponse)
+
+## Get Experiment By ID
+
+### Input
+
+#### Parameter Experiment ID
+The ID of the experiment that should be retrieved. 
+
+### Output
+
+API Version 1: [https://www.kubeflow.org/docs/components/pipelines/v1/reference/api/kubeflow-pipeline-api-spec/#/definitions/apiExperiment](https://www.kubeflow.org/docs/components/pipelines/v1/reference/api/kubeflow-pipeline-api-spec/#/definitions/apiExperiment)
+
+API Version 2: [https://www.kubeflow.org/docs/components/pipelines/v2/reference/api/kubeflow-pipeline-api-spec/#/definitions/v2beta1Experiment](https://www.kubeflow.org/docs/components/pipelines/v2/reference/api/kubeflow-pipeline-api-spec/#/definitions/v2beta1Experiment)
+
+## <a id="get-runs"></a> Get Runs
+
+### Input
+
+#### Parameter Filter
+
+API Version 1:
+```json
+{ "predicates":
+  [
+    {
+      "op":"IS_SUBSTRING",
+      "key": "name",
+      "string_value": "test"
+    }
+  ]
+}
+```
+
+API Version 2:
+```json
+{ "predicates":
+  [
+    {
+      "operation":"IS_SUBSTRING",
+      "key": "name",
+      "string_value": "test"
+    }
+  ]
+}
+```
+
+#### Parameter Namespace (required in multiuser deployment)
+
+API Version 1 and 2: namespace where the runs should be retrieved from.
+
+### Output
+
+API Version 1: [https://www.kubeflow.org/docs/components/pipelines/v1/reference/api/kubeflow-pipeline-api-spec/#/definitions/apiListRunsResponse](https://www.kubeflow.org/docs/components/pipelines/v1/reference/api/kubeflow-pipeline-api-spec/#/definitions/apiListRunsResponse)
+
+API Version 2: [https://www.kubeflow.org/docs/components/pipelines/v2/reference/api/kubeflow-pipeline-api-spec/#/definitions/v2beta1ListRunsResponse](https://www.kubeflow.org/docs/components/pipelines/v2/reference/api/kubeflow-pipeline-api-spec/#/definitions/v2beta1ListRunsResponse)
+
+
+## Get Run By ID
+
+### Input
+
+#### Parameter Run ID
+The ID of the run that should be retrieved. 
+
+### Output
+
+API Version 1: [https://www.kubeflow.org/docs/components/pipelines/v1/reference/api/kubeflow-pipeline-api-spec/#/definitions/apiRunDetail](https://www.kubeflow.org/docs/components/pipelines/v1/reference/api/kubeflow-pipeline-api-spec/#/definitions/apiRunDetail)
+
+API Version 2: [https://www.kubeflow.org/docs/components/pipelines/v2/reference/api/kubeflow-pipeline-api-spec/#/definitions/v2beta1Run](https://www.kubeflow.org/docs/components/pipelines/v2/reference/api/kubeflow-pipeline-api-spec/#/definitions/v2beta1Run)
+
+## Get Run By Name
+This request tries to retrieve a single run by looking for a run that contains the name defined in the name parameter.
+
+### Input
+
+#### Parameter Name
+The name to look for in the runs. This looks for the name to be equal.
+
+#### Parameter Namespace
+The namespace where to look for runs.
+
+### Output
+equal to responses of [Get Runs](#get-runs)
+
+
+## <a id="start-run"></a> Start Run
+This operation starts a run and continues the process without waiting for the pipeline to finish.
+
+### Input
+
+#### Parameter Pipeline ID
+The ID of the pipeline that should be run.
+
+#### Parameter Experiment ID
+The ID of the experiment in which the run should be started.
+
+#### Parameter Suffix of run name
+The name of the triggered run will be created as such: <Camunda_process_instance_id>_<suffix_of_run_name>.
+
+#### Parameter Run parameters (optional)
+If the pipeline requires parameters to run they can be set here.
+
+### Output
+
+API Version 1: [https://www.kubeflow.org/docs/components/pipelines/v1/reference/api/kubeflow-pipeline-api-spec/#/definitions/apiRunDetail](https://www.kubeflow.org/docs/components/pipelines/v1/reference/api/kubeflow-pipeline-api-spec/#/definitions/apiRunDetail)
+
+API Version 2: [https://www.kubeflow.org/docs/components/pipelines/v2/reference/api/kubeflow-pipeline-api-spec/#/definitions/v2beta1Run](https://www.kubeflow.org/docs/components/pipelines/v2/reference/api/kubeflow-pipeline-api-spec/#/definitions/v2beta1Run)
+
+## Start Run and Monitor
+This operation starts a run and monitors it until it finishes are throws an error. If the connector crashes during the run, the connector will pick up the already started run and monitor it after receiving the job again from Zeebe.
+
+### Input
+
+#### Parameter Pipeline ID
+The ID of the pipeline that should be run.
+
+#### Parameter Experiment ID
+The ID of the experiment in which the run should be started.
+
+#### Polling interval
+You can define the interval in which the connector should regularly check the state of the run using ISO 8601 format. E. g. PT10S means every 10 seconds.
+
+#### Parameter Suffix of run name
+The name of the triggered run will be created as such: <Camunda_process_instance_id>_<suffix_of_run_name>.
+
+#### Parameter Run parameters (optional)
+If the pipeline requires parameters to run they can be set here.
+
+### Output
+see [Start Run](#start-run)
+
+## Create Experiment
+This operation allows to create an experiment, which can e. g. be used in a subsequent run.
+
+### Input
+
+#### Parameter Experiment Name
+The name of the experiment to create.
+
+#### Parameter Experiment Description (optional)
+The description of the experiment.
+
+#### Parameter Namespace
+The namespace where to create the experiment in.
+
+### Output
+
+API Version 1: [https://www.kubeflow.org/docs/components/pipelines/v1/reference/api/kubeflow-pipeline-api-spec/#/definitions/apiExperiment](https://www.kubeflow.org/docs/components/pipelines/v1/reference/api/kubeflow-pipeline-api-spec/#/definitions/apiExperiment)
+
+API Version 2: [https://www.kubeflow.org/docs/components/pipelines/v2/reference/api/kubeflow-pipeline-api-spec/#/definitions/v2beta1Experiment](https://www.kubeflow.org/docs/components/pipelines/v2/reference/api/kubeflow-pipeline-api-spec/#/definitions/v2beta1Experiment)
+
+## Error handling
+
+In case a return code >= 400 is returned by the API calls, the connector will raise an exception.
 
 ## Element Template
 The element templates can be found in the [kubeflow-connector.json](./element-templates/kubeflow-connector.json) file.
 
 # Local development environment setup
 
-Start a local kubernets cluster e.g. with mimikube or kind.
+Start a local kubernets cluster e.g. with minikube or kind.
 
 Run the following command from the root folder in order to deploy the dev environment into the kubernetes cluster.
 ```bash
@@ -113,15 +347,3 @@ client-secret: Jq09L1liFa0UiaXnL3pcnXzlqOKXaoOW
 
 ## Contact Information
 For any queries and further support, please drop us a mail at [camunda8-connector-su-aaaamkuzw6jcci2hm7rscvue7y@viadee.slack.com](mailto:camunda8-connector-su-aaaamkuzw6jcci2hm7rscvue7y@viadee.slack.com)
-
-# OLD ==========
-
-### Shading dependencies
-
-You can use the `maven-shade-plugin` defined in the [Maven configuration](./pom.xml) to relocate common dependencies
-that are used in other Connectors and the [Connector Runtime](https://github.com/camunda-community-hub/spring-zeebe/tree/master/connector-runtime#building-connector-runtime-bundles).
-This helps to avoid classpath conflicts when the Connector is executed. 
-
-Use the `relocations` configuration in the Maven Shade plugin to define the dependencies that should be shaded.
-The [Maven Shade documentation](https://maven.apache.org/plugins/maven-shade-plugin/examples/class-relocation.html) 
-provides more details on relocations.
