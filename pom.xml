@@ -6,28 +6,36 @@
     <groupId>de.viadee.bpm</groupId>
     <artifactId>camunda-kubeflow-connector</artifactId>
     <packaging>jar</packaging>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <properties>
-        <maven.compiler.release>17</maven.compiler.release>
+        <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <!-- connector SDK version -->
-        <version.connectors>8.3.8</version.connectors>
+        <version.connectors>8.5.7</version.connectors>
         <!-- external libraries -->
-        <version.assertj>3.24.2</version.assertj>
-        <version.junit-jupiter>5.10.0</version.junit-jupiter>
-        <version.mockito>5.10.0</version.mockito>
-        <version.slf4j>2.0.9</version.slf4j>
+        <version.assertj>3.26.3</version.assertj>
+        <version.junit-jupiter>5.11.1</version.junit-jupiter>
+        <version.mockito>5.14.1</version.mockito>
+        <version.slf4j>2.0.16</version.slf4j>
+        <version.gson>2.11.0</version.gson>
+        <version.joup>1.18.1</version.joup>
+        <version.javax-annotation>1.3.2</version.javax-annotation>
+        <version.swagger-annotations>2.2.24</version.swagger-annotations>
+        <version.threetenbp>1.7.0</version.threetenbp>
+        <version.httpclient>4.5.14</version.httpclient>
+        <version.jackson-datatype-jdk8>2.18.0</version.jackson-datatype-jdk8>
+        <version.commons-lang3>3.17.0</version.commons-lang3>
         <!-- maven plugins -->
         <plugin.version.maven-clean-plugin>3.3.1</plugin.version.maven-clean-plugin>
         <plugin.version.maven-compiler-plugin>3.11.0</plugin.version.maven-compiler-plugin>
-        <plugin.version.maven-dependency-plugin>3.6.0</plugin.version.maven-dependency-plugin>
+        <plugin.version.maven-dependency-plugin>3.8.0</plugin.version.maven-dependency-plugin>
         <plugin.version.maven-install-plugin>3.1.1</plugin.version.maven-install-plugin>
         <plugin.version.maven-jar-plugin>3.3.0</plugin.version.maven-jar-plugin>
         <plugin.version.maven-resources-plugin>3.3.1</plugin.version.maven-resources-plugin>
-        <plugin.version.maven-shade-plugin>3.5.1</plugin.version.maven-shade-plugin>
-        <plugin.version.maven-surefire-plugin>3.1.2</plugin.version.maven-surefire-plugin>
-        <plugin.version.maven-failsafe-plugin>3.2.5</plugin.version.maven-failsafe-plugin>
+        <plugin.version.maven-shade-plugin>3.6.0</plugin.version.maven-shade-plugin>
+        <plugin.version.maven-surefire-plugin>3.5.0</plugin.version.maven-surefire-plugin>
+        <plugin.version.maven-failsafe-plugin>3.5.0</plugin.version.maven-failsafe-plugin>
         <skipTests>false</skipTests>
         <skipUnitTests>${skipTests}</skipUnitTests>
         <skipIntegrationTests>${skipTests}</skipIntegrationTests>
@@ -99,43 +107,43 @@
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.10.1</version>
+            <version>${version.gson}</version>
         </dependency>
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
-            <version>1.17.1</version>
+            <version>${version.joup}</version>
         </dependency>
         <!-- for generating models from swagger specifications -->
         <dependency>
             <groupId>javax.annotation</groupId>
             <artifactId>javax.annotation-api</artifactId>
-            <version>1.3.2</version>
+            <version>${version.javax-annotation}</version>
         </dependency>
         <!-- for generating models from swagger specifications -->
         <dependency>
             <groupId>io.swagger.core.v3</groupId>
             <artifactId>swagger-annotations</artifactId>
-            <version>2.2.19</version>
+            <version>${version.swagger-annotations}</version>
         </dependency>
         <!-- for generating models from swagger specifications -->
         <dependency>
             <groupId>org.threeten</groupId>
             <artifactId>threetenbp</artifactId>
-            <version>1.6.8</version>
+            <version>${version.threetenbp}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.5.13</version>
+            <version>${version.httpclient}</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jdk8 -->
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jdk8</artifactId>
-            <version>2.16.1</version>
+            <version>${version.jackson-datatype-jdk8}</version>
         </dependency>
 
         <dependency>
@@ -147,7 +155,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.9</version>
+            <version>${version.commons-lang3}</version>
         </dependency>
     </dependencies>
     <build>
